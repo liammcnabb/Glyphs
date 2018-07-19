@@ -7,7 +7,7 @@ Canvas::Canvas( QWidget* parent ) : QOpenGLWidget( parent )
 }
 
 /**
- * @brief canvas::initializeGL called when the OpenGL Widget is started.
+ * @brief Canvas::initializeGL called when the OpenGL Widget is started.
  */
 void Canvas::initializeGL()
 {
@@ -29,11 +29,41 @@ void Canvas::initializeGL()
 
 void Canvas::paintGL()
 {
-
+    prepareDraw();
 }
 
 void Canvas::resizeGL( int w, int h )
 {
     //qDebug() <<w<<h; //Remove warnings
     update();
+}
+
+/**
+ * @brief Canvas::prepareDraw called before window is redrawn.
+ */
+void Canvas::prepareDraw()
+{
+    glPointSize( 1 );
+    setOrtho( );
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+    return;
+}
+
+void Canvas::setOrtho()
+{
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+
+    glClearColor( 1,
+                  1,
+                  1, 1.0 );
+
+    glOrtho( 100, 100,
+             100, 100,
+             -1.0, 1.0 );
+
+
+    glClear( GL_COLOR_BUFFER_BIT );
+    return;
 }

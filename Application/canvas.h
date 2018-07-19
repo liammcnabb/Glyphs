@@ -13,6 +13,8 @@ public:
     void initializeGL();
     void paintGL();
     void resizeGL( int w, int h );
+    void prepareDraw();
+    void setOrtho();
 };
 
 #endif // CANVAS_H
