@@ -28,15 +28,22 @@ public:
     AABB getWrapper() const;
     void setWrapper(const AABB &value);
 
+    float getLength() const;
+    void setLength(float value);
+
 private:
     QVector<Polygon> m_loadedPolygons;
     AABB wrapper;
+    float length;
 
     void prepareDraw();
     void setOrtho();
 
     void redraw();
     void drawPolygons(QVector<Polygon> polyList);
+    void drawCentroids(QVector<Polygon> list);
+    bool debugCircle(double centerX, double centerY, QColor color, double size);
+    float scaleModifier();
 };
 
 #endif // CANVAS_H

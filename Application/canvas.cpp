@@ -38,6 +38,7 @@ void Canvas::redraw()
     prepareDraw();
     glLineWidth( 1 );
     drawPolygons( loadedPolygons() );
+    drawCentroids( loadedPolygons() );
     qDebug() << "drawn.";
 }
 
@@ -61,6 +62,54 @@ void Canvas::drawPolygons(QVector<Polygon> list)
     }
 }
 
+void Canvas::drawCentroids(QVector<Polygon> list)
+{
+    for ( int i = 0; i < list.size(); ++i )
+    {
+        debugCircle( list.at(i).centroid()->x(), list.at(i).centroid()->y(),
+                     Qt::red, 0.4);
+    }
+}
+
+bool Canvas:: debugCircle( double centerX, double centerY,
+                           QColor color, double size )
+{
+    /* Outline */
+    glColor4f( 0, 0, 0, 0.25 );
+    glBegin( GL_TRIANGLE_FAN );
+    glVertex2f( centerX, centerY );
+    //double size = 1;
+    double rad = getLength() /*+ scaleModifier()*/ / 100;
+
+    for ( float angle = 1.0f; angle < 361.0f; angle += 0.2 )
+    {
+        float x = centerX + sin( angle ) *
+                  ( size * ( rad ) );
+
+        float y = centerY + cos( angle ) *
+                  ( size * ( rad ) );
+
+        glVertex3f( x, y, 0.5 );
+    }
+    glEnd();
+    /* Fill */
+    glColor4f( color.redF(), color.greenF(), color.blueF(), 0.25 );
+    glBegin( GL_TRIANGLE_FAN );
+    glVertex2f( centerX, centerY );
+
+    for ( float angle = 1.0f; angle < 361.0f; angle += 0.2 )
+    {
+        float x = centerX + sin( angle ) *
+                  ( size * ( ( rad * 0.8 ) ) );
+
+        float y = centerY + cos( angle ) *
+                  ( size * ( ( rad * 0.8 ) ) );
+        glVertex3f( x, y, 0.5 );
+    }
+
+    glEnd();
+    return true;
+}
 
 void Canvas::resizeGL( int w, int h )
 {
@@ -94,6 +143,16 @@ void Canvas::setWrapper(const AABB &value)
     wrapper = value;
 }
 
+float Canvas::getLength() const
+{
+    return length;
+}
+
+void Canvas::setLength(float value)
+{
+    length = value;
+}
+
 /**
  * @brief Canvas::prepareDraw called before window is redrawn.
  */
@@ -115,15 +174,21 @@ void Canvas::setOrtho()
                   1,
                   1, 1.0 );
 
-    float length = std::max( wrapper.length( AABB::XDIM ),
-                             wrapper.length( AABB::YDIM ) );
-    glOrtho( wrapper.minimums.at(AABB::XDIM),
-             wrapper.minimums.at(AABB::XDIM)+length,
-             wrapper.minimums.at(AABB::YDIM),
-             wrapper.minimums.at(AABB::YDIM)+length,
+    setLength( std::max( wrapper.length( AABB::XDIM ),
+                             wrapper.length( AABB::YDIM ) ) );
+
+    glOrtho( wrapper.minimums.at(AABB::XDIM) - scaleModifier(),
+             wrapper.minimums.at(AABB::XDIM)+ getLength() + scaleModifier(),
+             wrapper.minimums.at(AABB::YDIM) - scaleModifier(),
+             wrapper.minimums.at(AABB::YDIM)+ getLength() + scaleModifier(),
              -1.0, 1.0 );
 
 
     glClear( GL_COLOR_BUFFER_BIT );
     return;
+}
+
+float Canvas::scaleModifier()
+{
+    return getLength() * 0.05;
 }
