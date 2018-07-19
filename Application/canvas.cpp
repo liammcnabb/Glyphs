@@ -29,13 +29,69 @@ void Canvas::initializeGL()
 
 void Canvas::paintGL()
 {
-    prepareDraw();
+    if(loadedPolygons().size() > 0)
+        redraw();
 }
+
+void Canvas::redraw()
+{
+    prepareDraw();
+    glLineWidth( 1 );
+    drawPolygons( loadedPolygons() );
+    qDebug() << "drawn.";
+}
+
+void Canvas::drawPolygons(QVector<Polygon> list)
+{
+    for ( int i = 0; i < list.size(); ++i )
+    {
+        Polygon polygon = list.at( i );
+        glLineWidth( 1 );
+        glBegin( GL_LINE_STRIP );
+
+
+        glColor4f( 0, 0, 0, 0.5 );
+
+        for( QVector<QPointF>::const_iterator it =
+                    polygon.getPoints().begin();
+                it < polygon.getPoints().end(); ++it )
+            glVertex2f( it->x(), it->y() );
+
+        glEnd();
+    }
+}
+
 
 void Canvas::resizeGL( int w, int h )
 {
     //qDebug() <<w<<h; //Remove warnings
     update();
+}
+
+QVector<Polygon> Canvas::loadedPolygons() const
+{
+    return m_loadedPolygons;
+}
+
+void Canvas::setLoadedPolygons(const QVector<Polygon> &loadedPolygons)
+{
+    m_loadedPolygons = loadedPolygons;
+}
+
+void Canvas::setDefaultOrtho(OGREnvelope wrapper)
+{
+    setWrapper( AABB( wrapper.MinX,wrapper.MaxX,
+                                  wrapper.MinY,wrapper.MaxY ) );
+}
+
+AABB Canvas::getWrapper() const
+{
+    return wrapper;
+}
+
+void Canvas::setWrapper(const AABB &value)
+{
+    wrapper = value;
 }
 
 /**
@@ -59,8 +115,12 @@ void Canvas::setOrtho()
                   1,
                   1, 1.0 );
 
-    glOrtho( 100, 100,
-             100, 100,
+    float length = std::max( wrapper.length( AABB::XDIM ),
+                             wrapper.length( AABB::YDIM ) );
+    glOrtho( wrapper.minimums.at(AABB::XDIM),
+             wrapper.minimums.at(AABB::XDIM)+length,
+             wrapper.minimums.at(AABB::YDIM),
+             wrapper.minimums.at(AABB::YDIM)+length,
              -1.0, 1.0 );
 
 

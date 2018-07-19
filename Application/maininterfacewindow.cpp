@@ -16,10 +16,13 @@ MainInterfaceWindow::~MainInterfaceWindow()
 void MainInterfaceWindow::on_actionEngland_Example_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName( this,
-                                                     tr( "Open Shape File" ),
-                                                     "path/to/file",
-                                                     tr( "ESRI Shape Files (*.shp)" ) );
+                                    tr( "Open Shape File" ),
+                                    "path/to/file",
+                                    tr( "ESRI Shape Files (*.shp)" ) );
     ShpReader shpreader( fileName );
-    Map map(shpreader.getMapData());
+    Map map( shpreader.getMapData() );
+    ui->OpenGLWidget->setDefaultOrtho(map.getWrapper());
+    ui->OpenGLWidget->setLoadedPolygons( map.getLoadedPolygons() );
+    ui->OpenGLWidget->update();
     return;
 }
