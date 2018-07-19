@@ -1,0 +1,1 @@
+-A1 -S -Y -M40 -p -D -k1 -W1 -xj -xC65 -xL -n Application/*.cpp Application/*.h
