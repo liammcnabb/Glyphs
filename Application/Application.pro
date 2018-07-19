@@ -14,11 +14,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         maininterfacewindow.cpp \
-    canvas.cpp
+    canvas.cpp \
+    ../Additional/Libraries/LM/shpreader.cpp \
+    ../Additional/Libraries/LM/reader.cpp
 
 HEADERS  += maininterfacewindow.h \
-    canvas.h
+    canvas.h \
+    ../Additional/Libraries/LM/shpreader.h \
+    ../Additional/Libraries/LM/reader.h
 
 FORMS    += maininterfacewindow.ui
 
 LIBS += -lgdal -lGL -lGLU -lglut
+
+INCLUDEPATH += ../Additional/Libraries/

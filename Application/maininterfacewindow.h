@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QOpenGLWidget>
+#include "LM/shpreader.h"
 
 namespace Ui {
 class MainInterfaceWindow;

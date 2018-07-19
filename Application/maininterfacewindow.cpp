@@ -15,5 +15,7 @@ MainInterfaceWindow::~MainInterfaceWindow()
 
 void MainInterfaceWindow::on_actionEngland_Example_triggered()
 {
-
+    QString fileName = "/home/liam/Projects/Glyphs/Additional/Materials/CCG/CCG.shp";
+    ShpReader shpreader( fileName );
+    return;
 }
