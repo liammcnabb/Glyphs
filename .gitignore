@@ -10,6 +10,9 @@
 *.dll
 *.dylib
 
+#Build file
+Application\Application*
+
 # Qt-es
 
 /.qmake.cache
@@ -35,3 +38,4 @@ Makefile*
 
 #Doxygen
 Doxygen*
+Application/Application
