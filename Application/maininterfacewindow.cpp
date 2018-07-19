@@ -15,7 +15,11 @@ MainInterfaceWindow::~MainInterfaceWindow()
 
 void MainInterfaceWindow::on_actionEngland_Example_triggered()
 {
-    QString fileName = "/home/liam/Projects/Glyphs/Additional/Materials/CCG/CCG.shp";
+    QString fileName = QFileDialog::getOpenFileName( this,
+                                                     tr( "Open Shape File" ),
+                                                     "path/to/file",
+                                                     tr( "ESRI Shape Files (*.shp)" ) );
     ShpReader shpreader( fileName );
+    Map map(shpreader.getMapData());
     return;
 }

@@ -16,12 +16,24 @@ SOURCES += main.cpp\
         maininterfacewindow.cpp \
     canvas.cpp \
     ../Additional/Libraries/LM/shpreader.cpp \
-    ../Additional/Libraries/LM/reader.cpp
+    ../Additional/Libraries/LM/reader.cpp \
+    map.cpp \
+    ../Additional/Libraries/SCZ/segment.cpp \
+    ../Additional/Libraries/SCZ/mapextractor.cpp \
+    ../Additional/Libraries/SCZ/polygon.cpp \
+    ../Additional/Libraries/LM/aabb.cpp \
+    ../Additional/Libraries/LM/boundingbox.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
     ../Additional/Libraries/LM/shpreader.h \
-    ../Additional/Libraries/LM/reader.h
+    ../Additional/Libraries/LM/reader.h \
+    map.h \
+    ../Additional/Libraries/SCZ/segment.h \
+    ../Additional/Libraries/SCZ/mapextractor.h \
+    ../Additional/Libraries/SCZ/polygon.h \
+    ../Additional/Libraries/LM/aabb.h \
+    ../Additional/Libraries/LM/boundingbox.h
 
 FORMS    += maininterfacewindow.ui
 

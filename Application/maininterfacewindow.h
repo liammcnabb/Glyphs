@@ -3,7 +3,10 @@
 
 #include <QMainWindow>
 #include <QOpenGLWidget>
+#include <QFileDialog>
+
 #include "LM/shpreader.h"
+#include "map.h"
 
 namespace Ui {
 class MainInterfaceWindow;
