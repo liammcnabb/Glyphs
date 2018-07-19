@@ -13,8 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        maininterfacewindow.cpp
+        maininterfacewindow.cpp \
+    canvas.cpp
 
-HEADERS  += maininterfacewindow.h
+HEADERS  += maininterfacewindow.h \
+    canvas.h
 
 FORMS    += maininterfacewindow.ui
+
+LIBS += -lgdal -lGL -lGLU -lglut

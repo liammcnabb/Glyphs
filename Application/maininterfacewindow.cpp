@@ -12,3 +12,8 @@ MainInterfaceWindow::~MainInterfaceWindow()
 {
     delete ui;
 }
+
+void MainInterfaceWindow::on_actionEngland_Example_triggered()
+{
+
+}

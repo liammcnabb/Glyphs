@@ -2,6 +2,7 @@
 #define MAININTERFACEWINDOW_H
 
 #include <QMainWindow>
+#include <QOpenGLWidget>
 
 namespace Ui {
 class MainInterfaceWindow;
@@ -14,6 +15,9 @@ class MainInterfaceWindow : public QMainWindow
 public:
     explicit MainInterfaceWindow(QWidget *parent = 0);
     ~MainInterfaceWindow();
+
+private slots:
+    void on_actionEngland_Example_triggered();
 
 private:
     Ui::MainInterfaceWindow *ui;
