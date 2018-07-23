@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     ../Additional/Libraries/SCZ/mapextractor.cpp \
     ../Additional/Libraries/SCZ/polygon.cpp \
     ../Additional/Libraries/LM/aabb.cpp \
-    ../Additional/Libraries/LM/boundingbox.cpp
+    ../Additional/Libraries/LM/boundingbox.cpp \
+    ../Additional/Libraries/LM/csvreader.cpp \
+    personalerrors.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -33,7 +35,9 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/SCZ/mapextractor.h \
     ../Additional/Libraries/SCZ/polygon.h \
     ../Additional/Libraries/LM/aabb.h \
-    ../Additional/Libraries/LM/boundingbox.h
+    ../Additional/Libraries/LM/boundingbox.h \
+    ../Additional/Libraries/LM/csvreader.h \
+    ../Additional/Libraries/Spectrum/colourmanager.h
 
 FORMS    += maininterfacewindow.ui
 
