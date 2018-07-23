@@ -51,7 +51,7 @@ private:
      * @param polygonList current polygonList to append new polygons to
      * @param fields data fields related to feature
      */
-    void extractPolygonPoints( OGRFeature* feature,
+    void extractPolygonPoints(OGRFeature* feature,
                                QVector<Polygon>* polygonList,
                                QVector<QString>* fields );
     /**

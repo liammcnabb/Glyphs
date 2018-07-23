@@ -39,19 +39,19 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             OGRPolygon* polygon = ( OGRPolygon* ) geometry;
             OGRLinearRing extRing = polygon->getExteriorRing();
             extRing.closeRings();
-            if ( extRing.getNumPoints() < 5 )
-                return;
+//            if ( extRing.getNumPoints() < 5 )
+//                return;
             points = accumulatePoints( &extRing );
 
-            for ( int j = 0; j < polygon->getNumInteriorRings(); ++j )
-            {
-                OGRLinearRing intRing = polygon->getInteriorRing( j );
-                intRing.closeRings();
+//            for ( int j = 0; j < polygon->getNumInteriorRings(); ++j )
+//            {
+//                OGRLinearRing intRing = polygon->getInteriorRing( j );
+//                intRing.closeRings();
 
-                /** Hardcoded fix, comment and uncomment as necessary. **/
-                if ( intRing.getNumPoints() > 10 )
-                    accumulatePoints( &intRing, &points );
-            }
+//                /** Hardcoded fix, comment and uncomment as necessary. **/
+//                if ( intRing.getNumPoints() > 10 )
+//                    accumulatePoints( &intRing, &points );
+//            }
 
             points.squeeze();
             currentPolygon = Polygon( points );
@@ -65,25 +65,25 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             OGRGeometryCollection* collection =
                 ( OGRGeometryCollection* ) geometry;
 
-            for ( int i = 0; i < collection->getNumGeometries(); i++ )
+            for ( int i = 0; i < /*collection->getNumGeometries()*/1; i++ )
             {
                 OGRPolygon* poly = ( OGRPolygon* ) collection->getGeometryRef(
                                        i );
                 OGRLinearRing extRing = poly->getExteriorRing();
                 extRing.closeRings();
-                if ( extRing.getNumPoints() < 5 )
-                    return;
+//                if ( extRing.getNumPoints() < 5 )
+//                    return;
                 points = accumulatePoints( &extRing );
 
-                for ( int j = 0; j < poly->getNumInteriorRings(); ++j )
-                {
-                    OGRLinearRing intRing = poly->getInteriorRing( j );
-                    intRing.closeRings();
+//                for ( int j = 0; j < poly->getNumInteriorRings(); ++j )
+//                {
+//                    OGRLinearRing intRing = poly->getInteriorRing( j );
+//                    intRing.closeRings();
 
-                    /** Hardcoded fix, comment and uncomment as necessary. **/
-                    if ( intRing.getNumPoints() > 10 )
-                        accumulatePoints( &intRing, &points );
-                }
+//                    /** Hardcoded fix, comment and uncomment as necessary. **/
+//                    if ( intRing.getNumPoints() > 10 )
+//                        accumulatePoints( &intRing, &points );
+//                }
 
                 points.squeeze();
                 currentPolygon = Polygon( points );
