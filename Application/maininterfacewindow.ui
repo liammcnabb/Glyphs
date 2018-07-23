@@ -42,6 +42,11 @@
        <attribute name="title">
         <string>Tab 1</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListWidget" name="lstHeaders"/>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
