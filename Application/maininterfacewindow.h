@@ -6,6 +6,7 @@
 #include <QFileDialog>
 
 #include "LM/shpreader.h"
+#include "LM/csvreader.h"
 #include "map.h"
 
 namespace Ui {

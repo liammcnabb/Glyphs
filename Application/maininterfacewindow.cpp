@@ -20,7 +20,17 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
                                     "path/to/file",
                                     tr( "ESRI Shape Files (*.shp)" ) );
     ShpReader shpreader( fileName );
-    Map map( shpreader.getMapData() );
+
+    QString dataName = QFileDialog::getOpenFileName( this,
+                                    tr( "Open Data File" ),
+                                    "path/to/file",
+                                    tr( "Comma Seperated Value (*.csv)" ) );
+
+    CsvReader csvReader( dataName.toStdString() );
+    csvReader.extract();
+    QVector<QStringList> data = csvReader.getData();
+
+    Map map( shpreader.getMapData(), data );
     ui->OpenGLWidget->setDefaultOrtho(map.getWrapper());
     ui->OpenGLWidget->setLoadedPolygons( map.getLoadedPolygons() );
     ui->OpenGLWidget->update();
