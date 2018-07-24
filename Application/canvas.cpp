@@ -40,10 +40,19 @@ void Canvas::redraw()
     ColourMap cMap = CMList::getMapList(CMClassification::DIVERGING)[COLORMAP_INDEX];
     ColourManager::setCurrentColourMap(cMap);
     ColourManager::InvertColourMap();
-    calculateValueBounds( loadedPolygons() );
-    ColourManager manager(getValueLower(), getValueUpper());
+
     drawPolygons( loadedPolygons() );
-    drawCentroids( loadedPolygons(), manager );
+
+    /**Default*/
+//    calculateValueBounds( loadedPolygons() );
+//    ColourManager manager(getValueLower(), getValueUpper());
+//    drawCentroids( loadedPolygons(), manager );
+    /**Pies*/
+    createPieGlyphs( loadedPolygons() );
+    calculateValueBounds( getPieGlyphs() );
+    ColourManager manager(getValueLower(), getValueUpper());
+    drawPieGlyphs( getPieGlyphs(), manager);
+
     drawLegend( manager );
 
     qDebug() << "drawn.";
@@ -61,8 +70,20 @@ void Canvas::calculateValueBounds( QVector<Polygon> list )
         setValueUpper( std::max( getValueUpper(),
                                  p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
     }
+}
 
-
+void Canvas::calculateValueBounds( QVector<PieChart> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+    foreach( PieChart p, list )
+        foreach( PieSegment ps, p.pieSlices() )
+        {
+            setValueLower( std::min( getValueLower(),
+                                     ps.value() ) );
+            setValueUpper( std::max( getValueUpper(),
+                                     ps.value() ) );
+        }
 }
 
 void Canvas::drawPolygons(QVector<Polygon> list)
@@ -96,6 +117,82 @@ void Canvas::drawCentroids(QVector<Polygon> list, ColourManager cm)
 
     }
 }
+
+void Canvas::createPieGlyphs( QVector<Polygon> list )
+{
+    QVector<PieChart> pies;
+    foreach( Polygon p, list)
+    {
+        QStringList values = p.getValues();
+        for( int i = 0; i < 4; ++i )
+            values.removeFirst();
+        PieChart pie( *p.centroid(), 2.5f );
+        pie.initialize(values);
+        pies.append(pie);
+    }
+
+    setPieGlyphs(pies);
+    return;
+}
+
+
+
+void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
+{
+    Colour color;
+    foreach(PieChart p, list)
+    {
+//        /* Outline */
+        glColor4f( 0, 0, 0, 1 );
+        glBegin( GL_TRIANGLE_FAN );
+        glVertex2f( p.centroid().x(), p.centroid().y() );
+//        double size = 1;
+       double rad = getLength() /*+ scaleModifier()*/ / 100;
+       float startRadian = 1 * M_PI/180;
+
+        for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
+        {
+            float x = p.centroid().x() + sin( angle ) *
+                      ( p.size() * ( rad ) );
+            float y = p.centroid().y() + cos( angle ) *
+                      ( p.size() * ( rad ) );
+
+            glVertex3f( x, y, 0.5 );
+        }
+        glEnd();
+
+        float currentAngle = 0;
+//        color = Colour(1,0,0,1,"");
+        foreach( PieSegment ps, p.pieSlices())
+        {
+            color = cm.getInterpolatedColour( ps.value() );
+//            color = cm.getColourFromSeed(int(currentAngle));
+            /* Fill */
+            glColor4f( color.getR(), color.getG(), color.getB(), 1 );
+            glBegin( GL_TRIANGLE_FAN );
+            glVertex2f( p.centroid().x(), p.centroid().y() );
+
+            for( float angle = currentAngle; angle <=
+                 currentAngle+ps.angle()+0.1; angle+=0.1 )
+            {
+                float x = p.centroid().x() + sin( angle ) *
+                          ( p.size() * ( ( rad * 0.9 ) ) );
+
+                float y = p.centroid().y() + cos( angle ) *
+                          ( p.size() * ( ( rad * 0.9 ) ) );
+                glVertex3f( x, y, 0.5 );
+            }
+            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glEnd();
+            currentAngle += ps.angle();
+//            color = cm.getColourFromSeed(int(currentAngle));
+        }
+
+    }
+
+    return;
+}
+
 
 void Canvas::drawLegend( ColourManager cm )
 {
@@ -163,10 +260,6 @@ void Canvas::drawLegend( ColourManager cm )
 bool Canvas:: debugCircle( double centerX, double centerY,
                            Colour color, double size )
 {
-    if ( color.getR() ==  0.0f && color.getG() == 0.0f &&
-         color.getB() == 0.0f )
-        qDebug() << "This case.";
-
     /* Outline */
     glColor4f( 0, 0, 0, 0.25 );
     glBegin( GL_TRIANGLE_FAN );
@@ -283,6 +376,16 @@ float Canvas::getValueLower() const
 void Canvas::setValueLower(float value)
 {
     valueLower = value;
+}
+
+QVector<PieChart> Canvas::getPieGlyphs() const
+{
+    return m_pieGlyphs;
+}
+
+void Canvas::setPieGlyphs(const QVector<PieChart> &pieGlyphs)
+{
+    m_pieGlyphs = pieGlyphs;
 }
 
 /**
