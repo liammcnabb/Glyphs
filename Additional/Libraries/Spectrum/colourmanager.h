@@ -523,6 +523,21 @@ public:
         qualitative2.addColour(255,237,111,1.0f, "Col12");
         ColourMapList().addColourMap(qualitative2);
 
+        ColourMap qualitative3;
+        qualitative3.setMapName("New Tableau 10");
+        qualitative3.setClassification(QUALITATIVE);
+        qualitative3.addColour(Colour("#4E77A4"));
+        qualitative3.addColour(Colour("#F28E34"));
+        qualitative3.addColour(Colour("#E15557"));
+        qualitative3.addColour(Colour("#75B6B1"));
+        qualitative3.addColour(Colour("#59A255"));
+        qualitative3.addColour(Colour("#EDC953"));
+        qualitative3.addColour(Colour("#AE779E"));
+        qualitative3.addColour(Colour("#FF9BA5"));
+        qualitative3.addColour(Colour("#9B7460"));
+        qualitative3.addColour(Colour("#B9AFAA"));
+        ColourMapList().addColourMap(qualitative3);
+
         //Add indexes to the colour maps
         ColourMapList().setupIndexesInList();
 
