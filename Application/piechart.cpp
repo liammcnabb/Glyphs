@@ -17,13 +17,34 @@ void PieChart::initialize(QStringList values)
         case EQUAL_SLICES :
         {
             createEqualSlices( values );
+            break;
         }
         case FULL_SLICES :
         {
-
+            createVariableSlices( values );
+            break;
         }
     }
 
+    return;
+}
+
+void PieChart::createVariableSlices( QStringList values )
+{
+    QVector<PieSegment> slices;
+
+    float sum = 0;
+    for ( int i = 0; i < values.size(); ++i )
+        sum += values.at(i).toFloat();
+
+    for( int i = 0; i < values.size(); ++i )
+    {
+        float percent = values.at(i).toFloat()/sum;
+        float sliceAngle = (maxAngle())* percent;
+        slices.append( PieSegment( sliceAngle, values.at(i).toFloat() ) );
+    }
+
+    setPieSlices(slices);
     return;
 }
 
@@ -67,6 +88,16 @@ QVector<PieSegment> PieChart::pieSlices() const
 void PieChart::setPieSlices(const QVector<PieSegment> &pieSlices)
 {
     m_pieSlices = pieSlices;
+}
+
+int PieChart::getSliceType() const
+{
+    return sliceType;
+}
+
+void PieChart::setSliceType(int value)
+{
+    sliceType = value;
 }
 
 float PieSegment::angle() const

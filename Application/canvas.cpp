@@ -22,9 +22,42 @@ void Canvas::initializeGL()
 //                  1.0 );
     glClearColor(1,1,1,1);
 
+    changeColorMap( this->DIVERGING );
+    ColourManager::InvertColourMap();
+
+
 
     //    connect( &timer, SIGNAL( timeout() ), this, SLOT( update() ) );
     //    timer.start( 1000 );
+}
+
+void Canvas::changeColorMap(int mapType)
+{
+
+    switch(mapType)
+    {
+    case this->SEQUENTIAL :
+    {
+        break;
+    }
+    case this->DIVERGING :
+    {
+        if( !ColourManager::InvertColourMapFlag() )
+            ColourManager::InvertColourMap();
+        ColourMap cMap = CMList::getMapList(CMClassification::DIVERGING)[COLORMAP_INDEX];
+        ColourManager::setCurrentColourMap(cMap);
+
+        break;
+    }
+    case this->CATEGORICAL :
+    {
+        if( ColourManager::InvertColourMapFlag() )
+            ColourManager::InvertColourMap();
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[0];
+        ColourManager::setCurrentColourMap(cMap);
+        break;
+    }
+    }
 }
 
 void Canvas::paintGL()
@@ -37,23 +70,39 @@ void Canvas::redraw()
 {
     prepareDraw();
     glLineWidth( 1 );
-    ColourMap cMap = CMList::getMapList(CMClassification::DIVERGING)[COLORMAP_INDEX];
-    ColourManager::setCurrentColourMap(cMap);
-    ColourManager::InvertColourMap();
 
     drawPolygons( loadedPolygons() );
 
     /**Default*/
-//    calculateValueBounds( loadedPolygons() );
-//    ColourManager manager(getValueLower(), getValueUpper());
-//    drawCentroids( loadedPolygons(), manager );
-    /**Pies*/
-    createPieGlyphs( loadedPolygons() );
-    calculateValueBounds( getPieGlyphs() );
-    ColourManager manager(getValueLower(), getValueUpper());
-    drawPieGlyphs( getPieGlyphs(), manager);
-
-    drawLegend( manager );
+    switch( getGlyphType() )
+    {
+    case GLYPH_CENTROID :
+    {
+        calculateValueBounds( loadedPolygons() );
+        ColourManager manager(getValueLower(), getValueUpper());
+        drawCentroids( loadedPolygons(), manager );
+        drawLegend( manager );
+        break;
+    }
+    case GLYPH_EQUAL_PIE :
+    {
+        createPieGlyphs( loadedPolygons(), GLYPH_EQUAL_PIE );
+        calculateValueBounds( getPieGlyphs() );
+        ColourManager manager(getValueLower(), getValueUpper());
+        drawPieGlyphs( getPieGlyphs(), manager);
+        drawLegend( manager );
+        break;
+    }
+    case GLYPH_VARIABLE_PIE :
+    {
+        createPieGlyphs( loadedPolygons(), GLYPH_VARIABLE_PIE );
+        calculateValueBounds( getPieGlyphs() );
+        ColourManager manager(getValueLower(), getValueUpper());
+        drawPieGlyphs( getPieGlyphs(), manager);
+        drawLegend( manager );
+        break;
+    }
+    }
 
     qDebug() << "drawn.";
 }
@@ -118,7 +167,7 @@ void Canvas::drawCentroids(QVector<Polygon> list, ColourManager cm)
     }
 }
 
-void Canvas::createPieGlyphs( QVector<Polygon> list )
+void Canvas::createPieGlyphs( QVector<Polygon> list, int pieType )
 {
     QVector<PieChart> pies;
     foreach( Polygon p, list)
@@ -127,6 +176,11 @@ void Canvas::createPieGlyphs( QVector<Polygon> list )
         for( int i = 0; i < 4; ++i )
             values.removeFirst();
         PieChart pie( *p.centroid(), 2.5f );
+        if(pieType == GLYPH_EQUAL_PIE)
+            pie.setSliceType(PieChart::EQUAL_SLICES);
+        else
+            pie.setSliceType(PieChart::FULL_SLICES);
+
         pie.initialize(values);
         pies.append(pie);
     }
@@ -134,8 +188,6 @@ void Canvas::createPieGlyphs( QVector<Polygon> list )
     setPieGlyphs(pies);
     return;
 }
-
-
 
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
@@ -148,7 +200,6 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         glVertex2f( p.centroid().x(), p.centroid().y() );
 //        double size = 1;
        double rad = getLength() /*+ scaleModifier()*/ / 100;
-       float startRadian = 1 * M_PI/180;
 
         for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
         {
@@ -161,25 +212,29 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         }
         glEnd();
 
+
         float currentAngle = 0;
 //        color = Colour(1,0,0,1,"");
-        foreach( PieSegment ps, p.pieSlices())
+        for( int i = 0; i < p.pieSlices().size(); ++i )
         {
-            color = cm.getInterpolatedColour( ps.value() );
-//            color = cm.getColourFromSeed(int(currentAngle));
+            PieSegment ps = p.pieSlices().at(i);
+            if(getGlyphType() == GLYPH_EQUAL_PIE)
+                color = cm.getInterpolatedColour( ps.value() );
+            else if(getGlyphType() == GLYPH_VARIABLE_PIE)
+                color = cm.getColourFromIndex(i);
             /* Fill */
             glColor4f( color.getR(), color.getG(), color.getB(), 1 );
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( p.centroid().x(), p.centroid().y() );
 
             for( float angle = currentAngle; angle <=
-                 currentAngle+ps.angle()+0.1; angle+=0.1 )
+                 currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( p.size() * ( ( rad * 0.9 ) ) );
+                          ( p.size() * ( ( rad * 0.95 ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( p.size() * ( ( rad * 0.9 ) ) );
+                          ( p.size() * ( ( rad * 0.95 ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );
@@ -225,7 +280,6 @@ void Canvas::drawLegend( ColourManager cm )
 
     for ( int i = 0; i < slices; ++i )
     {
-
         Colour color = cm.getClassColour(
                               cm.getLowerRange() + ( colourSlice * i ) + sliceCenter );
 
@@ -386,6 +440,16 @@ QVector<PieChart> Canvas::getPieGlyphs() const
 void Canvas::setPieGlyphs(const QVector<PieChart> &pieGlyphs)
 {
     m_pieGlyphs = pieGlyphs;
+}
+
+int Canvas::getGlyphType() const
+{
+    return glyphType;
+}
+
+void Canvas::setGlyphType(int value)
+{
+    glyphType = value;
 }
 
 /**

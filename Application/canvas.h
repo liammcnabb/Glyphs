@@ -19,8 +19,16 @@
 class Canvas : public QOpenGLWidget
 {
 public:
-    int COLORMAP_INDEX = 2;
+    static const int COLORMAP_INDEX = 2;
     int VALUE_INDEX = 5;
+    static const int GLYPH_CENTROID = 0;
+    static const int GLYPH_EQUAL_PIE = 1;
+    static const int GLYPH_VARIABLE_PIE = 2;
+
+    static const int SEQUENTIAL = 0;
+    static const int DIVERGING = 1;
+    static const int CATEGORICAL = 2;
+
     Canvas(QWidget *parent);
     void initializeGL();
     void paintGL();
@@ -46,6 +54,10 @@ public:
     QVector<PieChart> getPieGlyphs() const;
     void setPieGlyphs(const QVector<PieChart> &pieGlyphs);
 
+    int getGlyphType() const;
+    void setGlyphType(int value);
+
+    void changeColorMap(int mapType);
 private:
     QVector<Polygon> m_loadedPolygons;
     QVector<PieChart> m_pieGlyphs;
@@ -53,6 +65,7 @@ private:
     float length;
     float valueUpper;
     float valueLower;
+    int glyphType = GLYPH_CENTROID;
 
     void prepareDraw();
     void setOrtho();
@@ -67,7 +80,7 @@ private:
     void drawLegend(ColourManager cm);
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str);
-    void createPieGlyphs(QVector<Polygon> list);
+    void createPieGlyphs(QVector<Polygon> list, int pieType);
     void drawPieGlyphs(QVector<PieChart> list, ColourManager cm);
 };
 

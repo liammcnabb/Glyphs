@@ -28,6 +28,9 @@ private:
 class PieChart : public Glyph
 {
 public:
+    static const int FULL_SLICES = 0;
+    static const int EQUAL_SLICES = 1;
+
     PieChart();
     PieChart(QPointF centroid, float size);
     void initialize(QStringList values);
@@ -40,17 +43,20 @@ public:
     QVector<PieSegment> pieSlices() const;
     void setPieSlices(const QVector<PieSegment> &pieSlices);
 
+    int getSliceType() const;
+    void setSliceType(int value);
+
 private:
-    static const int FULL_SLICES = 0;
-    static const int EQUAL_SLICES = 1;
+
 
     float m_size = 0.0f;
     float m_maxAngle = 2*M_PI;
-    int sliceType = EQUAL_SLICES;
+    int sliceType = FULL_SLICES;
 
     QVector<PieSegment> m_pieSlices;
 
     void createEqualSlices(QStringList values);
+    void createVariableSlices(QStringList values);
 };
 
 #endif // PIECHART_H

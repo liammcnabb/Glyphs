@@ -48,3 +48,24 @@ void MainInterfaceWindow::on_lstHeaders_itemDoubleClicked(QListWidgetItem *item)
             ui->lstHeaders->currentRow();
     ui->OpenGLWidget->update();
 }
+
+void MainInterfaceWindow::on_rdo_DebugCentroids_released()
+{
+    ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->DIVERGING);
+    ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_CENTROID);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdo_EqualSegmentPie_released()
+{
+    ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->DIVERGING);
+    ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_EQUAL_PIE);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdo_VariableSegmentPie_released()
+{
+    ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
+    ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_VARIABLE_PIE);
+    ui->OpenGLWidget->update();
+}

@@ -44,6 +44,85 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>300</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>Glyph Type:</string>
+          </property>
+          <widget class="QRadioButton" name="rdo_DebugCentroids">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>30</y>
+             <width>151</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Debug Centroids</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rdo_EqualSegmentPie">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>60</y>
+             <width>181</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Equal Segment Pie Chart</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rdo_VariableSegmentPie">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>90</y>
+             <width>191</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Variable Segment Pie Chart</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
          <widget class="QListWidget" name="lstHeaders"/>
         </item>
        </layout>

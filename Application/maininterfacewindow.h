@@ -27,6 +27,13 @@ private slots:
 
     void on_lstHeaders_itemDoubleClicked(QListWidgetItem *item);
 
+
+    void on_rdo_DebugCentroids_released();
+
+    void on_rdo_EqualSegmentPie_released();
+
+    void on_rdo_VariableSegmentPie_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
