@@ -35,7 +35,7 @@ private:
      * @param ring ring of points taken from OGRFeature
      * @return return points as vector, after being forced as to be clockwise
      */
-    QVector<QPointF> accumulatePoints( const OGRLinearRing& ring );
+    QVector<QPointF> accumulatePoints(const OGRLinearRing *ring );
     /**
      * @brief SCZMapExtractor::accumulatePoints exctract points to current vector of points
      * @param ring ring of points taken from OGRFeature

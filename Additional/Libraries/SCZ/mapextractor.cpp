@@ -37,11 +37,11 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
         case wkbPolygon:
         {
             OGRPolygon* polygon = ( OGRPolygon* ) geometry;
-            OGRLinearRing extRing = polygon->getExteriorRing();
-            extRing.closeRings();
+            OGRLinearRing *extRing = polygon->getExteriorRing();
+            extRing->closeRings();
 //            if ( extRing.getNumPoints() < 5 )
 //                return;
-            points = accumulatePoints( &extRing );
+            points = accumulatePoints( extRing );
 
 //            for ( int j = 0; j < polygon->getNumInteriorRings(); ++j )
 //            {
@@ -69,11 +69,11 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             {
                 OGRPolygon* poly = ( OGRPolygon* ) collection->getGeometryRef(
                                        i );
-                OGRLinearRing extRing = poly->getExteriorRing();
-                extRing.closeRings();
+                OGRLinearRing *extRing = poly->getExteriorRing();
+                extRing->closeRings();
 //                if ( extRing.getNumPoints() < 5 )
 //                    return;
-                points = accumulatePoints( &extRing );
+                points = accumulatePoints( extRing );
 
 //                for ( int j = 0; j < poly->getNumInteriorRings(); ++j )
 //                {
@@ -104,15 +104,15 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
 }
 
 QVector<QPointF> MapExtractor::accumulatePoints(
-    const OGRLinearRing& ring )
+    const OGRLinearRing* ring )
 {
     QVector<QPointF> points = QVector<QPointF>();
     double x, y;
 
-    for ( int i = 0; i < ring.getNumPoints(); i++ )
+    for ( int i = 0; i < ring->getNumPoints(); i++ )
     {
-        x = ring.getX( i );
-        y = ring.getY( i );
+        x = ring->getX( i );
+        y = ring->getY( i );
         points.append( QPointF( x, y ) );
     }
     points = arrangeClockwise( points );
