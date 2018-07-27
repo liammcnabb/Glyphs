@@ -26,7 +26,14 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/csvreader.cpp \
     personalerrors.cpp \
     glyph.cpp \
-    piechart.cpp
+    piechart.cpp \
+    ../Additional/Libraries/SCZ/contiguitybuilder.cpp \
+    ../Additional/Libraries/SCZ/contiguousarea.cpp \
+    ../Additional/Libraries/SCZ/neighbourchecker.cpp \
+    ../Additional/Libraries/SCZ/treenode.cpp \
+    ../Additional/Libraries/SCZ/linkedlist.cpp \
+    ../Additional/Libraries/SCZ/boundary.cpp \
+    ../Additional/Libraries/SCZ/container.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -41,7 +48,14 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/csvreader.h \
     ../Additional/Libraries/Spectrum/colourmanager.h \
     glyph.h \
-    piechart.h
+    piechart.h \
+    ../Additional/Libraries/SCZ/contiguitybuilder.h \
+    ../Additional/Libraries/SCZ/contiguousarea.h \
+    ../Additional/Libraries/SCZ/neighbourchecker.h \
+    ../Additional/Libraries/SCZ/treenode.h \
+    ../Additional/Libraries/SCZ/linkedlist.h \
+    ../Additional/Libraries/SCZ/boundary.h \
+    ../Additional/Libraries/SCZ/container.h
 
 FORMS    += maininterfacewindow.ui
 
