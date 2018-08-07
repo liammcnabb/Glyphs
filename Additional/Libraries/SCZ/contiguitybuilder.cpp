@@ -1,7 +1,6 @@
 #include "contiguitybuilder.h"
 
-ContiguityBuilder::ContiguityBuilder( int searchType ,
-        bool debugMode ) :
+ContiguityBuilder::ContiguityBuilder( int searchType ) :
     Segment( searchType )
 {
     //Nothing Specific for ContiguityBuilder. All params used in
@@ -23,18 +22,20 @@ QVector<ContiguousArea> ContiguityBuilder::sortContiguously(
 
         for ( int j = 0; j < contigList.size(); ++j )
         {
-            for ( int k = 0; k < contigList.at( j ).polygons().size(); ++k )
-            {
-                if( NeighbourChecker::isNeighbour( current.at( 0 ),
-                                                   contigList.at( j ).polygons().at( k ),
-                                                   Segment::searchType() ) )
-                {
-                    neighbourFound = true;
-                    break;
-                }
-            }
+//            for ( int k = 0; k < contigList.at( j ).polygons().size(); ++k )
+//            {
+//                if( NeighbourChecker::isNeighbour( current.at( 0 ),
+//                                                   contigList.at( j ).polygons().at( k ),
+//                                                   Segment::searchType() ) )
+//                {
+//                    neighbourFound = true;
+//                    break;
+//                }
+//            }
 
-            if ( neighbourFound )
+            if ( current.at(0).getBoundingBox().intersects(
+                               contigList.at( j ).getBoundingBox() ) &&
+                    isPartofContiguousArea(current.at(0), contigList.at( j ) ) )
             {
                 for ( int k = 0; k < contigList.at( j ).polygons().size();
                         ++k )
@@ -46,12 +47,28 @@ QVector<ContiguousArea> ContiguityBuilder::sortContiguously(
         }
         newIsland.initPolygons( current );
         contigList.append( newIsland );
+
+        qDebug() << "ContigList size: " << contigList.size();
     }
 
     for( int i = 0; i < contigList.size(); ++i )
         contigList[i].sortedByArea();
 
     return contigList;
+}
+
+bool ContiguityBuilder::isPartofContiguousArea(Polygon p, ContiguousArea ca)
+{
+    for ( int i = 0; i < ca.polygons().size(); ++i )
+    {
+        if( NeighbourChecker::isNeighbour( p,
+                                           ca.polygons().at( i ),
+                                           Segment::searchType() ) )
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool ContiguityBuilder::debugRender( QVector<ContiguousArea>* list,

@@ -17,8 +17,7 @@ public:
      * @param searchType quality of search to use, shallow or deep (deep search for
      * point-line intersection).
      */
-    ContiguityBuilder( int searchType,
-                          bool debugMode );
+    ContiguityBuilder(int searchType);
     /**
      * @brief SCZContiguityBuilder::sortContiguously
      * @param unsorted list of polygons to sort contiguously
@@ -38,6 +37,7 @@ private:
      */
     bool debugRender( QVector<ContiguousArea>* list, int debugMode,
                       int highlight, int sleepMul );
+    bool isPartofContiguousArea(Polygon p, ContiguousArea ca);
 };
 
 #endif // SCZCONTIGUITYBUILDER_H

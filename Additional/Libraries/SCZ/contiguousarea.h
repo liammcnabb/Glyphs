@@ -4,6 +4,7 @@
 //#include "global.h"
 #include <QDebug>
 #include "polygon.h"
+#include "LM/aabb.h"
 #include <QVector>
 
 
@@ -30,11 +31,17 @@ public:
 
     bool initSortedIndexes() const;
     bool sortedByArea();
+
+    AABB getBoundingBox() const;
+    void setBoundingBox(const AABB &boundingBox);
+
 private:
     QVector<Polygon>* m_polygons = NULL;
     QVector<int>* m_sortedIndexes = NULL;
     bool m_treeReadyFlag = false;
+    AABB m_boundingBox;
 
+    void setupAABB(QVector<Polygon> *list);
 };
 
 #endif // CONTIGUOUSAREA_H

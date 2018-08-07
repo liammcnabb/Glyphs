@@ -11,6 +11,7 @@ ContiguousArea::ContiguousArea( const ContiguousArea& obj )
     std::copy( obj.polygons().begin(),
                obj.polygons().end(),
                m_polygons->begin() );
+    setBoundingBox(obj.getBoundingBox());
 }
 
 ContiguousArea& ContiguousArea::operator=( const ContiguousArea&
@@ -23,6 +24,7 @@ ContiguousArea& ContiguousArea::operator=( const ContiguousArea&
     std::copy( other.polygons().begin(),
                other.polygons().end(),
                m_polygons->begin() );
+    setBoundingBox(other.getBoundingBox());
 
     return *this;
 }
@@ -38,7 +40,27 @@ bool ContiguousArea::initPolygons( QVector<Polygon> input )
     m_polygons->resize( input.size() );
     std::copy( input.begin(), input.end(), m_polygons->begin() );
     //    m_polygons = new QVector<Polygon>(input);
+
+    setupAABB(m_polygons);
     return true;
+}
+
+void ContiguousArea::setupAABB(QVector<Polygon> *list)
+{
+    float minX = std::numeric_limits<float>::max();
+    float maxX = -std::numeric_limits<float>::max();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = -std::numeric_limits<float>::max();
+
+    for(int i = 0; i < list->size(); ++i)
+    {
+        minX = std::min(minX, list->at(i).getMinX());
+        maxX = std::max(maxX, list->at(i).getMaxX());
+        minY = std::min(minY, list->at(i).getMinY());
+        maxY = std::max(maxY, list->at(i).getMaxY());
+    }
+
+    setBoundingBox(AABB(minX,maxX,minY,maxY));
 }
 
 bool ContiguousArea::sortedByArea()
@@ -76,12 +98,22 @@ bool ContiguousArea::sortedByArea()
     return true;
 }
 
+AABB ContiguousArea::getBoundingBox() const
+{
+    return m_boundingBox;
+}
+
+void ContiguousArea::setBoundingBox(const AABB &boundingBox)
+{
+    m_boundingBox = boundingBox;
+}
+
 bool ContiguousArea::initSortedIndexes() const
 {
     sortedIndexes().empty();
-
+    
     sortedIndexes().append( 0 );
-
+    
     for ( int i = 1; i < polygons().size(); ++i )
     {
         for ( int j = 0; j < sortedIndexes().size(); ++j )
