@@ -163,37 +163,41 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
 void TreeBuilder::applyValue( TreeNode* node,
                                  int calculationType )
 {
-    switch( calculationType )
+    QStringList values = node->getValues();
+    for( int i = 0; i < values.size(); ++i )
     {
+        switch( calculationType )
+        {
         case CALC_BY_ADDITION:
-            node->value =  node->getRightChild()->value +
-                           node->getLeftChild()->value;
+            values[i] = node->getRightChild()->getValues().at(i).toDouble() +
+                    node->getLeftChild()->getValues().at(i).toDouble();
             break;
         case CALC_BY_AVERAGE:
-            node->value = calculateValueByAverage( node );
+            values[i] = calculateValueByAverage( node, i );
             break;
         case CALC_BY_LARGEST:
-            node->value = node->getRightChild()->value;
+            values[i] = node->getRightChild()->getValues().at(i).toDouble();
             break;
         case CALC_BY_FREQUENCY:
-            node->value = calculateValueByFrequency( node, upperValue );
+            values[i] = double(calculateValueByFrequency( node, upperValue, i ));
             break;
         case CALC_BY_AREA_NORMALISED_SUM:
-            node->value = node->getRightChild()->value +
-                          node->getLeftChild()->value;
+            values[i] = node->getRightChild()->getValues().at(i).toDouble() +
+                    node->getLeftChild()->getValues().at(i).toDouble();
             break;
         default:
-            node->value = 0;
+            values[i] = 0.0;
             break;
+        }
     }
 }
 
 int TreeBuilder::calculateValueByFrequency( TreeNode* node,
-        int upperValue )
+        int upperValue, int fieldIndex )
 {
     freq.clear();
     freq.resize( int( upperValue + 1 ) );
-    calculateValueByFrequency( node );
+    calculateValueByFrequency( node, fieldIndex );
 
     int highest = 0;
     for ( int i = 0; i < freq.size(); ++i )
@@ -205,49 +209,49 @@ int TreeBuilder::calculateValueByFrequency( TreeNode* node,
 }
 
 void TreeBuilder::calculateValueByFrequency(
-    TreeNode* node )
+    TreeNode* node, int fieldIndex )
 {
     if( node->getLeftChild() != nullptr )
-        calculateValueByFrequency( node->getLeftChild() );
+        calculateValueByFrequency( node->getLeftChild(), fieldIndex );
     if( node->getRightChild() != nullptr )
-        calculateValueByFrequency( node->getRightChild() );
+        calculateValueByFrequency( node->getRightChild(), fieldIndex );
 
     if( node->getLeftChild() == nullptr &&
             node->getRightChild() == nullptr )
-        freq[node->value]++;
+        freq[node->getValues().at(fieldIndex).toInt()]++;
 }
 
-double TreeBuilder::calculateValueByAreaNormalisedSum( TreeNode* node )
+double TreeBuilder::calculateValueByAreaNormalisedSum( TreeNode* node, int fieldIndex )
 {
     int vCount = 0;
     double value = 0;
-    calculateValueByAverage( &vCount, &value, node );
+    calculateValueByAverage( &vCount, &value, node, fieldIndex );
     return double( value / node->getArea() );
 }
 
-double TreeBuilder::calculateValueByAverage( TreeNode* node )
+double TreeBuilder::calculateValueByAverage( TreeNode* node, int fieldIndex )
 {
     int vCount = 0;
     double value = 0;
-    calculateValueByAverage( &vCount, &value, node );
+    calculateValueByAverage( &vCount, &value, node, fieldIndex );
 
     return double( value / vCount );
 
 }
 
 void TreeBuilder::calculateValueByAverage( int* vCount,
-        double* value, TreeNode* node )
+        double* value, TreeNode* node, int fieldIndex )
 {
     if( node->getLeftChild() != nullptr )
-        calculateValueByAverage( vCount, value, node->getLeftChild() );
+        calculateValueByAverage( vCount, value, node->getLeftChild(), fieldIndex );
     if( node->getRightChild() != nullptr )
-        calculateValueByAverage( vCount, value, node->getRightChild() );
+        calculateValueByAverage( vCount, value, node->getRightChild(), fieldIndex );
 
     if( node->getLeftChild() == nullptr &&
             node->getRightChild() == nullptr )
     {
         *vCount += 1;
-        *value += node->value;
+        *value += node->getValues().at(fieldIndex).toDouble();
     }
 
 }

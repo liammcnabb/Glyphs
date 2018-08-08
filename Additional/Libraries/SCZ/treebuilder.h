@@ -298,7 +298,7 @@ private:
      * @param node node to calculate average value of
      * @return average value
      */
-    double calculateValueByAverage( TreeNode* node );
+    double calculateValueByAverage(TreeNode* node , int fieldIndex);
 
     /**
      * @brief calculateValueByAverage recursive method to calculate average
@@ -308,8 +308,8 @@ private:
      * @param value current sum of values
      * @param node current node in DFS
      */
-    void calculateValueByAverage( int* vCount, double* value,
-                                  TreeNode* node );
+    void calculateValueByAverage(int* vCount, double* value,
+                                  TreeNode* node , int fieldIndex);
     /**
      * @brief calculateValueByFrequency Base call for finding accurate frequency
      *  of values of leaf nodes only. This would be used for Qualitative data
@@ -319,7 +319,7 @@ private:
      * @return highest frequent value
      */
     int calculateValueByFrequency( TreeNode* node,
-                                   int upperValue );
+                                   int upperValue, int fieldIndex );
 
     /**
      * @brief calculateValueByFrequency recursive method to calculate most
@@ -328,14 +328,14 @@ private:
      * @see SCZTreeBuilder::calculateValueByFrequency( TreeNode* node, int uppderValue )
      * @param node current node in DFS
      */
-    void calculateValueByFrequency( TreeNode* node );
+    void calculateValueByFrequency( TreeNode* node, int fieldIndex );
 
     /**
      * @brief calculateValueRange calculate maximum value in list
      * @param list list of nodes
      */
     void calculateValueRange( LinkedList* list );
-    double calculateValueByAreaNormalisedSum( TreeNode* node );
+    double calculateValueByAreaNormalisedSum(TreeNode* node , int fieldIndex);
     bool debugRender( LinkedList* list, int debugMode, int highlight,
                       int sleepMul );
 
