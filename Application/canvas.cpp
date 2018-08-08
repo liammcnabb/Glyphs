@@ -240,9 +240,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                      ( p.size() * ( rad ) );
+                      ( p.size() * ( rad *1.05 ) );
             float y = p.centroid().y() + cos( angle ) *
-                      ( p.size() * ( rad ) );
+                      ( p.size() * ( rad * 1.05 ) );
 
             glVertex3f( x, y, 0.5 );
         }
@@ -267,10 +267,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( p.size() * ( ( rad * 0.95 ) ) );
+                          ( p.size() * ( ( rad ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( p.size() * ( ( rad * 0.95 ) ) );
+                          ( p.size() * ( ( rad ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );
