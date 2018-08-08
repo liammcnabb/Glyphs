@@ -60,33 +60,44 @@ void Canvas::changeColorMap(int mapType)
     }
 }
 
+QVector<TreeNode> Canvas::getGroomedPolygons() const
+{
+    return m_groomedPolygons;
+}
+
+void Canvas::setGroomedPolygons(const QVector<TreeNode> &groomedPolygons)
+{
+    m_groomedPolygons = groomedPolygons;
+}
+
 void Canvas::paintGL()
 {
-    if(loadedPolygons().size() > 0)
+    if(getGroomedPolygons().size() > 0)
         redraw();
 }
 
 void Canvas::redraw()
 {
+    qDebug() << "drawing";
     prepareDraw();
     glLineWidth( 1 );
-
-    drawPolygons( loadedPolygons() );
-
+    
+    drawPolygons( getGroomedPolygons() );
+    
     /**Default*/
     switch( getGlyphType() )
     {
     case GLYPH_CENTROID :
     {
-        calculateValueBounds( loadedPolygons() );
+        calculateValueBounds( getGroomedPolygons() );
         ColourManager manager(getValueLower(), getValueUpper());
-        drawCentroids( loadedPolygons(), manager );
+        drawCentroids( getGroomedPolygons(), manager );
         drawLegend( manager );
         break;
     }
     case GLYPH_EQUAL_PIE :
     {
-        createPieGlyphs( loadedPolygons(), GLYPH_EQUAL_PIE );
+        createPieGlyphs( getGroomedPolygons(), GLYPH_EQUAL_PIE );
         calculateValueBounds( getPieGlyphs() );
         ColourManager manager(getValueLower(), getValueUpper());
         drawPieGlyphs( getPieGlyphs(), manager);
@@ -95,7 +106,7 @@ void Canvas::redraw()
     }
     case GLYPH_VARIABLE_PIE :
     {
-        createPieGlyphs( loadedPolygons(), GLYPH_VARIABLE_PIE );
+        createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE );
         calculateValueBounds( getPieGlyphs() );
         ColourManager manager(getValueLower(), getValueUpper());
         drawPieGlyphs( getPieGlyphs(), manager);
@@ -107,12 +118,12 @@ void Canvas::redraw()
     qDebug() << "drawn.";
 }
 
-void Canvas::calculateValueBounds( QVector<Polygon> list )
+void Canvas::calculateValueBounds( QVector<TreeNode> list )
 {
     setValueLower(std::numeric_limits<float>::max());
     setValueUpper(-std::numeric_limits<float>::max());
 
-    for(Polygon p: list)
+    for(TreeNode p: list)
     {
         setValueLower( std::min( getValueLower(),
                                  p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
@@ -135,11 +146,11 @@ void Canvas::calculateValueBounds( QVector<PieChart> list )
         }
 }
 
-void Canvas::drawPolygons(QVector<Polygon> list)
+void Canvas::drawPolygons(QVector<TreeNode> list)
 {
     for ( int i = 0; i < list.size(); ++i )
     {
-        Polygon polygon = list.at( i );
+        TreeNode polygon = list.at( i );
         glLineWidth( 1 );
         glBegin( GL_LINE_STRIP );
 
@@ -147,15 +158,15 @@ void Canvas::drawPolygons(QVector<Polygon> list)
         glColor4f( 0, 0, 0, 0.5 );
 
         for( QVector<QPointF>::const_iterator it =
-                    polygon.getPoints().begin();
-                it < polygon.getPoints().end(); ++it )
+                    polygon.getNonSharedBoundary()->getBoundary().begin();
+                it < polygon.getNonSharedBoundary()->getBoundary().end(); ++it )
             glVertex2f( it->x(), it->y() );
 
         glEnd();
     }
 }
 
-void Canvas::drawCentroids(QVector<Polygon> list, ColourManager cm)
+void Canvas::drawCentroids(QVector<TreeNode> list, ColourManager cm)
 {
     Colour col;
     for ( int i = 0; i < list.size(); ++i )
@@ -167,10 +178,10 @@ void Canvas::drawCentroids(QVector<Polygon> list, ColourManager cm)
     }
 }
 
-void Canvas::createPieGlyphs( QVector<Polygon> list, int pieType )
+void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
 {
     QVector<PieChart> pies;
-    foreach( Polygon p, list)
+    foreach( TreeNode p, list)
     {
         QStringList values = p.getValues();
         for( int i = 0; i < 4; ++i )

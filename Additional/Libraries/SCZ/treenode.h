@@ -77,6 +77,9 @@ public:
 
     QStringList values;
 
+    QStringList getValues() const;
+    void setValues(const QStringList &value);
+
 private:
     void calculateArea();
 
@@ -87,6 +90,7 @@ private:
     TreeNode* rightChild = nullptr;
     QPointF* m_centroid = nullptr;
     AABB m_boundingBox;
+
 
     QVector<TreeNode*>* neighbours = nullptr;
 

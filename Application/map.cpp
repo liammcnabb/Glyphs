@@ -13,6 +13,14 @@ Map::Map(GDALDataset* map, QVector<QStringList> data)
     copyInfoFromFile();
 }
 
+Map::Map(GDALDataset* map, QVector<QStringList> data, QString recipeLoc)
+{
+    setMap(map);
+    setValueData(data);
+    setRecipeLoc(recipeLoc);
+    copyInfoFromFile();
+}
+
 void Map::copyInfoFromFile()
 {
     OGRLayer* layer = getMap()->GetLayer( 0 );
@@ -22,6 +30,8 @@ void Map::copyInfoFromFile()
     setName( layer->GetName() );
 
     extractMap( layer );
+    splitContiguousRegions( getLoadedPolygons() );
+    buildHierarchy(getContiguousRegions());
 }
 
 void Map::extractMap( OGRLayer* layer )
@@ -100,6 +110,63 @@ QVector<Polygon> Map::linkDataToPolygons( QVector<Polygon> polygons,
     return polygons;
 }
 
+void Map::splitContiguousRegions( QVector<Polygon> list )
+{
+    if(DEBUG_CLASS)
+        qDebug() << "Begin: void Map::splitContiguousRegions("
+                    " QVector<Polygon> list )";
+
+    ContiguityBuilder builder(0);
+    QVector<ContiguousArea> contigs = builder.sortContiguously(list);
+    setContiguousRegions(contigs);
+
+    if(DEBUG_CLASS)
+        qDebug() << "End: void Map::splitContiguousRegions("
+                    " QVector<Polygon> list )";
+
+    return;
+}
+
+void Map::buildHierarchy( QVector<ContiguousArea> list)
+{
+    QVector<TreeNode> trees;
+    if(DEBUG_CLASS)
+        qDebug() << "Begin: void Map::buildHierarchy("
+                    " QVector<ContiguousArea> list )";
+
+    TreeBuilder builder = TreeBuilder(0,0,getRecipeType(),getRecipeLoc(),1);
+
+    QVector<QString>* instructions = new QVector<QString>();
+    CrfReader reader(getRecipeLoc().toStdString() );
+    QVector<CrfRow>* loadedRecipe;
+    if ( getRecipeType() == RECIPE_LOAD )
+        {
+            loadedRecipe = new QVector<CrfRow>( reader.read(
+                    getRecipeLoc().toUtf8().constData( ) ) );
+        }
+
+    for( int i = 0; i < list.size(); ++i )
+        trees.append( builder.createBinaryTree(
+                          list.at(i).polygons(),
+                          instructions, loadedRecipe) );
+
+    if ( getRecipeType() == RECIPE_SAVE )
+       {
+           CrfWriter writer( getRecipeLoc().toUtf8().constData() );
+           writer.write( instructions );
+       }
+
+    setHierarchies(trees);
+
+       delete instructions;
+       if ( getRecipeType() == RECIPE_LOAD )
+           delete loadedRecipe;
+
+    if(DEBUG_CLASS)
+        qDebug() << "End: void Map::buildHierarchy("
+                    " QVector<ContiguousArea> list )";
+}
+
 GDALDataset *Map::getMap() const
 {
     return m_map;
@@ -148,4 +215,44 @@ QVector<QStringList> Map::getValueData() const
 void Map::setValueData(const QVector<QStringList> &value)
 {
     valueData = value;
+}
+
+QVector<ContiguousArea> Map::getContiguousRegions() const
+{
+    return m_contiguousRegions;
+}
+
+void Map::setContiguousRegions(const QVector<ContiguousArea> &contiguousRegions)
+{
+    m_contiguousRegions = contiguousRegions;
+}
+
+QString Map::getRecipeLoc() const
+{
+    return m_recipeLoc;
+}
+
+void Map::setRecipeLoc(const QString &recipeLoc)
+{
+    m_recipeLoc = recipeLoc;
+}
+
+int Map::getRecipeType() const
+{
+    return m_recipeType;
+}
+
+void Map::setRecipeType(int recipeType)
+{
+    m_recipeType = recipeType;
+}
+
+QVector<TreeNode> Map::getHierarchies() const
+{
+    return m_hierarchies;
+}
+
+void Map::setHierarchies(const QVector<TreeNode> &hierarchies)
+{
+    m_hierarchies = hierarchies;
 }

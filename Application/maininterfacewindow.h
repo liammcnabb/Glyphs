@@ -22,6 +22,9 @@ public:
     explicit MainInterfaceWindow(QWidget *parent = 0);
     ~MainInterfaceWindow();
 
+    QVector<TreeNode> getFullHierarchies() const;
+    void setFullHierarchies(const QVector<TreeNode> &fullHierarchies);
+
 private slots:
     void on_actionEngland_Example_triggered();
 
@@ -34,9 +37,16 @@ private slots:
 
     void on_rdo_VariableSegmentPie_released();
 
+    void on_virtualzoom_valueChanged(int value);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
+    QVector<TreeNode> m_fullHierarchies;
+
+    QVector<TreeNode> visibleNodes(double minScreenSpace, TreeNode node);
+    void visibleNodes(double minScreenSpace, TreeNode *node, QVector<TreeNode> *currentList);
+    QVector<TreeNode> declareVisiblePolygons(QVector<TreeNode> list, double minScreenSpace);
 };
 
 #endif // MAININTERFACEWINDOW_H

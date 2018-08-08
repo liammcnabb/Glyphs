@@ -23,6 +23,7 @@ TreeNode::TreeNode( TreeNode* obj )
     leftChild = obj->getLeftChild();
     rightChild = obj->getRightChild();
     value = obj->value;
+    setValues(obj->getValues());
 }
 
 TreeNode::~TreeNode()
@@ -47,6 +48,7 @@ TreeNode& TreeNode::operator=( const TreeNode& b )
     leftChild = b.getLeftChild();
     rightChild = b.getRightChild();
     value = b.value;
+    setValues(b.getValues());
 
     sharedBoundary = b.getSharedBoundary();
     nonSharedBoundary = b.getNonSharedBoundary();
@@ -83,6 +85,7 @@ TreeNode::TreeNode( Polygon polygon )
     initNonSharedBoundary( polygon.getPoints() );
     neighbours = new QVector<TreeNode*>();
     setArea( polygon.area() );
+    setValues(polygon.getValues());
     //    value = rand() % COLORGORICAL_MAX ;
     //    if( polygon.getValues() && polygon.getFields())
     //        value = polygon.getFields().at( 2 ).toInt();
@@ -381,5 +384,15 @@ QString TreeNode::toString() const
            "\n MinY: " + QString::number( getMinY() ) +
            ",\t MaxY: " + QString::number( getMaxY() ) +
            "\n Value: " + QString::number( value );
+}
+
+QStringList TreeNode::getValues() const
+{
+    return values;
+}
+
+void TreeNode::setValues(const QStringList &value)
+{
+    values = value;
 }
 

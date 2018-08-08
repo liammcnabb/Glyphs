@@ -22,17 +22,6 @@ QVector<ContiguousArea> ContiguityBuilder::sortContiguously(
 
         for ( int j = 0; j < contigList.size(); ++j )
         {
-//            for ( int k = 0; k < contigList.at( j ).polygons().size(); ++k )
-//            {
-//                if( NeighbourChecker::isNeighbour( current.at( 0 ),
-//                                                   contigList.at( j ).polygons().at( k ),
-//                                                   Segment::searchType() ) )
-//                {
-//                    neighbourFound = true;
-//                    break;
-//                }
-//            }
-
             if ( current.at(0).getBoundingBox().intersects(
                                contigList.at( j ).getBoundingBox() ) &&
                     isPartofContiguousArea(current.at(0), contigList.at( j ) ) )
@@ -48,7 +37,7 @@ QVector<ContiguousArea> ContiguityBuilder::sortContiguously(
         newIsland.initPolygons( current );
         contigList.append( newIsland );
 
-        qDebug() << "ContigList size: " << contigList.size();
+//        qDebug() << "ContigList size: " << contigList.size();
     }
 
     for( int i = 0; i < contigList.size(); ++i )

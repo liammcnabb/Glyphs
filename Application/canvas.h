@@ -15,6 +15,7 @@
 #include "Spectrum/colourmanager.h"
 #include "LM/aabb.h"
 #include "piechart.h"
+#include "SCZ/treenode.h"
 
 class Canvas : public QOpenGLWidget
 {
@@ -58,8 +59,12 @@ public:
     void setGlyphType(int value);
 
     void changeColorMap(int mapType);
+    QVector<TreeNode> getGroomedPolygons() const;
+    void setGroomedPolygons(const QVector<TreeNode> &groomedPolygons);
+
 private:
     QVector<Polygon> m_loadedPolygons;
+    QVector<TreeNode> m_groomedPolygons;
     QVector<PieChart> m_pieGlyphs;
     AABB wrapper;
     float length;
@@ -71,16 +76,16 @@ private:
     void setOrtho();
 
     void redraw();
-    void drawPolygons(QVector<Polygon> polyList);
-    void drawCentroids(QVector<Polygon> list, ColourManager cm);
+    void drawPolygons(QVector<TreeNode> polyList);
+    void drawCentroids(QVector<TreeNode> list, ColourManager cm);
     bool debugCircle(double centerX, double centerY, Colour color, double size);
     float scaleModifier();
-    void calculateValueBounds(QVector<Polygon> list);
+    void calculateValueBounds(QVector<TreeNode> list);
     void calculateValueBounds(QVector<PieChart> list);
     void drawLegend(ColourManager cm);
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str);
-    void createPieGlyphs(QVector<Polygon> list, int pieType);
+    void createPieGlyphs(QVector<TreeNode> list, int pieType);
     void drawPieGlyphs(QVector<PieChart> list, ColourManager cm);
 };
 

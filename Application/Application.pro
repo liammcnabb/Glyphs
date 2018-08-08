@@ -33,7 +33,12 @@ SOURCES += main.cpp\
     ../Additional/Libraries/SCZ/treenode.cpp \
     ../Additional/Libraries/SCZ/linkedlist.cpp \
     ../Additional/Libraries/SCZ/boundary.cpp \
-    ../Additional/Libraries/SCZ/container.cpp
+    ../Additional/Libraries/SCZ/container.cpp \
+    ../Additional/Libraries/SCZ/treebuilder.cpp \
+    ../Additional/Libraries/LM/crfreader.cpp \
+    ../Additional/Libraries/LM/crfwriter.cpp \
+    ../Additional/Libraries/LM/crfrow.cpp \
+    ../Additional/Libraries/LM/writer.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -55,7 +60,13 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/SCZ/treenode.h \
     ../Additional/Libraries/SCZ/linkedlist.h \
     ../Additional/Libraries/SCZ/boundary.h \
-    ../Additional/Libraries/SCZ/container.h
+    ../Additional/Libraries/SCZ/container.h \
+    ../Additional/Libraries/SCZ/treebuilder.h \
+    ../Additional/Libraries/LM/crfreader.h \
+    ../Additional/Libraries/LM/crfwriter.h \
+    ../Additional/Libraries/LM/crfrow.h \
+    ../Additional/Libraries/LM/crfreader.h.autosave \
+    ../Additional/Libraries/LM/writer.h
 
 FORMS    += maininterfacewindow.ui
 
