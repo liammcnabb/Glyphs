@@ -134,7 +134,7 @@ void Map::buildHierarchy( QVector<ContiguousArea> list)
         qDebug() << "Begin: void Map::buildHierarchy("
                     " QVector<ContiguousArea> list )";
 
-    TreeBuilder builder = TreeBuilder(0,0,getRecipeType(),getRecipeLoc(),1);
+    TreeBuilder builder = TreeBuilder(0,2,getRecipeType(),getRecipeLoc(),1);
 
     QVector<QString>* instructions = new QVector<QString>();
     CrfReader reader(getRecipeLoc().toStdString() );

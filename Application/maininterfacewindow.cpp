@@ -45,7 +45,7 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     Map map( shpreader.getMapData(), data, recipeLoc );
     ui->virtualzoom->setEnabled(true);
     ui->OpenGLWidget->setDefaultOrtho(map.getWrapper());
-//    ui->OpenGLWidget->setLoadedPolygons( map.getLoadedPolygons() );
+    ui->OpenGLWidget->setLoadedPolygons( map.getLoadedPolygons() );
     setFullHierarchies( map.getHierarchies() );
     on_virtualzoom_valueChanged(0);
 //    ui->OpenGLWidget->setGroomedPolygons( map.getHierarchies() );

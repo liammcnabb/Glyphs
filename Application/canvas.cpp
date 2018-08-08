@@ -80,10 +80,11 @@ void Canvas::redraw()
 {
     qDebug() << "drawing";
     prepareDraw();
-    glLineWidth( 1 );
     
+    drawPolygons( loadedPolygons() );
     drawPolygons( getGroomedPolygons() );
     
+    glLineWidth( 1 );
     /**Default*/
     switch( getGlyphType() )
     {
@@ -146,6 +147,26 @@ void Canvas::calculateValueBounds( QVector<PieChart> list )
         }
 }
 
+void Canvas::drawPolygons(QVector<Polygon> list)
+{
+    for ( int i = 0; i < list.size(); ++i )
+    {
+        Polygon polygon = list.at( i );
+        glLineWidth( 1 );
+        glBegin( GL_LINE_STRIP );
+
+
+        glColor4f( 0, 0, 0, 0.05 );
+
+        for( QVector<QPointF>::const_iterator it =
+                    polygon.getPoints().begin();
+                it < polygon.getPoints().end(); ++it )
+            glVertex2f( it->x(), it->y() );
+
+        glEnd();
+    }
+}
+
 void Canvas::drawPolygons(QVector<TreeNode> list)
 {
     for ( int i = 0; i < list.size(); ++i )
@@ -160,6 +181,10 @@ void Canvas::drawPolygons(QVector<TreeNode> list)
         for( QVector<QPointF>::const_iterator it =
                     polygon.getNonSharedBoundary()->getBoundary().begin();
                 it < polygon.getNonSharedBoundary()->getBoundary().end(); ++it )
+            glVertex2f( it->x(), it->y() );
+        for( QVector<QPointF>::const_iterator it =
+                    polygon.getSharedBoundary()->getBoundary().begin();
+                it < polygon.getSharedBoundary()->getBoundary().end(); ++it )
             glVertex2f( it->x(), it->y() );
 
         glEnd();

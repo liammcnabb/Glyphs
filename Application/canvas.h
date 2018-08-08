@@ -76,6 +76,7 @@ private:
     void setOrtho();
 
     void redraw();
+    void drawPolygons(QVector<Polygon> list);
     void drawPolygons(QVector<TreeNode> polyList);
     void drawCentroids(QVector<TreeNode> list, ColourManager cm);
     bool debugCircle(double centerX, double centerY, Colour color, double size);
@@ -87,6 +88,7 @@ private:
     void glPrintString(void *font, const char *str);
     void createPieGlyphs(QVector<TreeNode> list, int pieType);
     void drawPieGlyphs(QVector<PieChart> list, ColourManager cm);
+
 };
 
 #endif // CANVAS_H
