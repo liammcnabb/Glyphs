@@ -70,6 +70,16 @@ void Canvas::setGroomedPolygons(const QVector<TreeNode> &groomedPolygons)
     m_groomedPolygons = groomedPolygons;
 }
 
+float Canvas::getGlyphSize() const
+{
+    return glyphSize;
+}
+
+void Canvas::setGlyphSize(float value)
+{
+    glyphSize = value;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -198,7 +208,7 @@ void Canvas::drawCentroids(QVector<TreeNode> list, ColourManager cm)
     {
         col = cm.getClassColour( list.at(i).getValues().at(VALUE_INDEX).toFloat()/**100*/ );
         debugCircle( list.at(i).centroid()->x(), list.at(i).centroid()->y(),
-                     col, 2.5);
+                     col, getGlyphSize());
 
     }
 }
@@ -240,9 +250,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                      ( 2.5f * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
+                      ( getGlyphSize() * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
             float y = p.centroid().y() + cos( angle ) *
-                      ( 2.5f * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
+                      ( getGlyphSize() * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
 
             glVertex3f( x, y, 0.5 );
         }
@@ -267,10 +277,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( 2.5f * ( ( rad ) ) );
+                          ( getGlyphSize() * ( ( rad ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( 2.5f * ( ( rad ) ) );
+                          ( getGlyphSize() * ( ( rad ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );

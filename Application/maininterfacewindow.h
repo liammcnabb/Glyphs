@@ -39,6 +39,8 @@ private slots:
 
     void on_virtualzoom_valueChanged(int value);
 
+    void on_GlyphSize_valueChanged(int value);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

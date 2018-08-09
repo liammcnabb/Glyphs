@@ -158,3 +158,9 @@ void MainInterfaceWindow::visibleNodes( double minScreenSpace, TreeNode* node,
 
         return;
 }
+
+void MainInterfaceWindow::on_GlyphSize_valueChanged(int value)
+{
+    ui->OpenGLWidget->setGlyphSize(float(value)/2);
+    ui->OpenGLWidget->update();
+}

@@ -62,6 +62,9 @@ public:
     QVector<TreeNode> getGroomedPolygons() const;
     void setGroomedPolygons(const QVector<TreeNode> &groomedPolygons);
 
+    float getGlyphSize() const;
+    void setGlyphSize(float value);
+
 private:
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
@@ -71,6 +74,7 @@ private:
     float valueUpper;
     float valueLower;
     int glyphType = GLYPH_CENTROID;
+    float glyphSize = 2.5f;
 
     void prepareDraw();
     void setOrtho();
