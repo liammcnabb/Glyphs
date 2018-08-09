@@ -2,12 +2,13 @@
 
 PieChart::PieChart() : Glyph( QPointF( 0.0f,0.0f ) )
 {
-    setSize(2.5f);
+    setSize(1 * SIZE_MODIFIER);
+
 }
 
 PieChart::PieChart(QPointF centroid, float size) : Glyph( centroid )
 {
-    setSize( size );
+    setSize( size * SIZE_MODIFIER );
 }
 
 void PieChart::initialize(QStringList values)

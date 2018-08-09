@@ -24,6 +24,7 @@ TreeNode::TreeNode( TreeNode* obj )
     rightChild = obj->getRightChild();
     value = obj->value;
     setValues(obj->getValues());
+    setLevel(obj->getLevel());
 }
 
 TreeNode::~TreeNode()
@@ -49,6 +50,7 @@ TreeNode& TreeNode::operator=( const TreeNode& b )
     rightChild = b.getRightChild();
     value = b.value;
     setValues(b.getValues());
+    setLevel(b.getLevel());
 
     sharedBoundary = b.getSharedBoundary();
     nonSharedBoundary = b.getNonSharedBoundary();
@@ -86,6 +88,7 @@ TreeNode::TreeNode( Polygon polygon )
     neighbours = new QVector<TreeNode*>();
     setArea( polygon.area() );
     setValues(polygon.getValues());
+    setLevel(0);
     //    value = rand() % COLORGORICAL_MAX ;
     //    if( polygon.getValues() && polygon.getFields())
     //        value = polygon.getFields().at( 2 ).toInt();
@@ -252,6 +255,16 @@ void TreeNode::calculateArea()
 
     setArea( polygonArea );
     return;
+}
+
+int TreeNode::getLevel() const
+{
+    return level;
+}
+
+void TreeNode::setLevel(int value)
+{
+    level = value;
 }
 
 AABB TreeNode::getBoundingBox() const

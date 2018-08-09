@@ -80,6 +80,9 @@ public:
     QStringList getValues() const;
     void setValues(const QStringList &value);
 
+    int getLevel() const;
+    void setLevel(int value);
+
 private:
     void calculateArea();
 
@@ -101,6 +104,7 @@ private:
 
     double area = 0.0;
 
+    int level;
 
     void calculateCentroid();
 };

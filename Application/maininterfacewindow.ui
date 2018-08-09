@@ -19,7 +19,14 @@
      <widget class="QWidget" name="widget" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="Canvas" name="OpenGLWidget"/>
+        <widget class="Canvas" name="OpenGLWidget">
+         <property name="maximumSize">
+          <size>
+           <width>999999</width>
+           <height>999999</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QSlider" name="virtualzoom">

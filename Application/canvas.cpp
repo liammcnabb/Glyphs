@@ -211,7 +211,7 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
         QStringList values = p.getValues();
         for( int i = 0; i < 4; ++i )
             values.removeFirst();
-        PieChart pie( *p.centroid(), 2.5f );
+        PieChart pie( *p.centroid(), p.getLevel() );
         if(pieType == GLYPH_EQUAL_PIE)
             pie.setSliceType(PieChart::EQUAL_SLICES);
         else
@@ -231,7 +231,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
     foreach(PieChart p, list)
     {
 //        /* Outline */
-        glColor4f( 0, 0, 0, 1 );
+        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
         glBegin( GL_TRIANGLE_FAN );
         glVertex2f( p.centroid().x(), p.centroid().y() );
 //        double size = 1;
@@ -240,9 +240,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                      ( p.size() * ( rad *1.05 ) );
+                      ( 2.5f * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
             float y = p.centroid().y() + cos( angle ) *
-                      ( p.size() * ( rad * 1.05 ) );
+                      ( 2.5f * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
 
             glVertex3f( x, y, 0.5 );
         }
@@ -267,10 +267,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( p.size() * ( ( rad ) ) );
+                          ( 2.5f * ( ( rad ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( p.size() * ( ( rad ) ) );
+                          ( 2.5f * ( ( rad ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );

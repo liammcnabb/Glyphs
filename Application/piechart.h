@@ -18,7 +18,7 @@ public:
     void setAngle(float angle);
 
     float value() const;
-    void setValue(float value);
+    void setValue(float value);\
 
 private:
     float m_angle = 1.0f;
@@ -28,6 +28,7 @@ private:
 class PieChart : public Glyph
 {
 public:
+    static constexpr float SIZE_MODIFIER = 0.05;
     static const int FULL_SLICES = 0;
     static const int EQUAL_SLICES = 1;
 

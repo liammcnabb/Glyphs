@@ -53,6 +53,7 @@ TreeNode TreeBuilder::createBinaryTree( QVector<Polygon>
         list->append( new TreeNode( contiguousArea.at( i ) ) );
         list->last()->value = selectDefaultValue( contiguousArea.at(
                                   i ) );
+        list->last()->setLevel(1);
     }
 
     lowerRange( list, false );
@@ -130,7 +131,8 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
         parent->setLeftChild( list->first() );
         parent->setRightChild( list->at( neighbour ) );
         parent->setValues(parent->getRightChild()->getValues());
-        applyValue( parent, getCalculationType() );
+        parent->setLevel(parent->getLeftChild()->getLevel()+1);
+//        applyValue( parent, getCalculationType() );
 
 //        if ( Segment::getDebugMode() )
 //        {
