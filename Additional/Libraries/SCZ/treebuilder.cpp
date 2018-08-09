@@ -131,7 +131,8 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
         parent->setLeftChild( list->first() );
         parent->setRightChild( list->at( neighbour ) );
         parent->setValues(parent->getRightChild()->getValues());
-        parent->setLevel(parent->getLeftChild()->getLevel()+1);
+        parent->setLevel(parent->getLeftChild()->getLevel() +
+                         parent->getRightChild()->getLevel() );
 //        applyValue( parent, getCalculationType() );
 
 //        if ( Segment::getDebugMode() )

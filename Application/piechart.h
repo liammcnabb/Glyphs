@@ -28,7 +28,7 @@ private:
 class PieChart : public Glyph
 {
 public:
-    static constexpr float SIZE_MODIFIER = 0.05;
+    static constexpr float SIZE_MODIFIER = 0.03;
     static const int FULL_SLICES = 0;
     static const int EQUAL_SLICES = 1;
 
