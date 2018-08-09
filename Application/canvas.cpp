@@ -288,6 +288,27 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             currentAngle += ps.angle();
 //            color = cm.getColourFromSeed(int(currentAngle));
         }
+        for( int i = 0; i < p.pieSlices().size(); ++i )
+        {
+            PieSegment ps = p.pieSlices().at(i);
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.6 );
+            glBegin( GL_LINE_STRIP );
+            glVertex2f( p.centroid().x(), p.centroid().y() );
+
+            for( float angle = currentAngle; angle <=
+                 currentAngle+ps.angle()+0.05; angle+=0.1 )
+            {
+                float x = p.centroid().x() + sin( angle ) *
+                          ( getGlyphSize() * ( ( rad ) ) );
+
+                float y = p.centroid().y() + cos( angle ) *
+                          ( getGlyphSize() * ( ( rad ) ) );
+                glVertex3f( x, y, 0.5 );
+            }
+            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glEnd();
+            currentAngle += ps.angle();
+        }
 
     }
 
