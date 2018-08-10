@@ -218,17 +218,21 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
     QVector<PieChart> pies;
     foreach( TreeNode p, list)
     {
-        QStringList values = p.getValues();
-        for( int i = 0; i < 4; ++i )
-            values.removeFirst();
-        PieChart pie( *p.centroid(), p.getLevel() );
-        if(pieType == GLYPH_EQUAL_PIE)
-            pie.setSliceType(PieChart::EQUAL_SLICES);
-        else
-            pie.setSliceType(PieChart::FULL_SLICES);
+        if(p.getLevel() > 0)
+        {
+            QStringList values = p.getValues();
+            for( int i = 0; i < 4; ++i )
+                values.removeFirst();
+            PieChart pie( *p.centroid(), p.getLevel() );
+            if(pieType == GLYPH_EQUAL_PIE)
+                pie.setSliceType(PieChart::EQUAL_SLICES);
+            else
+                pie.setSliceType(PieChart::FULL_SLICES);
 
-        pie.initialize(values);
-        pies.append(pie);
+            pie.initialize(values);
+            pies.append(pie);
+        }
+
     }
 
     setPieGlyphs(pies);
