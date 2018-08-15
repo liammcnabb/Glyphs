@@ -573,7 +573,10 @@ public:
         //This ceils or floors any values outside of the range to prevent componding errors.
         if(value<=getLowerRange()){value=getLowerRange();}
         if(value>=getUpperRange()){value=getUpperRange();}
-        Colour colourOutput;
+        Colour colourOutput(CurrentColourMap()[0].getR(),
+                CurrentColourMap()[0].getG(),
+                CurrentColourMap()[0].getB(),
+                CurrentColourMap()[0].getAlpha());
         float distance=abs((float)getUpperRange()-(float)getLowerRange());
         float valueAlongRange = (float)abs(value-getLowerRange())/(float)abs(distance);
         if(valueAlongRange<0){
