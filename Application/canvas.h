@@ -32,6 +32,7 @@ public:
     static const int SEQUENTIAL = 0;
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;
+    static const int OUTLINE = 3;
 
     Canvas(QWidget *parent);
     void initializeGL();
@@ -77,6 +78,10 @@ public:
     int getClickedIndex() const;
     void setClickedIndex(int clickedIndex);
 
+
+    QStringList getDataHeaders() const;
+    void setDataHeaders(const QStringList &value);
+
 private:
     bool m_debugMousePointer = false;
 
@@ -91,6 +96,8 @@ private:
     float glyphSize = 2.5f;
 
     int m_clickedIndex = NEGATIVE_INDEX;
+
+    QStringList dataHeaders;
 
     QPointF mouse;
 
@@ -116,6 +123,7 @@ private:
     float convertedY(float windowY);
     int findClickedIndex(QPointF coords, QVector<PieChart> list);
     void drawPolygon(TreeNode polygon);
+    void fillToolTip(int glyphIndex);
 };
 
 #endif // CANVAS_H

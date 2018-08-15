@@ -41,7 +41,12 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
     setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
 //    qDebug() << getClickedIndex();
 //    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
+    if(getClickedIndex() > NEGATIVE_INDEX)
+        fillToolTip(getClickedIndex());
+
         update();
+
+
 
 }
 
@@ -105,7 +110,29 @@ void Canvas::changeColorMap(int mapType)
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
+    case this->OUTLINE :
+    {
+        if( ColourManager::InvertColourMapFlag() )
+            ColourManager::InvertColourMap();
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[1];
+        ColourManager::setCurrentColourMap(cMap);
+        break;
     }
+    }
+}
+
+void Canvas::fillToolTip(int glyphIndex)
+{
+    QString string;
+    for( int i = 4; i < getGroomedPolygons().at(glyphIndex).getValues().size();
+        ++i )
+    {
+        string.append(getDataHeaders().at(i)+": ");
+        string.append(getGroomedPolygons().at(glyphIndex).getValues().at(i)+"%, \n");
+    }
+    string.remove(string.size()-3,3);
+    QWidget::setToolTip(string);
+    return;
 }
 
 QVector<TreeNode> Canvas::getGroomedPolygons() const
@@ -158,6 +185,16 @@ void Canvas::setClickedIndex(int clickedIndex)
     m_clickedIndex = clickedIndex;
 }
 
+QStringList Canvas::getDataHeaders() const
+{
+    return dataHeaders;
+}
+
+void Canvas::setDataHeaders(const QStringList &value)
+{
+    dataHeaders = value;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -180,6 +217,7 @@ void Canvas::redraw()
     case GLYPH_CENTROID :
     {
         calculateValueBounds( getGroomedPolygons() );
+        changeColorMap(this->DIVERGING);
         ColourManager manager(getValueLower(), getValueUpper());
         drawCentroids( getGroomedPolygons(), manager );
         drawLegend( manager );
@@ -189,6 +227,7 @@ void Canvas::redraw()
     {
         createPieGlyphs( getGroomedPolygons(), GLYPH_EQUAL_PIE );
         calculateValueBounds( getPieGlyphs() );
+        changeColorMap(this->DIVERGING);
         ColourManager manager(getValueLower(), getValueUpper());
         drawPieGlyphs( getPieGlyphs(), manager);
         drawLegend( manager );
@@ -198,6 +237,7 @@ void Canvas::redraw()
     {
         createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE );
         calculateValueBounds( getPieGlyphs() );
+        changeColorMap(this->CATEGORICAL);
         ColourManager manager(getValueLower(), getValueUpper());
         drawPieGlyphs( getPieGlyphs(), manager);
         drawLegend( manager );
@@ -289,14 +329,17 @@ void Canvas::drawPolygon(TreeNode polygon)
 
 void Canvas::drawPolygons(QVector<TreeNode> list)
 {
+    changeColorMap(this->OUTLINE);
+    ColourManager outline(0,list.size());
     for ( int i = 0; i < list.size(); ++i )
     {
         TreeNode polygon = list.at( i );
-        glLineWidth( 1 );
+        glLineWidth( 2 );
         glBegin( GL_LINE_STRIP );
 
-
-        glColor4f( 0, 0, 0, 0.5 );
+        Colour c = outline.getInterpolatedColour(i);
+        glColor4f( c.getR(), c.getG(), c.getB(), 0.8 );
+//        glColor4f( 0, 0, 0, 0.5 );
 
         for( QVector<QPointF>::const_iterator it =
                     polygon.getNonSharedBoundary()->getBoundary().begin();
@@ -352,8 +395,10 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
     Colour color;
-    foreach(PieChart p, list)
+    for( int j = 0; j < list.size(); ++j )
     {
+        PieChart p = list.at(j);
+//        Colour c = outline.getInterpolatedColour(j);
 //        /* Outline */
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
         glBegin( GL_TRIANGLE_FAN );
@@ -372,7 +417,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         }
         glEnd();
 
-
+        changeColorMap(this->CATEGORICAL);
         float currentAngle = 0;
 //        color = Colour(1,0,0,1,"");
         for( int i = 0; i < p.pieSlices().size(); ++i )

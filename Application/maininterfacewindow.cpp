@@ -36,8 +36,8 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     CsvReader csvReader( dataName.toStdString() );
     csvReader.extract();
     QVector<QStringList> data = csvReader.getData();
-
     QStringList valueHeaders = data.at(0);
+    ui->OpenGLWidget->setDataHeaders(valueHeaders);
     for( int i = 0; i < ignoredValues; ++i )
         valueHeaders.removeFirst();
     ui->lstHeaders->addItems(valueHeaders);
