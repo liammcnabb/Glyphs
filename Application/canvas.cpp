@@ -25,10 +25,58 @@ void Canvas::initializeGL()
     changeColorMap( this->DIVERGING );
     ColourManager::InvertColourMap();
 
+    QWidget::setMouseTracking(true);
 
 
     //    connect( &timer, SIGNAL( timeout() ), this, SLOT( update() ) );
     //    timer.start( 1000 );
+}
+
+void Canvas::mouseMoveEvent( QMouseEvent *event )
+{
+
+    setMouse(QPointF( convertedX( float( event->x() ) ),
+                      convertedY( float( event->y() ) ) ) );
+
+    setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
+    qDebug() << getClickedIndex();
+    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
+        update();
+
+}
+
+float Canvas::convertedX( float windowX )
+{
+    float newX;
+    newX = (getWrapper().minimums.at(AABB::XDIM) - scaleModifier()) +
+            ( ( windowX / this->width() ) *
+              ( getLength() + (scaleModifier()*2) ) ) ;
+    return newX;
+}
+
+float Canvas::convertedY( float windowY )
+{
+    float newY,reverseY;
+    reverseY = -( windowY - 1 - this->height() );
+
+    newY = (getWrapper().minimums.at(AABB::YDIM) - scaleModifier()) +
+            ( ( reverseY / this->height() ) *
+              ( getLength() + (scaleModifier()*2) ) );
+    return newY;
+}
+
+int Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list )
+{
+    for(int i = 0; i < list.size(); i++)
+    {
+        QPointF c = list.at(i).centroid();
+        if( IntersectTester::isIntersecting( Point( coords.x(),coords.y() ),
+                                  Circle( Point( c.x(),c.y() ),
+                                  ( getLength() / 100 ) * getGlyphSize() ) ) )
+            return i;
+    }
+
+    return NEGATIVE_INDEX;
 }
 
 void Canvas::changeColorMap(int mapType)
@@ -80,10 +128,43 @@ void Canvas::setGlyphSize(float value)
     glyphSize = value;
 }
 
+QPointF Canvas::getMouse() const
+{
+    return mouse;
+}
+
+void Canvas::setMouse(const QPointF &value)
+{
+    mouse = value;
+}
+
+bool Canvas::debugMousePointer() const
+{
+    return m_debugMousePointer;
+}
+
+void Canvas::setDebugMousePointer(bool value)
+{
+    m_debugMousePointer = value;
+}
+
+int Canvas::getClickedIndex() const
+{
+    return m_clickedIndex;
+}
+
+void Canvas::setClickedIndex(int clickedIndex)
+{
+    m_clickedIndex = clickedIndex;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
         redraw();
+
+
+
 }
 
 void Canvas::redraw()
@@ -124,6 +205,17 @@ void Canvas::redraw()
         drawLegend( manager );
         break;
     }
+    }
+
+//    if( getClickedIndex() > NEGATIVE_INDEX )
+//    {
+
+//    }
+
+    if( debugMousePointer() )
+    {
+        debugCircle( getMouse().x(),
+                     getMouse().y(), Colour("FF0000"), 0.5f);
     }
 
     qDebug() << "drawn.";
@@ -386,7 +478,7 @@ bool Canvas:: debugCircle( double centerX, double centerY,
                            Colour color, double size )
 {
     /* Outline */
-    glColor4f( 0, 0, 0, 0.25 );
+    glColor4f( 0, 0, 0, 1 );
     glBegin( GL_TRIANGLE_FAN );
     glVertex2f( centerX, centerY );
     //double size = 1;

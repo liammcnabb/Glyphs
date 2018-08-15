@@ -4,7 +4,7 @@
 //#include "global.h"
 #include "SCZ/polygon.h"
 #include "SCZ/boundary.h"
-#include "LM/aabb.h"
+#include "LM/IntersectTester/AABB.h"
 #include "personalerrors.cpp"
 #include <QVector>
 

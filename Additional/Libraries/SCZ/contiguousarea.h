@@ -4,7 +4,7 @@
 //#include "global.h"
 #include <QDebug>
 #include "polygon.h"
-#include "LM/aabb.h"
+#include "LM/IntersectTester/AABB.h"
 #include <QVector>
 
 

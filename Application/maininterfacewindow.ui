@@ -211,12 +211,27 @@
     </property>
     <addaction name="actionEngland_Example"/>
    </widget>
+   <widget class="QMenu" name="menuDebug_Options">
+    <property name="title">
+     <string>Debug Options</string>
+    </property>
+    <addaction name="actionDebugMousePointer"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuDebug_Options"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionEngland_Example">
    <property name="text">
     <string>England Example</string>
+   </property>
+  </action>
+  <action name="actionDebugMousePointer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>DebugMousePointer</string>
    </property>
   </action>
  </widget>

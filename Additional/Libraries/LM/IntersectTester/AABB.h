@@ -1,14 +1,13 @@
 #ifndef AABB_H
 #define AABB_H
 
-#include "LM/boundingbox.h"
 #include <vector>
 #include <string>
 #include <math.h>
-#include <QDebug>
+#include <iostream>
 
 
-class AABB : public BoundingBox
+class AABB
 {
 public:
     AABB(); //Base Constructor
@@ -16,9 +15,9 @@ public:
     AABB( float minX, float maxX, float minY, float maxY,
              float minZ, float maxZ );
     AABB( const AABB& other ); //Copy Constructor
-    ~AABB(); //Destructor
-
+    ~AABB();
     AABB& operator=( const AABB& other ); //Copy Assignment
+
 
     void overwrite( const AABB& other );
     bool equals( AABB comparitor ) const;
@@ -26,17 +25,16 @@ public:
     static AABB unify( AABB* a, AABB* b );
 
     float length( int dimension );
-
-
     std::vector<float> minimums;
     std::vector<float> maximums;
-
-
     std::string toString();
 
+    static const int XDIM = 0;
+    static const int YDIM = 1;
+    static const int ZDIM = 2;
+    static const int TOTAL_SIZE = 3;
+
 private:
-
-
     void initialize();
     void dimensionsDefaultSize();
 };

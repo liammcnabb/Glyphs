@@ -2,7 +2,7 @@
 #define POLYGON_H
 
 #include <QDebug>
-#include "LM/aabb.h"
+#include "LM/IntersectTester/AABB.h"
 #include <QVector>
 #include <stdio.h>
 
@@ -91,7 +91,7 @@ public:
     int getSortCriteria() const;
     void setSortCriteria( int value );
 
-    int sortCriteria;
+    int sortCriteria = 0;
 
 
     QVector<QString> getFields() const;

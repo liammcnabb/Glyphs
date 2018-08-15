@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     ../Additional/Libraries/SCZ/segment.cpp \
     ../Additional/Libraries/SCZ/mapextractor.cpp \
     ../Additional/Libraries/SCZ/polygon.cpp \
-    ../Additional/Libraries/LM/aabb.cpp \
     ../Additional/Libraries/LM/boundingbox.cpp \
     ../Additional/Libraries/LM/csvreader.cpp \
     personalerrors.cpp \
@@ -38,7 +37,9 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/crfreader.cpp \
     ../Additional/Libraries/LM/crfwriter.cpp \
     ../Additional/Libraries/LM/crfrow.cpp \
-    ../Additional/Libraries/LM/writer.cpp
+    ../Additional/Libraries/LM/writer.cpp \
+    ../Additional/Libraries/LM/IntersectTester/IntersectTester.cpp \
+    ../Additional/Libraries/LM/IntersectTester/AABB.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -48,7 +49,6 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/SCZ/segment.h \
     ../Additional/Libraries/SCZ/mapextractor.h \
     ../Additional/Libraries/SCZ/polygon.h \
-    ../Additional/Libraries/LM/aabb.h \
     ../Additional/Libraries/LM/boundingbox.h \
     ../Additional/Libraries/LM/csvreader.h \
     ../Additional/Libraries/Spectrum/colourmanager.h \
@@ -66,7 +66,9 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/crfwriter.h \
     ../Additional/Libraries/LM/crfrow.h \
     ../Additional/Libraries/LM/crfreader.h.autosave \
-    ../Additional/Libraries/LM/writer.h
+    ../Additional/Libraries/LM/writer.h \
+    ../Additional/Libraries/LM/IntersectTester/IntersectTester.h \
+    ../Additional/Libraries/LM/IntersectTester/AABB.h
 
 FORMS    += maininterfacewindow.ui
 

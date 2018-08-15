@@ -11,15 +11,18 @@
 #include <QDebug>
 #include <algorithm>
 #include <cmath>
+#include <QMouseEvent>
 
 #include "Spectrum/colourmanager.h"
-#include "LM/aabb.h"
+#include "LM/IntersectTester/AABB.h"
 #include "piechart.h"
 #include "SCZ/treenode.h"
+#include "LM/IntersectTester/IntersectTester.h"
 
 class Canvas : public QOpenGLWidget
 {
 public:
+    static const int NEGATIVE_INDEX = -1;
     static const int COLORMAP_INDEX = 2;
     int VALUE_INDEX = 5;
     static const int GLYPH_CENTROID = 0;
@@ -65,7 +68,18 @@ public:
     float getGlyphSize() const;
     void setGlyphSize(float value);
 
+    QPointF getMouse() const;
+    void setMouse(const QPointF &value);
+
+    bool debugMousePointer() const;
+    void setDebugMousePointer(bool value);
+
+    int getClickedIndex() const;
+    void setClickedIndex(int clickedIndex);
+
 private:
+    bool m_debugMousePointer = false;
+
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
     QVector<PieChart> m_pieGlyphs;
@@ -75,6 +89,10 @@ private:
     float valueLower;
     int glyphType = GLYPH_CENTROID;
     float glyphSize = 2.5f;
+
+    int m_clickedIndex = NEGATIVE_INDEX;
+
+    QPointF mouse;
 
     void prepareDraw();
     void setOrtho();
@@ -93,6 +111,10 @@ private:
     void createPieGlyphs(QVector<TreeNode> list, int pieType);
     void drawPieGlyphs(QVector<PieChart> list, ColourManager cm);
 
+    void mouseMoveEvent(QMouseEvent *event);
+    float convertedX(float windowX);
+    float convertedY(float windowY);
+    int findClickedIndex(QPointF coords, QVector<PieChart> list);
 };
 
 #endif // CANVAS_H

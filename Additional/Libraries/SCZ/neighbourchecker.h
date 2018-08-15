@@ -4,7 +4,7 @@
 #include "SCZ/treenode.h"
 #include "SCZ/linkedlist.h"
 //#include "global.h"
-#include "LM/aabb.h"
+#include "LM/IntersectTester/AABB.h"
 
 class NeighbourChecker
 {

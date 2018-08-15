@@ -164,3 +164,9 @@ void MainInterfaceWindow::on_GlyphSize_valueChanged(int value)
     ui->OpenGLWidget->setGlyphSize(float(value)/2);
     ui->OpenGLWidget->update();
 }
+
+void MainInterfaceWindow::on_actionDebugMousePointer_toggled(bool arg1)
+{
+    ui->OpenGLWidget->setDebugMousePointer(arg1);
+    ui->OpenGLWidget->update();
+}

@@ -1,4 +1,4 @@
-#include "aabb.h"
+#include "LM/IntersectTester/AABB.h"
 
 AABB::AABB()
 {
@@ -45,8 +45,6 @@ AABB::AABB( const AABB& other )
     maximums.at( ZDIM ) = other.maximums.at( ZDIM );
 }
 
-AABB::~AABB()
-{ }
 
 AABB& AABB::operator=( const AABB& other )
 {
@@ -103,6 +101,10 @@ bool AABB::intersects( AABB comparitor ) const
     return true;
 }
 
+AABB::~AABB()
+{
+
+}
 
 /**
  * @brief AABB::unify
@@ -143,8 +145,8 @@ float AABB::length( int dimension )
             return fabs( maximums[ZDIM] - minimums[ZDIM] );
             break;
         default:
-            qDebug() << "LM_AABB::length(int dimension) : " <<
-                     "Dimension Doesn't exist.";
+            std::cout << "AABB::length(int dimension) : " <<
+                     "Dimension Doesn't exist." << std::endl;
             return 0.0f;
             break;
     }
@@ -166,11 +168,11 @@ void AABB::initialize()
  */
 std::string AABB::toString()
 {
-    return "Minimums: { " + std::to_string( minimums.at(
-            XDIM ) ) + ", " +
-           std::to_string( minimums.at( YDIM ) ) + ", " +
-           std::to_string( minimums.at( ZDIM ) ) + " } Maximums: { " +
-           std::to_string( maximums.at( XDIM ) ) + ", " +
-           std::to_string( maximums.at( YDIM ) ) + ", " +
-           std::to_string( maximums.at( ZDIM ) ) + "}.\n";
+//    return "Minimums: { " +  std::to_string(minimums[ XDIM ])  + ", " +
+//            std::to_string(minimums[ YDIM ])  + ", " +
+//            std::to_string(minimums[ ZDIM ])  + " } Maximums: { " +
+//            std::to_string(maximums[ XDIM ])  + ", " +
+//            std::to_string(maximums[ YDIM ])  + ", " +
+//            std::to_string(maximums[ ZDIM ])  + "}." + std::endl;
 }
+
