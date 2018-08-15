@@ -39,8 +39,8 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
                       convertedY( float( event->y() ) ) ) );
 
     setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
-    qDebug() << getClickedIndex();
-    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
+//    qDebug() << getClickedIndex();
+//    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
         update();
 
 }
@@ -163,8 +163,6 @@ void Canvas::paintGL()
     if(getGroomedPolygons().size() > 0)
         redraw();
 
-
-
 }
 
 void Canvas::redraw()
@@ -207,10 +205,10 @@ void Canvas::redraw()
     }
     }
 
-//    if( getClickedIndex() > NEGATIVE_INDEX )
-//    {
-
-//    }
+    if( getClickedIndex() > NEGATIVE_INDEX )
+    {
+        drawPolygon(getGroomedPolygons().at(getClickedIndex()));
+    }
 
     if( debugMousePointer() )
     {
@@ -269,6 +267,26 @@ void Canvas::drawPolygons(QVector<Polygon> list)
     }
 }
 
+void Canvas::drawPolygon(TreeNode polygon)
+{
+    glLineWidth( 3 );
+    glBegin( GL_LINE_STRIP );
+
+
+    glColor4f( 1, 0, 0, 0.5 );
+
+    for( QVector<QPointF>::const_iterator it =
+                polygon.getNonSharedBoundary()->getBoundary().begin();
+            it < polygon.getNonSharedBoundary()->getBoundary().end(); ++it )
+        glVertex2f( it->x(), it->y() );
+    for( QVector<QPointF>::const_iterator it =
+                polygon.getSharedBoundary()->getBoundary().begin();
+            it < polygon.getSharedBoundary()->getBoundary().end(); ++it )
+        glVertex2f( it->x(), it->y() );
+
+    glEnd();
+}
+
 void Canvas::drawPolygons(QVector<TreeNode> list)
 {
     for ( int i = 0; i < list.size(); ++i )
@@ -310,7 +328,7 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
     QVector<PieChart> pies;
     foreach( TreeNode p, list)
     {
-        if(p.getLevel() > 0)
+        if(p.getLevel() > -1)
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )

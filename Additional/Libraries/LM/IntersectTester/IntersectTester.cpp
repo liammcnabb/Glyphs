@@ -52,13 +52,7 @@ bool IntersectTester::doLineAndTriangleIntersect(Line l, Triangle t)
 
 bool IntersectTester::isPointOnCircle(Point p, Circle c)
 {
-    if(distanceBetweenPoints(p,c.getCenter()) < c.getRadius())
-    {
-        qDebug() << c.getRadius();
-        return true;
-    }
-
-    return false;
+    return distanceBetweenPoints(p,c.getCenter()) < c.getRadius();
 }
 
 float IntersectTester::distanceBetweenPoints(Point a, Point b)
@@ -67,7 +61,6 @@ float IntersectTester::distanceBetweenPoints(Point a, Point b)
     float squareY = (b.getY()-a.getY())*(b.getY()-a.getY());
     float answer = sqrt( squareX + squareY );
 
-    qDebug() << answer;
      return answer;
 }
 

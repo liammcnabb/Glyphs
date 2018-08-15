@@ -115,6 +115,7 @@ private:
     float convertedX(float windowX);
     float convertedY(float windowY);
     int findClickedIndex(QPointF coords, QVector<PieChart> list);
+    void drawPolygon(TreeNode polygon);
 };
 
 #endif // CANVAS_H
