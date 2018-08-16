@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/crfrow.cpp \
     ../Additional/Libraries/LM/writer.cpp \
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.cpp \
-    ../Additional/Libraries/LM/IntersectTester/AABB.cpp
+    ../Additional/Libraries/LM/IntersectTester/AABB.cpp \
+    starglyph.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -68,7 +69,8 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/crfreader.h.autosave \
     ../Additional/Libraries/LM/writer.h \
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.h \
-    ../Additional/Libraries/LM/IntersectTester/AABB.h
+    ../Additional/Libraries/LM/IntersectTester/AABB.h \
+    starglyph.h
 
 FORMS    += maininterfacewindow.ui
 
