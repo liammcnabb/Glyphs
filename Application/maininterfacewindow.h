@@ -43,6 +43,8 @@ private slots:
 
     void on_actionDebugMousePointer_toggled(bool arg1);
 
+    void on_rdo_StarGlyph_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

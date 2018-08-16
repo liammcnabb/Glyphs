@@ -41,8 +41,7 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
     setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
 //    qDebug() << getClickedIndex();
 //    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
-    if(getClickedIndex() > NEGATIVE_INDEX)
-        fillToolTip(getClickedIndex());
+    fillToolTip(getClickedIndex());
 
         update();
 
@@ -123,6 +122,12 @@ void Canvas::changeColorMap(int mapType)
 
 void Canvas::fillToolTip(int glyphIndex)
 {
+    if( glyphIndex <= NEGATIVE_INDEX )
+    {
+        QWidget::setToolTip(QString());
+        return;
+    }
+
     QString string;
     for( int i = 4; i < getGroomedPolygons().at(glyphIndex).getValues().size();
         ++i )
@@ -195,6 +200,16 @@ void Canvas::setDataHeaders(const QStringList &value)
     dataHeaders = value;
 }
 
+QVector<StarGlyph> Canvas::getStarGlyphs() const
+{
+    return m_starGlyphs;
+}
+
+void Canvas::setStarGlyphs(const QVector<StarGlyph> &starGlyphs)
+{
+    m_starGlyphs = starGlyphs;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -243,6 +258,19 @@ void Canvas::redraw()
         drawLegend( manager );
         break;
     }
+    case GLYPH_STAR :
+    {
+
+        calculateAbsoluteValueBounds( getGroomedPolygons() );
+        setValueLower(0.2);
+        setValueUpper(10.7);
+        createStarGlyphs( getGroomedPolygons() );
+        changeColorMap(this->CATEGORICAL);
+        ColourManager manager(getValueLower(), getValueUpper());
+        drawStarGlyphs( getStarGlyphs(), manager );
+        drawLegend( manager );
+        break;
+    }
     }
 
     if( getClickedIndex() > NEGATIVE_INDEX )
@@ -270,6 +298,23 @@ void Canvas::calculateValueBounds( QVector<TreeNode> list )
                                  p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
         setValueUpper( std::max( getValueUpper(),
                                  p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
+    }
+}
+
+void Canvas::calculateAbsoluteValueBounds( QVector<TreeNode> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+
+    for(TreeNode p: list)
+    {
+        for( int i = 0; i < p.getValues().size(); ++i )
+        {
+            setValueLower( std::min( getValueLower(),
+                                     p.getValues().at( i ).toFloat() ) ) ;
+            setValueUpper( std::max( getValueUpper(),
+                                     p.getValues().at( i ).toFloat() ) ) ;
+        }
     }
 }
 
@@ -390,6 +435,67 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
 
     setPieGlyphs(pies);
     return;
+}
+
+void Canvas::createStarGlyphs( QVector<TreeNode> list )
+{
+    QVector<StarGlyph> stars;
+    foreach( TreeNode p, list )
+    {
+        if(p.getLevel() > -1)
+        {
+            QStringList values = p.getValues();
+            for( int i = 0; i < 4; ++i )
+                values.removeFirst();
+            StarGlyph star( *p.centroid(), p.getLevel() );
+            star.initialize(values, getValueUpper(), getValueLower());
+            stars.append(star);
+        }
+    }
+
+    setStarGlyphs(stars);
+}
+
+void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
+{
+    Colour color;
+    for( int i = 0; i < list.size(); ++ i )
+    {
+        StarGlyph s = list.at(i);
+        glColor4f( 0.8, 0.8, 0.8, 0.8 );
+        glBegin( GL_TRIANGLE_FAN );
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+        double max = getLength() / 100;
+        float valueRotation = (2*M_PI) / s.points().size();
+        for( float j = 0; j < s.points().size(); ++j )
+        {
+            float x = s.centroid().x() + sin( valueRotation * j ) *
+                    (( getGlyphSize()*2) * ( max * s.points().at(j) ) );
+            float y = s.centroid().y() + cos( valueRotation * j ) *
+                    (( getGlyphSize()*2)* ( max * s.points().at(j) ) );
+            glVertex2f( x, y );
+        }
+        float x = s.centroid().x() + sin( valueRotation ) *
+                (( getGlyphSize()*2) * ( max * s.points().at(0) ) );
+        float y = s.centroid().y() + cos( valueRotation ) *
+                (( getGlyphSize()*2)* ( max * s.points().at(0) ) );
+        glVertex2f( x, y );
+
+        glEnd();
+
+        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+        glBegin( GL_LINES );
+        for( float j = 0; j < s.points().size(); ++j )
+        {
+            glVertex2f( s.centroid().x(), s.centroid().y() );
+            float x = s.centroid().x() + sin( valueRotation * j ) *
+                    (( getGlyphSize()*2) * ( max * s.points().at(j) ) );
+            float y = s.centroid().y() + cos( valueRotation * j ) *
+                    (( getGlyphSize()*2)* ( max * s.points().at(j) ) );
+            glVertex2f( x, y );
+        }
+        glEnd();
+    }
 }
 
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)

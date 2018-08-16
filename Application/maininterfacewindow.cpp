@@ -80,6 +80,14 @@ void MainInterfaceWindow::on_rdo_VariableSegmentPie_released()
     ui->OpenGLWidget->update();
 }
 
+void MainInterfaceWindow::on_rdo_StarGlyph_released()
+{
+    ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
+    ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_STAR);
+    ui->OpenGLWidget->update();
+}
+
+
 void MainInterfaceWindow::on_virtualzoom_valueChanged(int value)
 {
     double minScreenSpace = double(value) / 100;
@@ -170,3 +178,4 @@ void MainInterfaceWindow::on_actionDebugMousePointer_toggled(bool arg1)
     ui->OpenGLWidget->setDebugMousePointer(arg1);
     ui->OpenGLWidget->update();
 }
+

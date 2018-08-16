@@ -149,6 +149,25 @@
             <string>Variable Segment Pie Chart</string>
            </property>
           </widget>
+          <widget class="QRadioButton" name="rdo_StarGlyph">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>120</y>
+             <width>191</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Star Glyph</string>
+           </property>
+          </widget>
          </widget>
         </item>
         <item>

@@ -16,6 +16,7 @@
 #include "Spectrum/colourmanager.h"
 #include "LM/IntersectTester/AABB.h"
 #include "piechart.h"
+#include "starglyph.h"
 #include "SCZ/treenode.h"
 #include "LM/IntersectTester/IntersectTester.h"
 
@@ -28,6 +29,7 @@ public:
     static const int GLYPH_CENTROID = 0;
     static const int GLYPH_EQUAL_PIE = 1;
     static const int GLYPH_VARIABLE_PIE = 2;
+    static const int GLYPH_STAR = 3;
 
     static const int SEQUENTIAL = 0;
     static const int DIVERGING = 1;
@@ -82,12 +84,16 @@ public:
     QStringList getDataHeaders() const;
     void setDataHeaders(const QStringList &value);
 
+    QVector<StarGlyph> getStarGlyphs() const;
+    void setStarGlyphs(const QVector<StarGlyph> &starGlyphs);
+
 private:
     bool m_debugMousePointer = false;
 
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
     QVector<PieChart> m_pieGlyphs;
+    QVector<StarGlyph> m_starGlyphs;
     AABB wrapper;
     float length;
     float valueUpper;
@@ -124,6 +130,9 @@ private:
     int findClickedIndex(QPointF coords, QVector<PieChart> list);
     void drawPolygon(TreeNode polygon);
     void fillToolTip(int glyphIndex);
+    void createStarGlyphs(QVector<TreeNode> list);
+    void calculateAbsoluteValueBounds(QVector<TreeNode> list);
+    void drawStarGlyphs(QVector<StarGlyph> list, ColourManager cm);
 };
 
 #endif // CANVAS_H
