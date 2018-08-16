@@ -538,6 +538,22 @@ public:
         qualitative3.addColour(Colour("#B9AFAA"));
         ColourMapList().addColourMap(qualitative3);
 
+        ColourMap spectral;
+        spectral.setMapName("Spectral");
+        spectral.setClassification(DIVERGING);
+        spectral.addColour(Colour("#9e0142"));
+        spectral.addColour(Colour("#d53e4f"));
+        spectral.addColour(Colour("#f46d43"));
+        spectral.addColour(Colour("#fdae61"));
+        spectral.addColour(Colour("#fee08b"));
+        spectral.addColour(Colour("#ffffbf"));
+        spectral.addColour(Colour("#e6f598"));
+        spectral.addColour(Colour("#abdda4"));
+        spectral.addColour(Colour("#66c2a5"));
+        spectral.addColour(Colour("#3288bd"));
+        spectral.addColour(Colour("#5e4fa2"));
+        ColourMapList().addColourMap(spectral);
+
         //Add indexes to the colour maps
         ColourMapList().setupIndexesInList();
 
