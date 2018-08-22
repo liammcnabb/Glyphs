@@ -284,7 +284,13 @@ void Canvas::redraw()
     prepareDraw();
     
     drawPolygons( loadedPolygons() );
-    drawPolygons( getGroomedPolygons() );
+//    if(getTransitionNeutral().isEmpty())
+        drawPolygons( getGroomedPolygons() );
+//    else
+//    {
+//        drawPolygons( getTransitionNeutral() );
+//        drawPolygons( getTransitionAdd() );
+//    }
     
     glLineWidth( 1 );
     /**Default*/
@@ -381,7 +387,10 @@ void Canvas::redraw()
 
     if( getClickedIndex() > NEGATIVE_INDEX )
     {
-        drawPolygon(getGroomedPolygons().at(getClickedIndex()));
+        QVector<TreeNode> poly;
+        poly.append(getTransitionNeutral());
+        poly.append(getTransitionAdd());
+        drawPolygon(poly.at(getClickedIndex()));
     }
 
     if( debugMousePointer() )

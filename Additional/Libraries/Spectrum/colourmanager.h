@@ -671,7 +671,7 @@ public:
                 CurrentColourMap()[0].getAlpha());
         float distance=abs((float)getUpperRange()-(float)getLowerRange());
         float valueAlongRange = (float)abs(value-getLowerRange())/(float)abs(distance);
-        if(valueAlongRange<0){
+        if(valueAlongRange<=0){
             return colourOutput;
         }else if(valueAlongRange>1.0f){
             valueAlongRange=1.0f;
@@ -714,7 +714,6 @@ public:
 //        if(index<CurrentColourMap().getColourList().size()){
 //            colourOutput = CurrentColourMap()[index];
 //        };
-        qDebug() << index;
         return index;
 
     }
