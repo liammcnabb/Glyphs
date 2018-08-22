@@ -111,6 +111,8 @@ void MainInterfaceWindow::on_rdo_StarGlyph_released()
 
 void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
 {
+    double transitionFrames = 25;
+    double frameSkip = 2;
     double minScreenSpace = double(value) / 100;
     QVector<TreeNode> visiblePolygons;
     visiblePolygons = declareVisiblePolygons(getFullHierarchies(), minScreenSpace);
@@ -118,23 +120,14 @@ void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
     ui->OpenGLWidget->setGroomedPolygons( visiblePolygons );
 
      ui->OpenGLWidget->setTransitionState(true);
-
-    float incrementer = ui->OpenGLWidget->getGlyphSize() / 25;
-    for( int i = 0; i < 25; i+=2 )
+    float incrementer = ui->OpenGLWidget->getGlyphSize() / transitionFrames;
+    for( int i = 0; i < transitionFrames; i+=frameSkip )
     {
         ui->OpenGLWidget->setCurrentTransitionSize(incrementer*i);
         ui->OpenGLWidget->repaint();
         qApp->processEvents();
     }
-
-//    QVector<TreeNode> visible;
-//    visible.append(ui->OpenGLWidget->getTransitionNeutral());
-//    visible.append(ui->OpenGLWidget->getTransitionAdd());
-////    visible.append(ui->OpenGLWidget->getTransitionRemove());
-//    ui->OpenGLWidget->setGroomedPolygons(visible);
-
-     ui->OpenGLWidget->setTransitionState(false);
-//    qDebug() << visiblePolygons.size();
+    ui->OpenGLWidget->setTransitionState(false);
     ui->OpenGLWidget->update();
 
 }
