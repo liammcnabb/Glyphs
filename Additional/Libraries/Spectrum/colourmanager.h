@@ -689,6 +689,36 @@ public:
         return colourOutput;
     }
 
+    inline int getClassColourIndex(float value){
+        //This ceils or floors any values outside of the range to prevent componding errors.
+        if(value<=getLowerRange()){value=getLowerRange();}
+        if(value>=getUpperRange()){value=getUpperRange();}
+        int colourIndex = 0;
+//        Colour colourOutput(CurrentColourMap()[0].getR(),
+//                CurrentColourMap()[0].getG(),
+//                CurrentColourMap()[0].getB(),
+//                CurrentColourMap()[0].getAlpha());
+        float distance=abs((float)getUpperRange()-(float)getLowerRange());
+        float valueAlongRange = (float)abs(value-getLowerRange())/(float)abs(distance);
+        if(valueAlongRange<=0){
+            return colourIndex;
+        }else if(valueAlongRange>1.0f){
+            valueAlongRange=1.0f;
+        }
+
+        int size = CurrentColourMap().getColourList().size();
+        //This offset prevents any 1.0f values flooring to a larger index than the list size.
+        valueAlongRange-=(0.0005);
+        int index = (int)floor(valueAlongRange*size);
+
+//        if(index<CurrentColourMap().getColourList().size()){
+//            colourOutput = CurrentColourMap()[index];
+//        };
+        qDebug() << index;
+        return index;
+
+    }
+
     inline Colour getColourFromSeed(uint seed){
         std::srand(seed);
         float R = (float)std::rand()/(float)RAND_MAX;

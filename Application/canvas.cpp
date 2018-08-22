@@ -38,11 +38,12 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
     setMouse(QPointF( convertedX( float( event->x() ) ),
                       convertedY( float( event->y() ) ) ) );
 
-    setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
-//    qDebug() << getClickedIndex();
-//    if(debugMousePointer() || getClickedIndex() > NEGATIVE_INDEX )
-    fillToolTip(getClickedIndex());
-
+    if(getGlyphType() == this->GLYPH_EQUAL_PIE ||
+            getGlyphType() == GLYPH_VARIABLE_PIE)
+    {
+        setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
+        fillToolTip(getClickedIndex());
+    }
         update();
 
 
@@ -210,6 +211,16 @@ void Canvas::setStarGlyphs(const QVector<StarGlyph> &starGlyphs)
     m_starGlyphs = starGlyphs;
 }
 
+QVector<float> Canvas::getMeans() const
+{
+    return m_means;
+}
+
+void Canvas::setMeans(const QVector<float> &means)
+{
+    m_means = means;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -261,11 +272,12 @@ void Canvas::redraw()
     case GLYPH_STAR :
     {
 
-        calculateAbsoluteValueBounds( getGroomedPolygons() );
-        setValueLower(0.2);
-        setValueUpper(10.7);
+//        calculateAbsoluteValueBounds( getGroomedPolygons() );
+//        setValueLower(0.2);
+//        setValueUpper(10.7);
         createStarGlyphs( getGroomedPolygons() );
-        changeColorMap(this->CATEGORICAL);
+        calculateValueBounds( getStarGlyphs() );
+        changeColorMap(this->DIVERGING);
         ColourManager manager(getValueLower(), getValueUpper());
         drawStarGlyphs( getStarGlyphs(), manager );
         drawLegend( manager );
@@ -286,21 +298,6 @@ void Canvas::redraw()
 
     qDebug() << "drawn.";
 }
-
-void Canvas::calculateValueBounds( QVector<TreeNode> list )
-{
-    setValueLower(std::numeric_limits<float>::max());
-    setValueUpper(-std::numeric_limits<float>::max());
-
-    for(TreeNode p: list)
-    {
-        setValueLower( std::min( getValueLower(),
-                                 p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
-        setValueUpper( std::max( getValueUpper(),
-                                 p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
-    }
-}
-
 void Canvas::calculateAbsoluteValueBounds( QVector<TreeNode> list )
 {
     setValueLower(std::numeric_limits<float>::max());
@@ -318,6 +315,22 @@ void Canvas::calculateAbsoluteValueBounds( QVector<TreeNode> list )
     }
 }
 
+void Canvas::calculateValueBounds( QVector<TreeNode> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+
+    for(TreeNode p: list)
+    {
+        setValueLower( std::min( getValueLower(),
+                                 p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
+        setValueUpper( std::max( getValueUpper(),
+                                 p.getValues().at(VALUE_INDEX).toFloat() /**100*/ ) ) ;
+    }
+}
+
+
+
 void Canvas::calculateValueBounds( QVector<PieChart> list )
 {
     setValueLower(std::numeric_limits<float>::max());
@@ -330,6 +343,21 @@ void Canvas::calculateValueBounds( QVector<PieChart> list )
             setValueUpper( std::max( getValueUpper(),
                                      ps.value() ) );
         }
+}
+
+void Canvas::calculateValueBounds( QVector<StarGlyph> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+    foreach( StarGlyph p, list )
+        foreach( float ps, p.points() )
+        {
+            setValueLower( std::min( getValueLower(),
+                                     ps ) );
+            setValueUpper( std::max( getValueUpper(),
+                                     ps ) );
+        }
+
 }
 
 void Canvas::drawPolygons(QVector<Polygon> list)
@@ -448,7 +476,8 @@ void Canvas::createStarGlyphs( QVector<TreeNode> list )
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
             StarGlyph star( *p.centroid(), p.getLevel() );
-            star.initialize(values, getValueUpper(), getValueLower());
+//            star.initialize(values, getValueUpper(), getValueLower());
+            star.initialize(values, getMeans());
             stars.append(star);
         }
     }
@@ -459,41 +488,98 @@ void Canvas::createStarGlyphs( QVector<TreeNode> list )
 void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 {
     Colour color;
+    changeColorMap(this->CATEGORICAL);
+    double max = getLength() / 100;
+    int totalNooks = 7;
+    qDebug() << "totalNooks" << totalNooks;
+    int nook;
+    int nookSegment = max / totalNooks;
+
+    float x,y;
     for( int i = 0; i < list.size(); ++ i )
     {
+
         StarGlyph s = list.at(i);
         glColor4f( 0.8, 0.8, 0.8, 0.8 );
         glBegin( GL_TRIANGLE_FAN );
         glVertex2f( s.centroid().x(), s.centroid().y() );
-        double max = getLength() / 100;
+
+        //Fill
         float valueRotation = (2*M_PI) / s.points().size();
         for( float j = 0; j < s.points().size(); ++j )
         {
-            float x = s.centroid().x() + sin( valueRotation * j ) *
-                    (( getGlyphSize()*2) * ( max * s.points().at(j) ) );
-            float y = s.centroid().y() + cos( valueRotation * j ) *
-                    (( getGlyphSize()*2)* ( max * s.points().at(j) ) );
+            nook = cm.getClassColourIndex(s.points().at(j))/2;
+            x = s.centroid().x() + sin( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
-        float x = s.centroid().x() + sin( valueRotation ) *
-                (( getGlyphSize()*2) * ( max * s.points().at(0) ) );
-        float y = s.centroid().y() + cos( valueRotation ) *
-                (( getGlyphSize()*2)* ( max * s.points().at(0) ) );
+        nook = cm.getClassColourIndex(s.points().at(0))/2;
+        x = s.centroid().x() + sin( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
 
+        //Lines at Points
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
         glBegin( GL_LINES );
         for( float j = 0; j < s.points().size(); ++j )
         {
+            nook = cm.getClassColourIndex(s.points().at(j))/2;
             glVertex2f( s.centroid().x(), s.centroid().y() );
-            float x = s.centroid().x() + sin( valueRotation * j ) *
-                    (( getGlyphSize()*2) * ( max * s.points().at(j) ) );
-            float y = s.centroid().y() + cos( valueRotation * j ) *
-                    (( getGlyphSize()*2)* ( max * s.points().at(j) ) );
+            x = s.centroid().x() + sin( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
+        glEnd();
+
+        //Outlines
+        glBegin( GL_LINE_STRIP );
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+        for( float j = 0; j < s.points().size(); ++j )
+        {
+            nook = cm.getClassColourIndex(s.points().at(j))/2;
+            x = s.centroid().x() + sin( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        nook = cm.getClassColourIndex(s.points().at(0))/2;
+        x = s.centroid().x() + sin( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f( x, y );
+
+        glEnd();
+
+        //Standard
+        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
+        glBegin( GL_LINE_STRIP );
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+        for( float j = 0; j < s.points().size(); ++j )
+        {
+            nook = cm.getClassColourIndex(0)/2;
+            x = s.centroid().x() + sin( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( valueRotation * j ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        nook = cm.getClassColourIndex(0)/2;
+        x = s.centroid().x() + sin( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f( x, y );
+
         glEnd();
     }
 }

@@ -53,6 +53,7 @@ private:
     QVector<TreeNode> visibleNodes(double minScreenSpace, TreeNode node);
     void visibleNodes(double minScreenSpace, TreeNode *node, QVector<TreeNode> *currentList);
     QVector<TreeNode> declareVisiblePolygons(QVector<TreeNode> list, double minScreenSpace);
+    void calculateStandardDeviation(QVector<TreeNode> list);
 };
 
 #endif // MAININTERFACEWINDOW_H

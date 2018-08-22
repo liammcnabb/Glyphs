@@ -49,6 +49,27 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     setFullHierarchies( map.getHierarchies() );
     on_virtualzoom_valueChanged(0);
 //    ui->OpenGLWidget->setGroomedPolygons( map.getHierarchies() );
+    calculateStandardDeviation(map.getHierarchies());
+    return;
+}
+
+void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
+{
+    QVector<float> means;
+
+    for( int i = 4; i < list.first().getValues().size(); ++i )
+    {
+        float currentMean = 0;
+        for( int j = 0; j < list.size(); ++j )
+        {
+            currentMean += list.at(j).getValues().at(i).toFloat();
+        }
+        currentMean = currentMean / list.size();
+        means.append(currentMean);
+        qDebug() << means.last();
+    }
+
+    ui->OpenGLWidget->setMeans(means);
     return;
 }
 

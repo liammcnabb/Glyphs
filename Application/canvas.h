@@ -87,6 +87,9 @@ public:
     QVector<StarGlyph> getStarGlyphs() const;
     void setStarGlyphs(const QVector<StarGlyph> &starGlyphs);
 
+    QVector<float> getMeans() const;
+    void setMeans(const QVector<float> &means);
+
 private:
     bool m_debugMousePointer = false;
 
@@ -100,6 +103,8 @@ private:
     float valueLower;
     int glyphType = GLYPH_CENTROID;
     float glyphSize = 2.5f;
+
+    QVector<float> m_means;
 
     int m_clickedIndex = NEGATIVE_INDEX;
 
@@ -133,6 +138,7 @@ private:
     void createStarGlyphs(QVector<TreeNode> list);
     void calculateAbsoluteValueBounds(QVector<TreeNode> list);
     void drawStarGlyphs(QVector<StarGlyph> list, ColourManager cm);
+    void calculateValueBounds(QVector<StarGlyph> list);
 };
 
 #endif // CANVAS_H

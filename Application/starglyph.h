@@ -12,6 +12,7 @@ public:
     StarGlyph();
     StarGlyph( QPointF centroid, float size );
     void initialize(QStringList values, float upperBound, float lowerBound);
+    void initialize(QStringList values, QVector<float> means);
 
     QVector<float> points() const;
     void setPoints(const QVector<float> &points);
