@@ -5,7 +5,7 @@ StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ), NEUTRAL )
     setSize( 1 * SIZE_MODIFIER);
 }
 
-StarGlyph::StarGlyph(QPointF centroid, float size) : Glyph ( centroid, NEUTRAL )
+StarGlyph::StarGlyph(QPointF centroid, float size, int state) : Glyph ( centroid, state )
 {
     setSize( size * SIZE_MODIFIER);
 }

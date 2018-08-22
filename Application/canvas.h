@@ -158,7 +158,7 @@ private:
     int findClickedIndex(QPointF coords, QVector<PieChart> list);
     void drawPolygon(TreeNode polygon);
     void fillToolTip(int glyphIndex);
-    void createStarGlyphs(QVector<TreeNode> list);
+    QVector<StarGlyph> createStarGlyphs(QVector<TreeNode> list, int state);
     void calculateAbsoluteValueBounds(QVector<TreeNode> list);
     void drawStarGlyphs(QVector<StarGlyph> list, ColourManager cm);
     void calculateValueBounds(QVector<StarGlyph> list);

@@ -336,7 +336,6 @@ void Canvas::redraw()
 
         }
 
-
         calculateValueBounds( getPieGlyphs() );
         changeColorMap(this->CATEGORICAL);
         ColourManager manager(getValueLower(), getValueUpper());
@@ -346,10 +345,32 @@ void Canvas::redraw()
     }
     case GLYPH_STAR :
     {
-        createStarGlyphs( getGroomedPolygons() );
+        if( getTransitionState() )
+        {
+            QVector<StarGlyph> stars;
+            stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
+            stars.append( createStarGlyphs( getTransitionAdd(), 1 ) );
+            stars.append( createStarGlyphs( getTransitionRemove(), -1 ) );
+            setStarGlyphs( stars );
+        }
+        else
+        {
+            if( getTransitionNeutral().isEmpty() )
+            {
+                setStarGlyphs(createStarGlyphs( getGroomedPolygons(), 0 ) );
+            }
+            else
+            {
+                QVector<StarGlyph> stars;
+                stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
+                stars.append( createStarGlyphs( getTransitionAdd(), 0 ) );
+                setStarGlyphs( stars );
+            }
+        }
+
         calculateValueBounds( getStarGlyphs() );
         changeColorMap(this->DIVERGING);
-        ColourManager manager(getValueLower(), getValueUpper());
+        ColourManager manager(-2, 2);
         drawStarGlyphs( getStarGlyphs(), manager );
         drawLegend( manager );
         break;
@@ -538,7 +559,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
     return pies;
 }
 
-void Canvas::createStarGlyphs( QVector<TreeNode> list )
+QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
 {
     QVector<StarGlyph> stars;
     foreach( TreeNode p, list )
@@ -548,14 +569,14 @@ void Canvas::createStarGlyphs( QVector<TreeNode> list )
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            StarGlyph star( *p.centroid(), p.getLevel() );
+            StarGlyph star( *p.centroid(), p.getLevel(), state );
 //            star.initialize(values, getValueUpper(), getValueLower());
             star.initialize(values, getMeans());
             stars.append(star);
         }
     }
 
-    setStarGlyphs(stars);
+    return stars;
 }
 
 void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
@@ -564,7 +585,6 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     changeColorMap(this->CATEGORICAL);
     double max = getLength() / 100;
     int totalNooks = 7;
-    qDebug() << "totalNooks" << totalNooks;
     int nook;
     int nookSegment = max / totalNooks;
 
@@ -573,9 +593,17 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     {
 
         StarGlyph s = list.at(i);
-        glColor4f( 0.8, 0.8, 0.8, 0.8 );
+        glColor4f( 0.8, 0.8, 0.8, 1 );
         glBegin( GL_TRIANGLE_FAN );
         glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        double size;
+        if( s.state() == s.ADD )
+            size = (getCurrentTransitionSize()*1.5);
+        else if (s.state() == s.REMOVE )
+            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+        else /** if p.state() == p.NEUTRAL */
+            size = (getGlyphSize()*1.5);
 
         //Fill
         float valueRotation = (2*M_PI) / s.points().size();
@@ -583,16 +611,16 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         {
             nook = cm.getClassColourIndex(s.points().at(j))/2;
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         nook = cm.getClassColourIndex(s.points().at(0))/2;
         x = s.centroid().x() + sin( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         y = s.centroid().y() + cos( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
@@ -605,9 +633,9 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             nook = cm.getClassColourIndex(s.points().at(j))/2;
             glVertex2f( s.centroid().x(), s.centroid().y() );
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         glEnd();
@@ -619,16 +647,16 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         {
             nook = cm.getClassColourIndex(s.points().at(j))/2;
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         nook = cm.getClassColourIndex(s.points().at(0))/2;
         x = s.centroid().x() + sin( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         y = s.centroid().y() + cos( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
@@ -641,16 +669,16 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         {
             nook = cm.getClassColourIndex(0)/2;
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         nook = cm.getClassColourIndex(0)/2;
         x = s.centroid().x() + sin( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         y = s.centroid().y() + cos( 0 ) *
-                    ( getGlyphSize()  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
