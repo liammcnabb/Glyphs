@@ -97,7 +97,7 @@ TreeNode::TreeNode( Polygon polygon )
     //    values = polygon.values;
 }
 
-bool TreeNode::operator==( const TreeNode& b )
+bool TreeNode::operator==( const TreeNode& b ) const
 {
     if ( sharedBoundary != b.getSharedBoundary() )
         return false;
@@ -105,6 +105,8 @@ bool TreeNode::operator==( const TreeNode& b )
         return false;
     return true;
 }
+
+
 
 bool TreeNode::operator!=( const TreeNode& b )
 {

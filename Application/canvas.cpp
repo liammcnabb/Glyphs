@@ -221,6 +221,56 @@ void Canvas::setMeans(const QVector<float> &means)
     m_means = means;
 }
 
+bool Canvas::getTransitionState() const
+{
+    return m_transitionState;
+}
+
+void Canvas::setTransitionState(bool transitionState)
+{
+    m_transitionState = transitionState;
+}
+
+QVector<TreeNode> Canvas::getTransitionNeutral() const
+{
+    return m_transitionNeutral;
+}
+
+void Canvas::setTransitionNeutral(const QVector<TreeNode> &transitionNeutral)
+{
+    m_transitionNeutral = transitionNeutral;
+}
+
+QVector<TreeNode> Canvas::getTransitionAdd() const
+{
+    return m_transitionAdd;
+}
+
+void Canvas::setTransitionAdd(const QVector<TreeNode> &transitionAdd)
+{
+    m_transitionAdd = transitionAdd;
+}
+
+QVector<TreeNode> Canvas::getTransitionRemove() const
+{
+    return m_transitionRemove;
+}
+
+void Canvas::setTransitionRemove(const QVector<TreeNode> &transitionRemove)
+{
+    m_transitionRemove = transitionRemove;
+}
+
+float Canvas::getCurrentTransitionSize() const
+{
+    return currentTransitionSize;
+}
+
+void Canvas::setCurrentTransitionSize(float value)
+{
+    currentTransitionSize = value;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -251,7 +301,7 @@ void Canvas::redraw()
     }
     case GLYPH_EQUAL_PIE :
     {
-        createPieGlyphs( getGroomedPolygons(), GLYPH_EQUAL_PIE );
+        createPieGlyphs( getGroomedPolygons(), GLYPH_EQUAL_PIE, 0 );
         calculateValueBounds( getPieGlyphs() );
         changeColorMap(this->DIVERGING);
         ColourManager manager(getValueLower(), getValueUpper());
@@ -261,7 +311,32 @@ void Canvas::redraw()
     }
     case GLYPH_VARIABLE_PIE :
     {
-        createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE );
+        if(getTransitionState())
+        {
+            QVector<PieChart> pies;
+            pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
+            pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 1) );
+            pies.append( createPieGlyphs( getTransitionRemove(), GLYPH_VARIABLE_PIE, -1) );
+            setPieGlyphs(pies);
+
+        }
+        else
+        {
+            if(getTransitionNeutral().isEmpty())
+            {
+                setPieGlyphs(createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE, 0 ) );
+            }
+            else
+            {
+                    QVector<PieChart> pies;
+                    pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
+                    pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 0) );
+                    setPieGlyphs(pies);
+            }
+
+        }
+
+
         calculateValueBounds( getPieGlyphs() );
         changeColorMap(this->CATEGORICAL);
         ColourManager manager(getValueLower(), getValueUpper());
@@ -271,10 +346,6 @@ void Canvas::redraw()
     }
     case GLYPH_STAR :
     {
-
-//        calculateAbsoluteValueBounds( getGroomedPolygons() );
-//        setValueLower(0.2);
-//        setValueUpper(10.7);
         createStarGlyphs( getGroomedPolygons() );
         calculateValueBounds( getStarGlyphs() );
         changeColorMap(this->DIVERGING);
@@ -284,6 +355,8 @@ void Canvas::redraw()
         break;
     }
     }
+
+
 
     if( getClickedIndex() > NEGATIVE_INDEX )
     {
@@ -439,7 +512,8 @@ void Canvas::drawCentroids(QVector<TreeNode> list, ColourManager cm)
     }
 }
 
-void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
+QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
+                                           int state )
 {
     QVector<PieChart> pies;
     foreach( TreeNode p, list)
@@ -449,7 +523,7 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            PieChart pie( *p.centroid(), p.getLevel() );
+            PieChart pie( *p.centroid(), p.getLevel(), state );
             if(pieType == GLYPH_EQUAL_PIE)
                 pie.setSliceType(PieChart::EQUAL_SLICES);
             else
@@ -461,8 +535,7 @@ void Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType )
 
     }
 
-    setPieGlyphs(pies);
-    return;
+    return pies;
 }
 
 void Canvas::createStarGlyphs( QVector<TreeNode> list )
@@ -595,15 +668,22 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
         glBegin( GL_TRIANGLE_FAN );
         glVertex2f( p.centroid().x(), p.centroid().y() );
-//        double size = 1;
+        double size;
+        if( p.state() == p.ADD )
+            size = getCurrentTransitionSize();
+        else if (p.state() == p.REMOVE )
+            size = getGlyphSize() - getCurrentTransitionSize();
+        else /** if p.state() == p.NEUTRAL */
+            size = getGlyphSize();
+
        double rad = getLength() /*+ scaleModifier()*/ / 100;
 
         for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                      ( getGlyphSize() * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
+                      ( size * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
             float y = p.centroid().y() + cos( angle ) *
-                      ( getGlyphSize() * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
+                      ( size * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
 
             glVertex3f( x, y, 0.5 );
         }
@@ -628,10 +708,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( getGlyphSize() * ( ( rad ) ) );
+                          ( size * ( ( rad ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( getGlyphSize() * ( ( rad ) ) );
+                          ( size * ( ( rad ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );
@@ -650,10 +730,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( getGlyphSize() * ( ( rad ) ) );
+                          ( size * ( ( rad ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( getGlyphSize() * ( ( rad ) ) );
+                          ( size * ( ( rad ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );

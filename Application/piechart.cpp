@@ -1,12 +1,12 @@
 #include "piechart.h"
 
-PieChart::PieChart() : Glyph( QPointF( 0.0f,0.0f ) )
+PieChart::PieChart() : Glyph( QPointF( 0.0f,0.0f ), 0 )
 {
     setSize(1 * SIZE_MODIFIER);
 
 }
 
-PieChart::PieChart(QPointF centroid, float size) : Glyph( centroid )
+PieChart::PieChart(QPointF centroid, float size, int state) : Glyph( centroid, state )
 {
     setSize( size * SIZE_MODIFIER );
 }

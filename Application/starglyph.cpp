@@ -1,11 +1,11 @@
 #include "starglyph.h"
 
-StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ) )
+StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ), NEUTRAL )
 {
     setSize( 1 * SIZE_MODIFIER);
 }
 
-StarGlyph::StarGlyph(QPointF centroid, float size) : Glyph ( centroid )
+StarGlyph::StarGlyph(QPointF centroid, float size) : Glyph ( centroid, NEUTRAL )
 {
     setSize( size * SIZE_MODIFIER);
 }

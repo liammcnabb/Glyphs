@@ -109,15 +109,62 @@ void MainInterfaceWindow::on_rdo_StarGlyph_released()
 }
 
 
-void MainInterfaceWindow::on_virtualzoom_valueChanged(int value)
+void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
 {
     double minScreenSpace = double(value) / 100;
     QVector<TreeNode> visiblePolygons;
     visiblePolygons = declareVisiblePolygons(getFullHierarchies(), minScreenSpace);
+    splitVisible(visiblePolygons);
     ui->OpenGLWidget->setGroomedPolygons( visiblePolygons );
+
+     ui->OpenGLWidget->setTransitionState(true);
+
+    float incrementer = ui->OpenGLWidget->getGlyphSize() / 25;
+    for( int i = 0; i < 25; i+=2 )
+    {
+        ui->OpenGLWidget->setCurrentTransitionSize(incrementer*i);
+        ui->OpenGLWidget->repaint();
+        qApp->processEvents();
+    }
+
+//    QVector<TreeNode> visible;
+//    visible.append(ui->OpenGLWidget->getTransitionNeutral());
+//    visible.append(ui->OpenGLWidget->getTransitionAdd());
+////    visible.append(ui->OpenGLWidget->getTransitionRemove());
+//    ui->OpenGLWidget->setGroomedPolygons(visible);
+
+     ui->OpenGLWidget->setTransitionState(false);
 //    qDebug() << visiblePolygons.size();
     ui->OpenGLWidget->update();
 
+}
+
+
+void MainInterfaceWindow::splitVisible(QVector<TreeNode> list)
+{
+    if(ui->OpenGLWidget->getGroomedPolygons().isEmpty())
+        return;
+
+     QVector<TreeNode> transitionRemove, transitionAdd, transitionNeutral;
+
+     for( int i = 0; i < list.size(); ++i )
+         if( ui->OpenGLWidget->getGroomedPolygons().contains( list.at(i) ) )
+             transitionNeutral.append( list.at(i) );
+         else
+             transitionAdd.append( list.at(i) );
+
+     for( int i = 0; i < ui->OpenGLWidget->getGroomedPolygons().size(); ++i )
+         if( !list.contains( ui->OpenGLWidget->getGroomedPolygons().at(i) ) )
+             transitionRemove.append(
+                         ui->OpenGLWidget->getGroomedPolygons().at(i) );
+
+     ui->OpenGLWidget->setTransitionNeutral(transitionNeutral);
+     ui->OpenGLWidget->setTransitionAdd(transitionAdd);
+     ui->OpenGLWidget->setTransitionRemove(transitionRemove);
+     ui->OpenGLWidget->setTransitionState(true);
+     ui->OpenGLWidget->setCurrentTransitionSize(0.0f);
+
+     return;
 }
 
 QVector<TreeNode> MainInterfaceWindow::getFullHierarchies() const

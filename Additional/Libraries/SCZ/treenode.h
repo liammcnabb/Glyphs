@@ -20,7 +20,7 @@ public:
     TreeNode( TreeNode* obj );
     ~TreeNode();
     TreeNode& operator=( const TreeNode& b );
-    bool operator==( const TreeNode& b );
+    bool operator==( const TreeNode& b ) const;
     bool operator!=( const TreeNode& b );
 
     static TreeNode* top( TreeNode* t );

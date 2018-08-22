@@ -90,8 +90,25 @@ public:
     QVector<float> getMeans() const;
     void setMeans(const QVector<float> &means);
 
+    bool getTransitionState() const;
+    void setTransitionState(bool transitionState);
+
+    QVector<TreeNode> getTransitionNeutral() const;
+    void setTransitionNeutral(const QVector<TreeNode> &transitionNeutral);
+
+    QVector<TreeNode> getTransitionAdd() const;
+    void setTransitionAdd(const QVector<TreeNode> &transitionAdd);
+
+    QVector<TreeNode> getTransitionRemove() const;
+    void setTransitionRemove(const QVector<TreeNode> &transitionRemove);
+
+    float getCurrentTransitionSize() const;
+    void setCurrentTransitionSize(float value);
+
 private:
     bool m_debugMousePointer = false;
+
+    bool m_transitionState = false;
 
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
@@ -103,6 +120,12 @@ private:
     float valueLower;
     int glyphType = GLYPH_CENTROID;
     float glyphSize = 2.5f;
+
+        QVector<TreeNode> m_transitionNeutral;
+        QVector<TreeNode> m_transitionAdd;
+        QVector<TreeNode> m_transitionRemove;
+        float currentTransitionSize = 0.0f;
+
 
     QVector<float> m_means;
 
@@ -126,7 +149,7 @@ private:
     void drawLegend(ColourManager cm);
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str);
-    void createPieGlyphs(QVector<TreeNode> list, int pieType);
+    QVector<PieChart> createPieGlyphs(QVector<TreeNode> list, int pieType, int state);
     void drawPieGlyphs(QVector<PieChart> list, ColourManager cm);
 
     void mouseMoveEvent(QMouseEvent *event);
