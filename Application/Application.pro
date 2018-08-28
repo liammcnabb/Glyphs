@@ -13,19 +13,20 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        maininterfacewindow.cpp \
+    maininterfacewindow.cpp \
     canvas.cpp \
+    map.cpp \
+    personalerrors.cpp \
+    glyph.cpp \
+    piechart.cpp \
+    starglyph.cpp \
     ../Additional/Libraries/LM/shpreader.cpp \
     ../Additional/Libraries/LM/reader.cpp \
-    map.cpp \
     ../Additional/Libraries/SCZ/segment.cpp \
     ../Additional/Libraries/SCZ/mapextractor.cpp \
     ../Additional/Libraries/SCZ/polygon.cpp \
     ../Additional/Libraries/LM/boundingbox.cpp \
     ../Additional/Libraries/LM/csvreader.cpp \
-    personalerrors.cpp \
-    glyph.cpp \
-    piechart.cpp \
     ../Additional/Libraries/SCZ/contiguitybuilder.cpp \
     ../Additional/Libraries/SCZ/contiguousarea.cpp \
     ../Additional/Libraries/SCZ/neighbourchecker.cpp \
@@ -40,21 +41,22 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/writer.cpp \
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.cpp \
     ../Additional/Libraries/LM/IntersectTester/AABB.cpp \
-    starglyph.cpp
+    legendcanvas.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
+    map.h \
+    glyph.h \
+    piechart.h \
+    starglyph.h \
     ../Additional/Libraries/LM/shpreader.h \
     ../Additional/Libraries/LM/reader.h \
-    map.h \
     ../Additional/Libraries/SCZ/segment.h \
     ../Additional/Libraries/SCZ/mapextractor.h \
     ../Additional/Libraries/SCZ/polygon.h \
     ../Additional/Libraries/LM/boundingbox.h \
     ../Additional/Libraries/LM/csvreader.h \
     ../Additional/Libraries/Spectrum/colourmanager.h \
-    glyph.h \
-    piechart.h \
     ../Additional/Libraries/SCZ/contiguitybuilder.h \
     ../Additional/Libraries/SCZ/contiguousarea.h \
     ../Additional/Libraries/SCZ/neighbourchecker.h \
@@ -70,7 +72,7 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/writer.h \
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.h \
     ../Additional/Libraries/LM/IntersectTester/AABB.h \
-    starglyph.h
+    legendcanvas.h
 
 FORMS    += maininterfacewindow.ui
 

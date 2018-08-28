@@ -204,6 +204,23 @@
         <item>
          <widget class="QListWidget" name="lstHeaders"/>
         </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Glyph Legend:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="LegendCanvas" name="openGLWidget">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>250</height>
+           </size>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
@@ -260,6 +277,11 @@
    <class>Canvas</class>
    <extends>QOpenGLWidget</extends>
    <header>canvas.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LegendCanvas</class>
+   <extends>QOpenGLWidget</extends>
+   <header>legendcanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
