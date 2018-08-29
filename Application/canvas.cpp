@@ -281,6 +281,16 @@ void Canvas::setAreaOpacity(float areaOpacity)
     m_areaOpacity = areaOpacity;
 }
 
+QVector<WheelGlyph> Canvas::getWheelGlyphs() const
+{
+    return m_wheelGlyphs;
+}
+
+void Canvas::setWheelGlyphs(const QVector<WheelGlyph> &wheelGlyphs)
+{
+    m_wheelGlyphs = wheelGlyphs;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -317,11 +327,11 @@ void Canvas::redraw()
     }
     case GLYPH_EQUAL_PIE :
     {
-        createPieGlyphs( getGroomedPolygons(), GLYPH_EQUAL_PIE, 0 );
-        calculateValueBounds( getPieGlyphs() );
+        setWheelGlyphs(createWheelGlyphs( getGroomedPolygons(), 0) );
+        calculateValueBounds( getWheelGlyphs() );
         changeColorMap(this->DIVERGING);
-        ColourManager manager(getValueLower(), getValueUpper());
-        drawPieGlyphs( getPieGlyphs(), manager);
+        ColourManager manager(-2, 2);
+        drawWheelGlyphs( getWheelGlyphs(), manager );
         drawLegend( manager );
         break;
     }
@@ -464,6 +474,21 @@ void Canvas::calculateValueBounds( QVector<StarGlyph> list )
     setValueUpper(-std::numeric_limits<float>::max());
     foreach( StarGlyph p, list )
         foreach( float ps, p.points() )
+        {
+            setValueLower( std::min( getValueLower(),
+                                     ps ) );
+            setValueUpper( std::max( getValueUpper(),
+                                     ps ) );
+        }
+
+}
+
+void Canvas::calculateValueBounds( QVector<WheelGlyph> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+    foreach( WheelGlyph p, list )
+        foreach( float ps, p.getRads() )
         {
             setValueLower( std::min( getValueLower(),
                                      ps ) );
@@ -646,6 +671,26 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
     return stars;
 }
 
+QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state )
+{
+    QVector<WheelGlyph> wheels;
+    foreach( TreeNode p, list )
+    {
+        if(p.getLevel() > -1)
+        {
+            QStringList values = p.getValues();
+            for( int i = 0; i < 4; ++i )
+                values.removeFirst();
+            WheelGlyph w( *p.centroid(), p.getLevel(), state );
+//            star.initialize(values, getValueUpper(), getValueLower());
+            w.initialize(values, getMeans());
+            wheels.append(w);
+        }
+    }
+
+    return wheels;
+}
+
 void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 {
     Colour color;
@@ -747,6 +792,131 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         y = s.centroid().y() + cos( 0 ) *
                     ( size  * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
+
+        glEnd();
+    }
+}
+
+void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
+{
+    Colour color;
+    changeColorMap(this->CATEGORICAL);
+    double max = getLength() / 100;
+    int totalNooks = 11;
+    int nook;
+    int nookSegment = max / totalNooks;
+
+    float x,y;
+    for( int i = 0; i < list.size(); ++ i )
+    {
+
+        WheelGlyph s = list.at(i);
+        glColor4f( 0.8, 0.8, 0.8, 1 );
+        glBegin( GL_TRIANGLE_FAN );
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        double size;
+        if( s.state() == s.ADD )
+            size = (getCurrentTransitionSize()*1.5);
+        else if (s.state() == s.REMOVE )
+            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+        else /** if p.state() == p.NEUTRAL */
+            size = (getGlyphSize()*1.5);
+
+        int sliceNo = -1;
+        //Fill
+//        qDebug() << s.getRads().size();
+        float valueRotation = (2*M_PI) / s.getRads().size();
+        for( float angle = 0; angle < 2*M_PI; angle += 0.01 )
+        {
+            if(sliceNo < s.getRads().size()-1 &&
+                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+            {
+                sliceNo++;
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+            }
+            color = cm.getColourFromIndex(sliceNo);
+            glColor3f(color.getR(), color.getG(), color.getB() );
+            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
+            x = s.centroid().x() + sin( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        x = s.centroid().x() + sin( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f(x,y);
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        glEnd();
+
+//        //Lines at Points
+//        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+//        glBegin( GL_LINES );
+//        for( float j = 0; j < s.points().size(); ++j )
+//        {
+//            nook = cm.getClassColourIndex(s.points().at(j))/2;
+//            glVertex2f( s.centroid().x(), s.centroid().y() );
+//            x = s.centroid().x() + sin( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            y = s.centroid().y() + cos( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            glVertex2f( x, y );
+//        }
+//        glEnd();
+
+        sliceNo = -1;
+        //Outlines
+        glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+        glBegin( GL_LINE_STRIP );
+        for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
+        {
+            if(sliceNo < s.getRads().size()-1 &&
+                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+            {
+                sliceNo++;
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+            }
+//            color = cm.getColourFromIndex(sliceNo);
+//            glColor3f(color.getR(), color.getG(), color.getB() );
+            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
+            x = s.centroid().x() + sin( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        x = s.centroid().x() + sin( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f(x,y);
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+
+
+//        //Standard
+//        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
+//        glBegin( GL_LINE_STRIP );
+//        glVertex2f( s.centroid().x(), s.centroid().y() );
+//        for( float j = 0; j < s.points().size(); ++j )
+//        {
+//            nook = cm.getClassColourIndex(0)/2;
+//            x = s.centroid().x() + sin( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            y = s.centroid().y() + cos( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            glVertex2f( x, y );
+//        }
+//        nook = cm.getClassColourIndex(0)/2;
+//        x = s.centroid().x() + sin( 0 ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//        y = s.centroid().y() + cos( 0 ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//        glVertex2f( x, y );
 
         glEnd();
     }

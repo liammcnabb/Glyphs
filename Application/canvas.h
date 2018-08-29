@@ -17,6 +17,7 @@
 #include "LM/IntersectTester/AABB.h"
 #include "piechart.h"
 #include "starglyph.h"
+#include "wheelglyph.h"
 #include "SCZ/treenode.h"
 #include "LM/IntersectTester/IntersectTester.h"
 
@@ -108,6 +109,9 @@ public:
     float getAreaOpacity() const;
     void setAreaOpacity(float areaOpacity);
 
+    QVector<WheelGlyph> getWheelGlyphs() const;
+    void setWheelGlyphs(const QVector<WheelGlyph> &wheelGlyphs);
+
 private:
     bool m_debugMousePointer = false;
 
@@ -117,6 +121,7 @@ private:
     QVector<TreeNode> m_groomedPolygons;
     QVector<PieChart> m_pieGlyphs;
     QVector<StarGlyph> m_starGlyphs;
+    QVector<WheelGlyph> m_wheelGlyphs;
     AABB wrapper;
     float length;
     float valueUpper;
@@ -166,6 +171,9 @@ private:
     void calculateAbsoluteValueBounds(QVector<TreeNode> list);
     void drawStarGlyphs(QVector<StarGlyph> list, ColourManager cm);
     void calculateValueBounds(QVector<StarGlyph> list);
+    QVector<WheelGlyph> createWheelGlyphs(QVector<TreeNode> list, int state);
+    void calculateValueBounds(QVector<WheelGlyph> list);
+    void drawWheelGlyphs(QVector<WheelGlyph> list, ColourManager cm);
 };
 
 #endif // CANVAS_H
