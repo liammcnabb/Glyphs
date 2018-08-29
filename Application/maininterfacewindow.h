@@ -49,6 +49,9 @@ private slots:
     void on_rdo_StarGlyph_released();
 
     void on_lstHeaders_doubleClicked(const QModelIndex &index);
+
+    void on_AreaOpacity_valueChanged(int value);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
