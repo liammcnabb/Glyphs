@@ -40,7 +40,9 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     ui->OpenGLWidget->setDataHeaders(valueHeaders);
     for( int i = 0; i < ignoredValues; ++i )
         valueHeaders.removeFirst();
-    ui->lstHeaders->addItems(valueHeaders);
+//    ui->lstHeaders->addItems(valueHeaders);
+
+    initializeTable(valueHeaders);
 
     Map map( shpreader.getMapData(), data, recipeLoc );
     ui->virtualzoom->setEnabled(true);
@@ -73,39 +75,54 @@ void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
     return;
 }
 
-void MainInterfaceWindow::on_lstHeaders_itemDoubleClicked(QListWidgetItem *item)
+void MainInterfaceWindow::on_lstHeaders_doubleClicked(const QModelIndex &index)
 {
-    ui->OpenGLWidget->VALUE_INDEX = ignoredValues +
-            ui->lstHeaders->currentRow();
-    ui->OpenGLWidget->update();
+        ui->OpenGLWidget->VALUE_INDEX = ignoredValues + index.row();
+        ui->OpenGLWidget->update();
 }
+
+
+//void MainInterfaceWindow::on_lstHeaders_itemDoubleClicked(QListWidgetItem *item)
+//{
+//    ui->OpenGLWidget->VALUE_INDEX = ignoredValues +
+//            ui->lstHeaders->currentRow();
+//    ui->OpenGLWidget->update();
+//}
 
 void MainInterfaceWindow::on_rdo_DebugCentroids_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->DIVERGING);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_CENTROID);
+    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_CENTROID);
     ui->OpenGLWidget->update();
+    ui->GlLegend->update();
 }
 
 void MainInterfaceWindow::on_rdo_EqualSegmentPie_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->DIVERGING);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_EQUAL_PIE);
+    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_EQUAL_PIE);
     ui->OpenGLWidget->update();
+    ui->GlLegend->update();
 }
 
 void MainInterfaceWindow::on_rdo_VariableSegmentPie_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_VARIABLE_PIE);
+        ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_VARIABLE_PIE);
     ui->OpenGLWidget->update();
+    ui->GlLegend->update();
 }
 
 void MainInterfaceWindow::on_rdo_StarGlyph_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_STAR);
+    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_STAR);
     ui->OpenGLWidget->update();
+    ui->GlLegend->update();
 }
 
 
@@ -159,6 +176,32 @@ void MainInterfaceWindow::splitVisible(QVector<TreeNode> list)
 
      return;
 }
+
+void MainInterfaceWindow::initializeTable(QStringList list)
+{
+    QStandardItemModel* model = new QStandardItemModel();
+//    int lineIndex =0;
+
+    QStringList headers;
+    /*headers.append("ID");*/ headers.append("ValueHeader");
+
+    model->setHorizontalHeaderLabels(headers);
+    ui->lstHeaders->horizontalHeader()->setStretchLastSection(true);
+
+    for( int i = 0; i < list.size(); ++i )
+    {
+        QStandardItem* id, *title;
+//        id = new QStandardItem(QString::number(i));
+        title = new QStandardItem(list.at(i));
+//        model->setItem(i,0,id);
+        model->setItem(i,0,title);
+    }
+    ui->lstHeaders->setModel(model);
+    ui->lstHeaders->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->lstHeaders->show();
+
+}
+
 
 QVector<TreeNode> MainInterfaceWindow::getFullHierarchies() const
 {
@@ -240,3 +283,11 @@ void MainInterfaceWindow::on_actionDebugMousePointer_toggled(bool arg1)
     ui->OpenGLWidget->update();
 }
 
+
+
+void MainInterfaceWindow::on_AreaOpacity_valueChanged(int value)
+{
+
+    ui->OpenGLWidget->setAreaOpacity(float(value)/100.0f);
+    ui->OpenGLWidget->update();
+}

@@ -8,7 +8,7 @@ class Glyph
 public:
     static constexpr float SIZE_MODIFIER = 0.03;
 
-    int NEUTRAL = 0;
+    static const int NEUTRAL = 0;
     int REMOVE = -1;
     int ADD = 1;
 

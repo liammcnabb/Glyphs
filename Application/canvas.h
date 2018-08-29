@@ -105,6 +105,9 @@ public:
     float getCurrentTransitionSize() const;
     void setCurrentTransitionSize(float value);
 
+    float getAreaOpacity() const;
+    void setAreaOpacity(float areaOpacity);
+
 private:
     bool m_debugMousePointer = false;
 
@@ -125,6 +128,7 @@ private:
         QVector<TreeNode> m_transitionAdd;
         QVector<TreeNode> m_transitionRemove;
         float currentTransitionSize = 0.0f;
+        float m_areaOpacity = 0.3f;
 
 
     QVector<float> m_means;
