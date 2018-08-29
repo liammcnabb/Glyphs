@@ -250,6 +250,22 @@ public:
         return m_NameID;
     }
 
+    inline Colour brighter(){
+        return Colour(this->getR() + 0.07f,
+                      this->getG() + 0.07f,
+                      this->getB() + 0.07f,
+                      this->getAlpha(),
+                      this->getNameID()+":brighter");
+    }
+
+    inline Colour darker(){
+        return Colour(this->getR() - 0.07f,
+                      this->getG() - 0.07f,
+                      this->getB() - 0.07f,
+                      this->getAlpha(),
+                      this->getNameID()+":darker");
+    }
+
 private:
     float m_R;
     float m_G;
