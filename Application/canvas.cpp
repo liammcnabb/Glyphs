@@ -920,6 +920,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         glEnd();
     }
+    return;
 }
 
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
@@ -1005,9 +1006,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             glEnd();
             currentAngle += ps.angle();
         }
-
     }
-
     return;
 }
 

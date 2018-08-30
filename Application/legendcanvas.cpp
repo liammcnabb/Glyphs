@@ -24,6 +24,7 @@ void LegendCanvas::initializeGL()
 
     initializeVariablePie();
     initalizeStarGlyph();
+    initalizeWheelGlyph();
 }
 
 void LegendCanvas::paintGL()
@@ -32,6 +33,8 @@ void LegendCanvas::paintGL()
         paintVariablePie();
     else if(currentGlyphType() == GLYPH_STAR )
         paintStarGlyph();
+    else if (currentGlyphType() == GLYPH_EQUAL_PIE)
+        paintWheelGlyph();
 }
 
 void LegendCanvas::initializeVariablePie()
@@ -62,6 +65,23 @@ void LegendCanvas::initalizeStarGlyph()
     }
     s.initialize(samplePoints, mean);
     setStarGlyph(s);
+    return;
+}
+
+void LegendCanvas::initalizeWheelGlyph()
+{
+    int seed = 13;
+    srand(seed);
+    WheelGlyph s(QPointF(50,60),3,WheelGlyph::NEUTRAL);
+    QStringList samplePoints;
+    QVector<float> mean;
+    for( int i = 0; i < SAMPLE_POINTS; ++i )
+    {
+        samplePoints.append(QString::number( (rand() % 50) ) );
+        mean.append(25);
+    }
+    s.initialize(samplePoints, mean);
+    setWheelGlyph(s);
     return;
 }
 
@@ -184,10 +204,20 @@ void LegendCanvas::paintVariablePie()
     return;
 }
 
+WheelGlyph LegendCanvas::wheelGlyph() const
+{
+    return m_wheelGlyph;
+}
+
+void LegendCanvas::setWheelGlyph(const WheelGlyph &wheelGlyph)
+{
+    m_wheelGlyph = wheelGlyph;
+}
+
 void LegendCanvas::paintStarGlyph()
 {
     ColourManager cm(-10, 10);
-//    Colour color;
+    //    Colour color;
     changeColorMap(this->CATEGORICAL);
     double max = 40;
     int totalNooks = 11;
@@ -311,6 +341,93 @@ void LegendCanvas::paintStarGlyph()
     glPrintString(32,50,"5");
     glPrintString(15,76,"6");
 
+}
+
+void LegendCanvas::paintWheelGlyph()
+{
+    ColourManager cm(-10, 10);
+    Colour color;
+    changeColorMap(this->CATEGORICAL);
+    double max = 30;
+    int totalNooks = 11;
+    int nook;
+    int nookSegment = max / totalNooks;
+
+    float x,y;
+        WheelGlyph s = wheelGlyph();
+        glColor4f( 0.8, 0.8, 0.8, 1 );
+        glBegin( GL_TRIANGLE_FAN );
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        double size = 1;
+
+        int sliceNo = -1;
+        //Fill
+        float valueRotation = (2*M_PI) / s.getRads().size();
+        for( float angle = 0; angle < 2*M_PI; angle += 0.01 )
+        {
+            if(sliceNo < s.getRads().size()-1 &&
+                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+            {
+                sliceNo++;
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+            }
+            color = cm.getColourFromIndex(sliceNo);
+            glColor3f(color.getR(), color.getG(), color.getB() );
+            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
+            x = s.centroid().x() + sin( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        x = s.centroid().x() + sin( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f(x,y);
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        glEnd();
+
+        sliceNo = -1;
+        //Outlines
+        glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+        glBegin( GL_LINE_STRIP );
+        for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
+        {
+            if(sliceNo < s.getRads().size()-1 &&
+                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+            {
+                sliceNo++;
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+            }
+            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
+            x = s.centroid().x() + sin( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( angle ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        x = s.centroid().x() + sin( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( 0 ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f(x,y);
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        glEnd();
+
+//        glPrintString(1,1,"Red Line presents: Standard value per field");
+        glPrintString(54.5,70,"1");
+        glPrintString(65,59,"2");
+        glPrintString(55,50,"3");
+        glPrintString(44,42.5,"4");
+        glPrintString(34,53,"5");
+        glPrintString(40,76,"6");
+
+
+    return;
 }
 
 StarGlyph LegendCanvas::starGlyph() const

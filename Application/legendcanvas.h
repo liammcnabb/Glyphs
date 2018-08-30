@@ -10,6 +10,7 @@
 #include "Spectrum/colourmanager.h"
 #include "piechart.h"
 #include "starglyph.h"
+#include "wheelglyph.h"
 
 
 class LegendCanvas : public QOpenGLWidget
@@ -40,17 +41,23 @@ public:
     StarGlyph starGlyph() const;
     void setStarGlyph(const StarGlyph &starGlyph);
 
+    WheelGlyph wheelGlyph() const;
+    void setWheelGlyph(const WheelGlyph &wheelGlyph);
+
 private:
     void initializeVariablePie();
     void paintVariablePie();
     PieChart m_variablePie;
     StarGlyph m_starGlyph;
+    WheelGlyph m_wheelGlyph;
     int m_currentGlyphType = 0;
 
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str);
     void paintStarGlyph();
     void initalizeStarGlyph();
+    void paintWheelGlyph();
+    void initalizeWheelGlyph();
 };
 
 #endif // LEGENDCANVAS_H
