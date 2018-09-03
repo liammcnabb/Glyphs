@@ -146,7 +146,7 @@ private:
     QVector<TreeNode> m_transitionAdd;
     QVector<TreeNode> m_transitionRemove;
     float currentTransitionSize = 0.0f;
-    float m_areaOpacity = 0.3f;
+    float m_areaOpacity = 0.0f;
 
     int m_hiddenIndicator = 0;
 

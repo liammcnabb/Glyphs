@@ -334,13 +334,13 @@ void Canvas::redraw()
     prepareDraw();
     calculateValueBounds( getGroomedPolygons() );
     drawPolygons( loadedPolygons() );
-//    if(getTransitionNeutral().isEmpty())
+    if(getTransitionNeutral().isEmpty())
         drawPolygons( getGroomedPolygons() );
-//    else
-//    {
-//        drawPolygons( getTransitionNeutral() );
-//        drawPolygons( getTransitionAdd() );
-//    }
+    else
+    {
+        drawPolygons( getTransitionNeutral() );
+        drawPolygons( getTransitionAdd() );
+    }
     
     glLineWidth( 1 );
     /**Default*/
@@ -454,13 +454,19 @@ void Canvas::redraw()
     }
     }
 
-
+        qDebug() << "6";
 
     if( getClickedIndex() > NEGATIVE_INDEX )
     {
+
         QVector<TreeNode> poly;
-        poly.append(getTransitionNeutral());
-        poly.append(getTransitionAdd());
+        if(getTransitionNeutral().isEmpty())
+            poly.append(getGroomedPolygons());
+        else
+        {
+            poly.append(getTransitionNeutral());
+            poly.append(getTransitionAdd());
+        }
         drawPolygon(poly.at(getClickedIndex()));
     }
 
