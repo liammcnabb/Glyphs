@@ -36,6 +36,7 @@ public:
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;
     static const int OUTLINE = 3;
+    static const bool DEBUG = true;
 
     Canvas(QWidget *parent);
     void initializeGL();
@@ -112,10 +113,13 @@ public:
     QVector<WheelGlyph> getWheelGlyphs() const;
     void setWheelGlyphs(const QVector<WheelGlyph> &wheelGlyphs);
 
+    bool getColorStarLines() const;
+    void setColorStarLines(bool colorStarLines);
+
 private:
     bool m_debugMousePointer = false;
-
     bool m_transitionState = false;
+    bool m_colorStarLines = false;
 
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;

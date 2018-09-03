@@ -71,7 +71,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -276,6 +276,28 @@
            </property>
            <property name="tickInterval">
             <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>80</y>
+          <width>298</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Star Glyph Colored Lines:</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="chkColoredStarLines">
+           <property name="text">
+            <string>Enabled</string>
            </property>
           </widget>
          </item>

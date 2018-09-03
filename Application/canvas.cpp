@@ -72,14 +72,24 @@ float Canvas::convertedY( float windowY )
 
 int Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list )
 {
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) BEGIN";
+
     for(int i = 0; i < list.size(); i++)
     {
         QPointF c = list.at(i).centroid();
         if( IntersectTester::isIntersecting( Point( coords.x(),coords.y() ),
                                   Circle( Point( c.x(),c.y() ),
                                   ( getLength() / 100 ) * getGlyphSize() ) ) )
+        {
+            if(DEBUG)
+                qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
             return i;
+        }
     }
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
 
     return NEGATIVE_INDEX;
 }
@@ -289,6 +299,16 @@ QVector<WheelGlyph> Canvas::getWheelGlyphs() const
 void Canvas::setWheelGlyphs(const QVector<WheelGlyph> &wheelGlyphs)
 {
     m_wheelGlyphs = wheelGlyphs;
+}
+
+bool Canvas::getColorStarLines() const
+{
+    return m_colorStarLines;
+}
+
+void Canvas::setColorStarLines(bool colorStarLines)
+{
+    m_colorStarLines = colorStarLines;
 }
 
 void Canvas::paintGL()
@@ -730,21 +750,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 
         glEnd();
 
-        //Lines at Points
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-        glBegin( GL_LINES );
-        for( float j = 0; j < s.points().size(); ++j )
-        {
-            nook = cm.getClassColourIndex(s.points().at(j))/2;
-            glVertex2f( s.centroid().x(), s.centroid().y() );
-            x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            glVertex2f( x, y );
-        }
-        glEnd();
-
         //Outlines
         glBegin( GL_LINE_STRIP );
         glVertex2f( s.centroid().x(), s.centroid().y() );
@@ -766,10 +772,32 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 
         glEnd();
 
+        //Lines at Points
+        glBegin( GL_LINES );
+        for( float j = 0; j < s.points().size(); ++j )
+        {
+            if( getColorStarLines() )
+            {
+                color = cm.getColourFromIndex(j);
+                glColor3f(color.getR(),color.getG(),color.getB());
+            }
+            else
+                glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+
+            nook = cm.getClassColourIndex(s.points().at(j))/2;
+            glVertex2f( s.centroid().x(), s.centroid().y() );
+            x = s.centroid().x() + sin( valueRotation * j ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( valueRotation * j ) *
+                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            glVertex2f( x, y );
+        }
+        glEnd();
+
         //Standard
         glColor4f( 1, 0.105882353, 0.105882353, 0.3);
         glBegin( GL_LINE_STRIP );
-        glVertex2f( s.centroid().x(), s.centroid().y() );
+//        glVertex2f( s.centroid().x(), s.centroid().y() );
         for( float j = 0; j < s.points().size(); ++j )
         {
             nook = cm.getClassColourIndex(0)/2;
@@ -1027,8 +1055,6 @@ void Canvas::drawLegend( ColourManager cm )
     double colourSlice = colorRange / slices;
 
     double sliceCenter = colourSlice / 2;
-
-
     glLineWidth( 20 );
 
     glBegin( GL_QUADS );

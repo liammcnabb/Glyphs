@@ -204,6 +204,16 @@ void LegendCanvas::paintVariablePie()
     return;
 }
 
+bool LegendCanvas::colorStarLines() const
+{
+    return m_colorStarLines;
+}
+
+void LegendCanvas::setColorStarLines(bool colorStarLines)
+{
+    m_colorStarLines = colorStarLines;
+}
+
 WheelGlyph LegendCanvas::wheelGlyph() const
 {
     return m_wheelGlyph;
@@ -216,6 +226,7 @@ void LegendCanvas::setWheelGlyph(const WheelGlyph &wheelGlyph)
 
 void LegendCanvas::paintStarGlyph()
 {
+    Colour color;
     ColourManager cm(-10, 10);
     //    Colour color;
     changeColorMap(this->CATEGORICAL);
@@ -250,22 +261,7 @@ void LegendCanvas::paintStarGlyph()
     glVertex2f( x, y );
 
     glEnd();
-
-    //Lines at Points
     glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-    glBegin( GL_LINES );
-    for( float j = 0; j < s.points().size(); ++j )
-    {
-        nook = cm.getClassColourIndex(s.points().at(j));
-        glVertex2f( s.centroid().x(), s.centroid().y() );
-        x = s.centroid().x() + sin( valueRotation * j ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
-        y = s.centroid().y() + cos( valueRotation * j ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
-        glVertex2f( x, y );
-    }
-    glEnd();
-
     //Outlines
     glBegin( GL_LINE_STRIP );
     glVertex2f( s.centroid().x(), s.centroid().y() );
@@ -287,10 +283,32 @@ void LegendCanvas::paintStarGlyph()
 
     glEnd();
 
+    //Lines at Points
+
+    glBegin( GL_LINES );
+    for( float j = 0; j < s.points().size(); ++j )
+    {
+        if( colorStarLines() )
+        {
+            color = cm.getColourFromIndex(j);
+            glColor3f(color.getR(),color.getG(),color.getB());
+        }
+        else
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+        nook = cm.getClassColourIndex(s.points().at(j));
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+        x = s.centroid().x() + sin( valueRotation * j ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        y = s.centroid().y() + cos( valueRotation * j ) *
+                ( size  * ( nookSegment * ( 1+nook ) ) );
+        glVertex2f( x, y );
+    }
+    glEnd();
+
     //Standard
     glColor4f( 1, 0.105882353, 0.105882353, 0.3);
     glBegin( GL_LINE_STRIP );
-    glVertex2f( s.centroid().x(), s.centroid().y() );
+//    glVertex2f( s.centroid().x(), s.centroid().y() );
     for( float j = 0; j < s.points().size(); ++j )
     {
         nook = cm.getClassColourIndex(0);
@@ -309,30 +327,7 @@ void LegendCanvas::paintStarGlyph()
 
     glEnd();
 
-    //Nooks
     glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-    glBegin( GL_LINES );
-    for( float j = 0; j < s.points().size(); ++j )
-    {
-        for( float k = 0; k < totalNooks; ++k )
-        {
-            nook = cm.getClassColourIndex(s.points().at(k));
-            glVertex2f( s.centroid().x(), s.centroid().y() );
-            x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            glVertex2f( x, y );
-
-            x = x + sin( ( valueRotation * j ) + ( M_PI / 2 ) ) *
-                        nookSegment;
-            y = y + cos( ( valueRotation * j ) + ( M_PI / 2 ) ) *
-                        nookSegment;
-            glVertex2f( x, y );
-            glEnd();
-        }
-    }
-
     glPrintString(1,1,"Red Line presents: Standard value per field");
     glPrintString(48.5,88,"1");
     glPrintString(80,80,"2");

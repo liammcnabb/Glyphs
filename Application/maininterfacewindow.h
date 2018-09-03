@@ -52,6 +52,8 @@ private slots:
 
     void on_AreaOpacity_valueChanged(int value);
 
+    void on_chkColoredStarLines_toggled(bool checked);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

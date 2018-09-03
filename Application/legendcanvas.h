@@ -44,6 +44,9 @@ public:
     WheelGlyph wheelGlyph() const;
     void setWheelGlyph(const WheelGlyph &wheelGlyph);
 
+    bool colorStarLines() const;
+    void setColorStarLines(bool colorStarLines);
+
 private:
     void initializeVariablePie();
     void paintVariablePie();
@@ -51,6 +54,7 @@ private:
     StarGlyph m_starGlyph;
     WheelGlyph m_wheelGlyph;
     int m_currentGlyphType = 0;
+    bool m_colorStarLines = false;
 
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str);

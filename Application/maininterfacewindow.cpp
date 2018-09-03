@@ -283,11 +283,17 @@ void MainInterfaceWindow::on_actionDebugMousePointer_toggled(bool arg1)
     ui->OpenGLWidget->update();
 }
 
-
-
 void MainInterfaceWindow::on_AreaOpacity_valueChanged(int value)
 {
 
     ui->OpenGLWidget->setAreaOpacity(float(value)/100.0f);
     ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_chkColoredStarLines_toggled(bool checked)
+{
+    ui->OpenGLWidget->setColorStarLines(checked);
+    ui->GlLegend->setColorStarLines(checked);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
 }
