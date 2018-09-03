@@ -542,51 +542,44 @@ void Canvas::drawPolygons(QVector<TreeNode> list)
 {
     ColourManager cm(getValueLower(),getValueUpper());
 
-
-    for( int i = 0; i < list.size(); ++i )
+    if(getAreaOpacity() > 0.0f)
     {
-        TreeNode polygon = list.at( i );
-        QVector<QPointF> points = polygon.fullBoundary();
-        Colour c = cm.getClassColour(polygon.getValues().at(VALUE_INDEX).toFloat());
-        glColor4f( c.getR(), c.getG(), c.getB(), getAreaOpacity() );
-
-        glEnable( GL_STENCIL_TEST );
-        glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-        glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
-        glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
-        glBegin( GL_TRIANGLES );
-
-        for( int j = 1; j < points.size() - 1; ++j )
+        for( int i = 0; i < list.size(); ++i )
         {
-            glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
-            glVertex2f( points.at( j ).x(), points.at( j ).y() );
-            glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
+            TreeNode polygon = list.at( i );
+            QVector<QPointF> points = polygon.fullBoundary();
+            Colour c = cm.getClassColour(polygon.getValues().at(VALUE_INDEX).toFloat());
+            glColor4f( c.getR(), c.getG(), c.getB(), getAreaOpacity() );
+
+            glEnable( GL_STENCIL_TEST );
+            glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+            glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
+            glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
+            glBegin( GL_TRIANGLES );
+
+            for( int j = 1; j < points.size() - 1; ++j )
+            {
+                glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
+                glVertex2f( points.at( j ).x(), points.at( j ).y() );
+                glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
+            }
+            glEnd();
+
+            // fill color buffer
+            //      glColor3ub( 0, 128, 0 );
+            glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+            glStencilFunc( GL_EQUAL, 0x1, 0x1 );
+            glBegin( GL_TRIANGLES );
+            for( int j = 1; j < points.size() - 1; ++j )
+            {
+                glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
+                glVertex2f( points.at( j ).x(), points.at( j ).y() );
+                glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
+            }
+            glEnd();
+
+            glDisable( GL_STENCIL_TEST );
         }
-        glEnd();
-
-        // fill color buffer
-        //      glColor3ub( 0, 128, 0 );
-        glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-        glStencilFunc( GL_EQUAL, 0x1, 0x1 );
-        glBegin( GL_TRIANGLES );
-        for( int j = 1; j < points.size() - 1; ++j )
-        {
-            glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
-            glVertex2f( points.at( j ).x(), points.at( j ).y() );
-            glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
-        }
-        glEnd();
-
-        //      if( polygon.centroid()->x() != 0 && polygon.centroid()->y() != 0 )
-        //         glVertex2f( polygon.centroid()->x(), polygon.centroid()->y() );
-
-        //      for ( QVector<QPointF>::const_iterator it = points.begin();
-        //            it < points.end();
-        //            ++it )
-        //         glVertex2f( it->x(), it->y() );
-        //      glEnd();
-
-        glDisable( GL_STENCIL_TEST );
     }
 
 
@@ -1044,9 +1037,8 @@ void Canvas::drawLegend( ColourManager cm )
     {
         Colour color = cm.getClassColour(
                               cm.getLowerRange() + ( colourSlice * i ) + sliceCenter );
-
         glColor4f( color.getR(), color.getG(),
-                   color.getB(), color.getAlpha() );
+                   color.getB(), 1 );
 
         glVertex2f( legendBL.x()  + ( canvasSlice * ( i + 1.0 ) ) ,
                     legendBL.y() );

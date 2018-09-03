@@ -133,7 +133,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Equal Segment Pie Chart</string>
+            <string>Wheel Glyph</string>
            </property>
           </widget>
           <widget class="QRadioButton" name="rdo_VariableSegmentPie">
