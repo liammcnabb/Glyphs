@@ -1,14 +1,11 @@
 #include "starglyph.h"
 
-StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ), NEUTRAL )
-{
-    setSize( 1 * SIZE_MODIFIER);
-}
+StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ), 0.0f, NEUTRAL )
+{}
 
-StarGlyph::StarGlyph(QPointF centroid, float size, int state) : Glyph ( centroid, state )
-{
-    setSize( size * SIZE_MODIFIER);
-}
+StarGlyph::StarGlyph(QPointF centroid, float size, int state)
+    : Glyph ( centroid, size, state )
+{}
 
 
 void StarGlyph::initialize(QStringList values, float upperBound,
@@ -45,14 +42,4 @@ QVector<float> StarGlyph::points() const
 void StarGlyph::setPoints(const QVector<float> &points)
 {
     m_points = points;
-}
-
-float StarGlyph::size() const
-{
-    return m_size;
-}
-
-void StarGlyph::setSize(float size)
-{
-    m_size = size;
 }

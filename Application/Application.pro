@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.cpp \
     ../Additional/Libraries/LM/IntersectTester/AABB.cpp \
     legendcanvas.cpp \
-    wheelglyph.cpp
+    wheelglyph.cpp \
+    barchart.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -74,7 +75,8 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/IntersectTester/IntersectTester.h \
     ../Additional/Libraries/LM/IntersectTester/AABB.h \
     legendcanvas.h \
-    wheelglyph.h
+    wheelglyph.h \
+    barchart.h
 
 FORMS    += maininterfacewindow.ui
 

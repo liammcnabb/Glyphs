@@ -22,7 +22,6 @@ public:
 
 private:
     QVector<float> m_points;
-    float m_size = 0.0f;
 };
 
 #endif // STARGLYPH_H

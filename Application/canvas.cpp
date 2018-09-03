@@ -321,6 +321,16 @@ void Canvas::setHiddenIndicator(int hiddenIndicator)
     m_hiddenIndicator = hiddenIndicator;
 }
 
+QVector<BarChart> Canvas::getBarCharts() const
+{
+    return m_barCharts;
+}
+
+void Canvas::setBarCharts(const QVector<BarChart> &barCharts)
+{
+    m_barCharts = barCharts;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -452,9 +462,19 @@ void Canvas::redraw()
         drawLegend( manager );
         break;
     }
+    case GLYPH_BAR :
+    {
+        QVector<BarChart> bars;
+        bars.append(createBarCharts(getGroomedPolygons(), 0));
+        setBarCharts(bars);
+        calculateValueBounds( getBarCharts() );
+        changeColorMap(this->CATEGORICAL);
+        ColourManager manager(getValueLower(), getValueUpper());
+        drawBarCharts( getBarCharts(), manager);
+        drawLegend( manager );
+        break;
     }
-
-        qDebug() << "6";
+    }
 
     if( getClickedIndex() > NEGATIVE_INDEX )
     {
@@ -522,6 +542,20 @@ void Canvas::calculateValueBounds( QVector<PieChart> list )
                                      ps.value() ) );
             setValueUpper( std::max( getValueUpper(),
                                      ps.value() ) );
+        }
+}
+
+void Canvas::calculateValueBounds( QVector<BarChart> list )
+{
+    setValueLower(std::numeric_limits<float>::max());
+    setValueUpper(-std::numeric_limits<float>::max());
+    foreach( BarChart b, list )
+        for( int i =0; i < b.values().size(); ++i )
+        {
+            setValueLower( std::min( getValueLower(),
+                                     b.values().at(i) ) );
+            setValueUpper( std::max( getValueUpper(),
+                                     b.values().at(i) ) );
         }
 }
 
@@ -739,6 +773,25 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
     }
 
     return wheels;
+}
+
+QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
+{
+    QVector<BarChart> bars;
+    foreach( TreeNode p, list)
+    {
+        if(p.getLevel() > -1)
+        {
+            QStringList values = p.getValues();
+            for( int i = 0; i < 4; ++i )
+                values.removeFirst();
+            BarChart bar( *p.centroid(), p.getLevel(), state );
+            bar.initialize(values);
+            bars.append(bar);
+        }
+    }
+
+    return bars;
 }
 
 void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
@@ -981,6 +1034,8 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
     return;
 }
 
+
+
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
     Colour color;
@@ -1144,6 +1199,73 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             glVertex2f( p.centroid().x(), p.centroid().y() );
             glEnd();
             currentAngle += ps.angle();
+        }
+    }
+    return;
+}
+
+void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
+{
+    Colour color;
+    changeColorMap(this->CATEGORICAL);
+    double max = getLength() / 50;
+    int bars = list.first().values().size();
+    int nook;
+    int barWidth = max*2 / bars;
+
+    float x,y;
+    for( int i = 0; i < list.size(); ++ i )
+    {
+
+        BarChart b = list.at(i);
+        glColor4f( 0.8, 0.8, 0.8, 1 );
+
+//        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+        double size;
+        if( b.state() == b.ADD )
+            size = (getCurrentTransitionSize()*1.5);
+        else if (b.state() == b.REMOVE )
+            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+        else /** if b.state() == b.NEUTRAL */
+            size = (getGlyphSize()*1.5);
+
+        //Fill
+        float minX, width, minY, height;
+        for( int j = 0; j < bars; ++j )
+        {
+            minX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*j);
+            width = barWidth;
+            minY = ( b.centroid().y() - ((max/4) * size) );
+            height = ( b.values().at(j) / getValueUpper() ) * (max *size);
+            color = cm.getColourFromIndex(j);
+            glColor3f(color.getR(), color.getG(), color.getB());
+
+            glBegin( GL_QUADS );
+            glVertex2f(minX, minY);
+            glVertex2f(minX, minY+height);
+            glVertex2f(minX+width, minY+height);
+            glVertex2f(minX+width,minY);
+//            glVertex2f(minX, minY);
+            glEnd();
+        }
+
+//        //Outlines
+        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+        for( int j = 0; j < bars; ++j )
+        {
+            minX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*j);
+            width = barWidth;
+            minY = ( b.centroid().y() - ((max/4) * size) );
+            height = ( b.values().at(j) / getValueUpper() ) * (max *size);
+
+            glBegin( GL_LINE_STRIP );
+            glVertex2f(minX, minY);
+            glVertex2f(minX, minY+height);
+            glVertex2f(minX+width, minY+height);
+            glVertex2f(minX+width,minY);
+            glVertex2f(minX, minY);
+            glEnd();
         }
     }
     return;

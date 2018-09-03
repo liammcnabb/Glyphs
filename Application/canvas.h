@@ -18,6 +18,7 @@
 #include "piechart.h"
 #include "starglyph.h"
 #include "wheelglyph.h"
+#include "barchart.h"
 #include "SCZ/treenode.h"
 #include "LM/IntersectTester/IntersectTester.h"
 
@@ -31,6 +32,7 @@ public:
     static const int GLYPH_EQUAL_PIE = 1;
     static const int GLYPH_VARIABLE_PIE = 2;
     static const int GLYPH_STAR = 3;
+    static const int GLYPH_BAR = 4;
 
     static const int HIDDEN_OUTLINE = 0;
     static const int HIDDEN_SIZE = 1;
@@ -125,6 +127,9 @@ public:
     int getHiddenIndicator() const;
     void setHiddenIndicator(int hiddenIndicator);
 
+    QVector<BarChart> getBarCharts() const;
+    void setBarCharts(const QVector<BarChart> &barCharts);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -135,6 +140,8 @@ private:
     QVector<PieChart> m_pieGlyphs;
     QVector<StarGlyph> m_starGlyphs;
     QVector<WheelGlyph> m_wheelGlyphs;
+    QVector<BarChart> m_barCharts;
+
     AABB wrapper;
     float length;
     float valueUpper;
@@ -189,6 +196,9 @@ private:
     QVector<WheelGlyph> createWheelGlyphs(QVector<TreeNode> list, int state);
     void calculateValueBounds(QVector<WheelGlyph> list);
     void drawWheelGlyphs(QVector<WheelGlyph> list, ColourManager cm);
+    QVector<BarChart> createBarCharts(QVector<TreeNode> list, int state);
+    void calculateValueBounds(QVector<BarChart> list);
+    void drawBarCharts(QVector<BarChart> list, ColourManager cm);
 };
 
 #endif // CANVAS_H

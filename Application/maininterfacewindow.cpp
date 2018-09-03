@@ -125,6 +125,16 @@ void MainInterfaceWindow::on_rdo_StarGlyph_released()
     ui->GlLegend->update();
 }
 
+void MainInterfaceWindow::on_radioButton_released()
+{
+    ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
+    ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_BAR);
+//    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_BAR);
+    ui->OpenGLWidget->update();
+//    ui->GlLegend->update();
+}
+
+
 
 void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
 {
@@ -322,3 +332,4 @@ void MainInterfaceWindow::on_rdoOutlineSize_released()
     ui->OpenGLWidget->setHiddenIndicator(ui->OpenGLWidget->HIDDEN_SIZEOUTLINE);
     ui->OpenGLWidget->update();
 }
+

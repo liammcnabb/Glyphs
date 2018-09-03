@@ -63,6 +63,8 @@ private slots:
 
     void on_rdoOutlineSize_released();
 
+    void on_radioButton_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

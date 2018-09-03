@@ -12,17 +12,21 @@ public:
     int REMOVE = -1;
     int ADD = 1;
 
-    Glyph( QPointF centroid, int state );
+    Glyph( QPointF centroid, float size, int state );
     QPointF centroid() const;
     void setCentroid(const QPointF &centroid);
 
     int state() const;
     void setState(int state);
 
+    float size() const;
+    void setSize(float size);
+
 private:
     QPointF m_centroid;
-    float m_size;
+    float m_size = 0.0f;
     int m_state;
+
 };
 
 #endif // GLYPH_H
