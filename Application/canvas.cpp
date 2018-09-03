@@ -311,6 +311,16 @@ void Canvas::setColorStarLines(bool colorStarLines)
     m_colorStarLines = colorStarLines;
 }
 
+int Canvas::getHiddenIndicator() const
+{
+    return m_hiddenIndicator;
+}
+
+void Canvas::setHiddenIndicator(int hiddenIndicator)
+{
+    m_hiddenIndicator = hiddenIndicator;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -347,7 +357,28 @@ void Canvas::redraw()
     }
     case GLYPH_EQUAL_PIE :
     {
-        setWheelGlyphs(createWheelGlyphs( getGroomedPolygons(), 0) );
+        if(getTransitionState())
+        {
+            QVector<WheelGlyph> wheels;
+            wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
+            wheels.append( createWheelGlyphs( getTransitionAdd(), 1) );
+            wheels.append( createWheelGlyphs( getTransitionRemove(), -1) );
+            setWheelGlyphs(wheels);
+        }
+        else
+        {
+            if(getTransitionNeutral().isEmpty())
+            {
+                setWheelGlyphs(createWheelGlyphs( getGroomedPolygons(), 0) );
+            }
+            else
+            {
+                QVector<WheelGlyph> wheels;
+                wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
+                wheels.append( createWheelGlyphs( getTransitionAdd(), 0) );
+                setWheelGlyphs(wheels);
+            }
+        }
         calculateValueBounds( getWheelGlyphs() );
         changeColorMap(this->DIVERGING);
         ColourManager manager(-2, 2);
@@ -950,12 +981,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
-//        Colour c = outline.getInterpolatedColour(j);
-//        /* Outline */
-        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
-        glBegin( GL_TRIANGLE_FAN );
-        glVertex2f( p.centroid().x(), p.centroid().y() );
-        double size;
+        double indicate = 0;
+        double size = 0;
+        double rad = getLength() / 100;
+
         if( p.state() == p.ADD )
             size = getCurrentTransitionSize();
         else if (p.state() == p.REMOVE )
@@ -963,19 +992,102 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         else /** if p.state() == p.NEUTRAL */
             size = getGlyphSize();
 
-       double rad = getLength() /*+ scaleModifier()*/ / 100;
-
-        for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.1 )
+//        Colour c = outline.getInterpolatedColour(j);
+        if(getHiddenIndicator() == HIDDEN_OUTLINE ||
+                getHiddenIndicator() == HIDDEN_SIZE ||
+                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            float x = p.centroid().x() + sin( angle ) *
-                      ( size * ( rad * ( 1 + p.size()/*0.03*/ ) ) );
-            float y = p.centroid().y() + cos( angle ) *
-                      ( size * ( rad * ( 1 + p.size()/*+0.03*/ ) ) );
+            /* Outline (STANDARD) */
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
+            glBegin( GL_TRIANGLE_FAN );
+            glVertex2f( p.centroid().x(), p.centroid().y() );
+            if(getHiddenIndicator() == HIDDEN_OUTLINE ||
+                    getHiddenIndicator() == HIDDEN_SIZE )
+            {
+                indicate = p.size();
+            }
+            else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+            {
+                indicate = p.size()*1.5;
+            }
+            for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
+            {
+
+                float x = p.centroid().x() + sin( angle ) *
+                        ( size * ( rad * ( 1 + indicate ) ) );
+                float y = p.centroid().y() + cos( angle ) *
+                        ( size * ( rad * ( 1 + indicate ) ) );
+
+                glVertex3f( x, y, 0.5 );
+            }
+
+            float x = p.centroid().x() + sin( 0 ) *
+                    ( size * ( rad * ( 1 + indicate ) ) );
+            float y = p.centroid().y() + cos( 0 ) *
+                    ( size * ( rad * ( 1 + indicate ) ) );
 
             glVertex3f( x, y, 0.5 );
+            glEnd();
         }
-        glEnd();
+        else
+        {
+            /* Outline (STEPS) */
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2 );
+            glLineWidth(3);
+            int rings = floor(p.size() / ((p.SIZE_MODIFIER)* 4) );
+            for ( int i = 1; i <= rings; ++i )
+            {
+                glBegin(GL_TRIANGLE_FAN);
+                glVertex2f(p.centroid().x(),p.centroid().y());
+                for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
+                {
+                    float x = p.centroid().x() + sin( angle ) *
+                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*rings) ) ) );
+                    float y = p.centroid().y() + cos( angle ) *
+                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*rings) ) ) );
+                    glVertex3f( x, y, 0.5 );
+                }
 
+                float x = p.centroid().x() + sin( 0 ) *
+                        ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+                float y = p.centroid().y() + cos( 0 ) *
+                        ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+                glVertex3f( x, y, 0.5 );
+                glEnd();
+
+//                /* Outline (RING) */
+//                glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
+//                glLineWidth(3);
+//                int rings = floor(p.size() / ((p.SIZE_MODIFIER)* 2) );
+//                for ( int i = 1; i <= rings; ++i )
+//                {
+//                    glBegin(GL_LINE_STRIP);
+//                    for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
+//                    {
+//                        float x = p.centroid().x() + sin( angle ) *
+//                                ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+//                        float y = p.centroid().y() + cos( angle ) *
+//                                ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+//                        glVertex3f( x, y, 0.5 );
+//                    }
+
+//                    float x = p.centroid().x() + sin( 0 ) *
+//                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+//                    float y = p.centroid().y() + cos( 0 ) *
+//                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
+//                    glVertex3f( x, y, 0.5 );
+//                    glEnd();
+            }
+        }
+        glLineWidth(1);
+
+
+        indicate = 0;
+        if( getHiddenIndicator() == HIDDEN_SIZE ||
+                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+        {
+            indicate = p.size();
+        }
         changeColorMap(this->CATEGORICAL);
         float currentAngle = 0;
 //        color = Colour(1,0,0,1,"");
@@ -995,10 +1107,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( size * ( ( rad ) ) );
+                          ( size * ( ( rad * ( 1 + indicate ) ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( size * ( ( rad ) ) );
+                          ( size * ( ( rad * ( 1 + indicate )) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );
@@ -1017,10 +1129,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( size * ( ( rad ) ) );
+                          ( size * ( ( rad * ( 1 + indicate )) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( size * ( ( rad ) ) );
+                          ( size * ( ( rad * ( 1 + indicate )) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );

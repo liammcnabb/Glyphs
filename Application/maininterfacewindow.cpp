@@ -297,3 +297,28 @@ void MainInterfaceWindow::on_chkColoredStarLines_toggled(bool checked)
     ui->OpenGLWidget->update();
     ui->GlLegend->update();
 }
+
+
+void MainInterfaceWindow::on_rdoOutline_released()
+{
+    ui->OpenGLWidget->setHiddenIndicator(ui->OpenGLWidget->HIDDEN_OUTLINE);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoSize_released()
+{
+    ui->OpenGLWidget->setHiddenIndicator(ui->OpenGLWidget->HIDDEN_SIZE);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoRings_released()
+{
+    ui->OpenGLWidget->setHiddenIndicator(ui->OpenGLWidget->HIDDEN_RINGS);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoOutlineSize_released()
+{
+    ui->OpenGLWidget->setHiddenIndicator(ui->OpenGLWidget->HIDDEN_SIZEOUTLINE);
+    ui->OpenGLWidget->update();
+}

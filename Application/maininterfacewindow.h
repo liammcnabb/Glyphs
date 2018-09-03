@@ -54,6 +54,15 @@ private slots:
 
     void on_chkColoredStarLines_toggled(bool checked);
 
+
+    void on_rdoOutline_released();
+
+    void on_rdoSize_released();
+
+    void on_rdoRings_released();
+
+    void on_rdoOutlineSize_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

@@ -32,6 +32,12 @@ public:
     static const int GLYPH_VARIABLE_PIE = 2;
     static const int GLYPH_STAR = 3;
 
+    static const int HIDDEN_OUTLINE = 0;
+    static const int HIDDEN_SIZE = 1;
+    static const int HIDDEN_RINGS = 2;
+    static const int HIDDEN_SIZEOUTLINE = 3;
+
+
     static const int SEQUENTIAL = 0;
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;
@@ -116,6 +122,9 @@ public:
     bool getColorStarLines() const;
     void setColorStarLines(bool colorStarLines);
 
+    int getHiddenIndicator() const;
+    void setHiddenIndicator(int hiddenIndicator);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -133,11 +142,13 @@ private:
     int glyphType = GLYPH_CENTROID;
     float glyphSize = 2.5f;
 
-        QVector<TreeNode> m_transitionNeutral;
-        QVector<TreeNode> m_transitionAdd;
-        QVector<TreeNode> m_transitionRemove;
-        float currentTransitionSize = 0.0f;
-        float m_areaOpacity = 0.3f;
+    QVector<TreeNode> m_transitionNeutral;
+    QVector<TreeNode> m_transitionAdd;
+    QVector<TreeNode> m_transitionRemove;
+    float currentTransitionSize = 0.0f;
+    float m_areaOpacity = 0.3f;
+
+    int m_hiddenIndicator = 0;
 
 
     QVector<float> m_means;
