@@ -45,12 +45,12 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
 
             for ( int j = 0; j < polygon->getNumInteriorRings(); ++j )
             {
-                OGRLinearRing intRing = polygon->getInteriorRing( j );
-                intRing.closeRings();
+                OGRLinearRing* intRing = polygon->getInteriorRing( j );
+                intRing->closeRings();
 
                 /** Hardcoded fix, comment and uncomment as necessary. **/
-                if ( intRing.getNumPoints() > 10 )
-                    accumulatePoints( &intRing, &points );
+                if ( intRing->getNumPoints() > 10 )
+                    accumulatePoints( intRing, &points );
             }
 
             points.squeeze();
@@ -77,12 +77,12 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
 
                 for ( int j = 0; j < poly->getNumInteriorRings(); ++j )
                 {
-                    OGRLinearRing intRing = poly->getInteriorRing( j );
-                    intRing.closeRings();
+                    OGRLinearRing* intRing = poly->getInteriorRing( j );
+                    intRing->closeRings();
 
                     /** Hardcoded fix, comment and uncomment as necessary. **/
-                    if ( intRing.getNumPoints() > 10 )
-                        accumulatePoints( &intRing, &points );
+                    if ( intRing->getNumPoints() > 10 )
+                        accumulatePoints( intRing, &points );
                 }
 
                 points.squeeze();
@@ -119,17 +119,17 @@ QVector<QPointF> MapExtractor::accumulatePoints(
     return points;
 }
 
-void MapExtractor::accumulatePoints( const OGRLinearRing&
+void MapExtractor::accumulatePoints( const OGRLinearRing*
                                         ring,
                                         QVector<QPointF>* points )
 {
     double x, y;
     QVector<QPointF> tempPoints;
 
-    for ( int i = 0; i < ring.getNumPoints(); i++ )
+    for ( int i = 0; i < ring->getNumPoints(); i++ )
     {
-        x = ring.getX( i );
-        y = ring.getY( i );
+        x = ring->getX( i );
+        y = ring->getY( i );
         tempPoints.append( QPointF( x, y ) );
     }
 

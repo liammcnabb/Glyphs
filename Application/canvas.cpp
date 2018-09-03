@@ -1029,7 +1029,7 @@ void Canvas::drawLegend( ColourManager cm )
 
     double lRange = legendTR.x() - legendTL.x();
     double colorRange = cm.getUpperRange() - cm.getLowerRange();
-    double slices = cm.getCurrentColourMap().classCount();
+    double slices = cm.getCurrentColourMap().getColourList().size();
     double canvasSlice = ( lRange / slices );
     double colourSlice = colorRange / slices;
 

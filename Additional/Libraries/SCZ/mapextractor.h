@@ -41,7 +41,7 @@ private:
      * @param ring ring of points taken from OGRFeature
      * @param points current list of points to append to
      */
-    void accumulatePoints( const OGRLinearRing& ring,
+    void accumulatePoints(const OGRLinearRing *ring,
                            QVector<QPointF>* points );
     /**
      * @brief SCZMapExtractor::extractPolygonPoints extract points from a specific

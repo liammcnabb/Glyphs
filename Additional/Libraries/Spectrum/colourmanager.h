@@ -30,6 +30,7 @@
 #include <sstream>
 #include <time.h>
 #include <algorithm>
+#include <math.h>
 using namespace std;
 
 /** The CMClassification enum.
