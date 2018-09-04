@@ -1298,7 +1298,6 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
         glEnd();
     }
 
-
     return;
 }
 

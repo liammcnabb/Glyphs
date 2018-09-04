@@ -25,6 +25,7 @@ void LegendCanvas::initializeGL()
     initializeVariablePie();
     initalizeStarGlyph();
     initalizeWheelGlyph();
+    initializeBarChart();
 }
 
 void LegendCanvas::paintGL()
@@ -35,6 +36,8 @@ void LegendCanvas::paintGL()
         paintStarGlyph();
     else if (currentGlyphType() == GLYPH_EQUAL_PIE)
         paintWheelGlyph();
+    else if (currentGlyphType() == GLYPH_BAR)
+        paintBarChart();
 }
 
 void LegendCanvas::initializeVariablePie()
@@ -82,6 +85,20 @@ void LegendCanvas::initalizeWheelGlyph()
     }
     s.initialize(samplePoints, mean);
     setWheelGlyph(s);
+    return;
+}
+
+void LegendCanvas::initializeBarChart()
+{
+    int seed = 0;
+    srand(seed);
+    BarChart b(QPointF(50,50),3,BarChart::NEUTRAL);
+    QStringList samplePoints;
+    for(int i =0; i < SAMPLE_POINTS; ++i)
+        samplePoints.append(QString::number( (rand() % SAMPLE_POINTS) + 1 ) );
+    b.initialize(samplePoints);
+
+    setBarChart(b);
     return;
 }
 
@@ -202,6 +219,16 @@ void LegendCanvas::paintVariablePie()
     glPrintString(44,77.5,"6");
 
     return;
+}
+
+BarChart LegendCanvas::barChart() const
+{
+    return m_barChart;
+}
+
+void LegendCanvas::setBarChart(const BarChart &barChart)
+{
+    m_barChart = barChart;
 }
 
 bool LegendCanvas::colorStarLines() const
@@ -423,6 +450,71 @@ void LegendCanvas::paintWheelGlyph()
 
 
     return;
+}
+
+void LegendCanvas::paintBarChart()
+{
+
+    Colour color;
+    changeColorMap(this->CATEGORICAL);
+    double max = 60;
+    int bars = barChart().values().size();
+
+    ColourManager cm(0, SAMPLE_POINTS);
+    BarChart b = barChart();
+    glColor4f( 0.8, 0.8, 0.8, 1 );
+
+    //        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+    double size = 1;
+
+    int barWidth = (max / bars) * (size * 0.7);
+    //Fill
+    float minX, width, minY, height;
+    for( int j = 0; j < bars; ++j )
+    {
+        minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);
+        width = barWidth;
+        minY = ( b.centroid().y() - ((max/3) * size) );
+        height = ( b.values().at(j) / SAMPLE_POINTS ) * (max *size);
+        color = cm.getColourFromIndex(j);
+        glColor3f(color.getR(), color.getG(), color.getB());
+
+        glBegin( GL_QUADS );
+        glVertex2f(minX, minY);
+        glVertex2f(minX, minY+height);
+        glVertex2f(minX+width, minY+height);
+        glVertex2f(minX+width,minY);
+        //            glVertex2f(minX, minY);
+        glEnd();
+    }
+
+    //        //Outlines
+    glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+    for( int j = 0; j < bars; ++j )
+    {
+        minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);
+        width = barWidth;
+        minY = ( b.centroid().y() - ((max/3) * size) );
+        height = ( b.values().at(j) / SAMPLE_POINTS ) * (max *size);
+
+        glBegin( GL_LINE_STRIP );
+        glVertex2f(minX, minY);
+        glVertex2f(minX, minY+height);
+        glVertex2f(minX+width, minY+height);
+        glVertex2f(minX+width,minY);
+        glVertex2f(minX, minY);
+        glEnd();
+    }
+
+    glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+//    glPrintString(1,1,"Red Line presents: Standard value per field");
+    glPrintString(32,25,"1");
+    glPrintString(39,25,"2");
+    glPrintString(47,25,"3");
+    glPrintString(54,25,"4");
+    glPrintString(62,25,"5");
+    glPrintString(69,25,"6");
 }
 
 StarGlyph LegendCanvas::starGlyph() const

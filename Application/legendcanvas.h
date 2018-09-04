@@ -11,6 +11,7 @@
 #include "piechart.h"
 #include "starglyph.h"
 #include "wheelglyph.h"
+#include "barchart.h"
 
 
 class LegendCanvas : public QOpenGLWidget
@@ -26,6 +27,7 @@ public:
     static const int GLYPH_EQUAL_PIE = 1;
     static const int GLYPH_VARIABLE_PIE = 2;
     static const int GLYPH_STAR = 3;
+    static const int GLYPH_BAR = 4;
 
     LegendCanvas(QWidget *parent);
     void initializeGL();
@@ -47,12 +49,16 @@ public:
     bool colorStarLines() const;
     void setColorStarLines(bool colorStarLines);
 
+    BarChart barChart() const;
+    void setBarChart(const BarChart &barChart);
+
 private:
     void initializeVariablePie();
     void paintVariablePie();
     PieChart m_variablePie;
     StarGlyph m_starGlyph;
     WheelGlyph m_wheelGlyph;
+    BarChart m_barChart;
     int m_currentGlyphType = 0;
     bool m_colorStarLines = false;
 
@@ -62,6 +68,8 @@ private:
     void initalizeStarGlyph();
     void paintWheelGlyph();
     void initalizeWheelGlyph();
+    void initializeBarChart();
+    void paintBarChart();
 };
 
 #endif // LEGENDCANVAS_H

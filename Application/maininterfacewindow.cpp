@@ -129,9 +129,9 @@ void MainInterfaceWindow::on_radioButton_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_BAR);
-//    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_BAR);
+    ui->GlLegend->setCurrentGlyphType(ui->GlLegend->GLYPH_BAR);
     ui->OpenGLWidget->update();
-//    ui->GlLegend->update();
+    ui->GlLegend->update();
 }
 
 
