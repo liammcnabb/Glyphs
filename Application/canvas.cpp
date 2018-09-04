@@ -1210,10 +1210,8 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
     changeColorMap(this->CATEGORICAL);
     double max = getLength() / 50;
     int bars = list.first().values().size();
-    int nook;
-    int barWidth = max*2 / bars;
 
-    float x,y;
+
     for( int i = 0; i < list.size(); ++ i )
     {
 
@@ -1230,6 +1228,8 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
         else /** if b.state() == b.NEUTRAL */
             size = (getGlyphSize()*1.5);
 
+
+        int barWidth = (max / bars) * (size * 0.5);
         //Fill
         float minX, width, minY, height;
         for( int j = 0; j < bars; ++j )
@@ -1264,10 +1264,25 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             glVertex2f(minX, minY+height);
             glVertex2f(minX+width, minY+height);
             glVertex2f(minX+width,minY);
-            glVertex2f(minX, minY);
             glEnd();
         }
+
+        // Extents
+        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2);
+        minX = ( b.centroid().x() - ((max/4) * size) );
+        minY = ( b.centroid().y() - ((max/4) * size) );
+        int maxX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*bars);
+        int maxY = minY + (max*size);
+
+        glBegin( GL_LINE_STRIP );
+        glVertex2f(minX, minY);
+        glVertex2f(minX, maxY);
+        glVertex2f(maxX, maxY);
+        glVertex2f(maxX,minY);
+        glEnd();
     }
+
+
     return;
 }
 
