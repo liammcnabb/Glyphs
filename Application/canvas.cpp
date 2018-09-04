@@ -464,9 +464,25 @@ void Canvas::redraw()
     }
     case GLYPH_BAR :
     {
-        QVector<BarChart> bars;
-        bars.append(createBarCharts(getGroomedPolygons(), 0));
-        setBarCharts(bars);
+        if( getTransitionState() )
+        {
+            QVector<BarChart> bars;
+            bars.append(createBarCharts(getTransitionNeutral(), 0));
+            bars.append(createBarCharts(getTransitionAdd(), 1));
+            bars.append(createBarCharts(getTransitionRemove(), -1));
+            setBarCharts(bars);
+        }
+        else if ( getTransitionNeutral().isEmpty() )
+        {
+            setBarCharts(createBarCharts(getGroomedPolygons(), 0) );
+        }
+        else
+        {
+            QVector<BarChart> bars;
+            bars.append(createBarCharts(getTransitionNeutral(), 0));
+            bars.append(createBarCharts(getTransitionAdd(), 0));
+            setBarCharts(bars);
+        }
         calculateValueBounds( getBarCharts() );
         changeColorMap(this->CATEGORICAL);
         ColourManager manager(getValueLower(), getValueUpper());
