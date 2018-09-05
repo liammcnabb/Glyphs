@@ -65,6 +65,8 @@ private slots:
 
     void on_radioButton_released();
 
+    void on_verticalSlider_valueChanged(int value);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

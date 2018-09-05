@@ -135,7 +135,6 @@ void MainInterfaceWindow::on_radioButton_released()
 }
 
 
-
 void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
 {
     double transitionFrames = 25;
@@ -333,3 +332,18 @@ void MainInterfaceWindow::on_rdoOutlineSize_released()
     ui->OpenGLWidget->update();
 }
 
+
+void MainInterfaceWindow::on_verticalSlider_valueChanged(int value)
+{
+    float pos = float( value ) / 100;
+        if( value == float( -100 ) )
+            ui->OpenGLWidget->setZoom( float( -0.99 ) );
+        else if ( value == float( 100 ) )
+            ui->OpenGLWidget->setZoom( float( 0.99 ) );
+        else
+            ui->OpenGLWidget->setZoom( pos );
+
+//        ui->OpenGLWidget->setOrtho();
+        on_virtualzoom_valueChanged(ui->virtualzoom->value());
+        ui->OpenGLWidget->update();
+}

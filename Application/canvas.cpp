@@ -53,7 +53,7 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
 float Canvas::convertedX( float windowX )
 {
     float newX;
-    newX = (getWrapper().minimums.at(AABB::XDIM) - scaleModifier()) +
+    newX = (getCurrentWrapper().minimums.at(AABB::XDIM) - scaleModifier()) +
             ( ( windowX / this->width() ) *
               ( getLength() + (scaleModifier()*2) ) ) ;
     return newX;
@@ -64,7 +64,7 @@ float Canvas::convertedY( float windowY )
     float newY,reverseY;
     reverseY = -( windowY - 1 - this->height() );
 
-    newY = (getWrapper().minimums.at(AABB::YDIM) - scaleModifier()) +
+    newY = (getCurrentWrapper().minimums.at(AABB::YDIM) - scaleModifier()) +
             ( ( reverseY / this->height() ) *
               ( getLength() + (scaleModifier()*2) ) );
     return newY;
@@ -329,6 +329,26 @@ QVector<BarChart> Canvas::getBarCharts() const
 void Canvas::setBarCharts(const QVector<BarChart> &barCharts)
 {
     m_barCharts = barCharts;
+}
+
+float Canvas::getZoom() const
+{
+    return m_zoom;
+}
+
+void Canvas::setZoom(float zoom)
+{
+    m_zoom = zoom;
+}
+
+AABB Canvas::getCurrentWrapper() const
+{
+    return m_currentWrapper;
+}
+
+void Canvas::setCurrentWrapper(const AABB &currentWrapper)
+{
+    m_currentWrapper = currentWrapper;
 }
 
 void Canvas::paintGL()
@@ -1306,17 +1326,17 @@ void Canvas::drawLegend( ColourManager cm )
 {
 //    double scaleModifier = getLength() / 20;
     QPointF legendBL, legendBR, legendTL, legendTR;
-    legendBL.setX( getWrapper().minimums.at(AABB::XDIM) - scaleModifier()/1.4);
-    legendBL.setY( getWrapper().maximums.at(AABB::YDIM) + scaleModifier()/2.8);
+    legendBL.setX( getCurrentWrapper().minimums.at(AABB::XDIM) - scaleModifier()/1.4);
+    legendBL.setY( getCurrentWrapper().maximums.at(AABB::YDIM) + scaleModifier()/2.8);
 
-    legendTL.setX( getWrapper().minimums.at(AABB::XDIM) - scaleModifier()/1.4);
-    legendTL.setY( getWrapper().maximums.at(AABB::YDIM) + (scaleModifier()/1.4));
+    legendTL.setX( getCurrentWrapper().minimums.at(AABB::XDIM) - scaleModifier()/1.4);
+    legendTL.setY( getCurrentWrapper().maximums.at(AABB::YDIM) + (scaleModifier()/1.4));
 
-    legendBR.setX( getWrapper().minimums.at(AABB::XDIM) + scaleModifier()*5 );
-    legendBR.setY( getWrapper().maximums.at(AABB::YDIM) + scaleModifier()/2.8);
+    legendBR.setX( getCurrentWrapper().minimums.at(AABB::XDIM) + scaleModifier()*5 );
+    legendBR.setY( getCurrentWrapper().maximums.at(AABB::YDIM) + scaleModifier()/2.8);
 
-    legendTR.setX( getWrapper().minimums.at(AABB::XDIM) + scaleModifier()*5);
-    legendTR.setY( getWrapper().maximums.at(AABB::YDIM) + (scaleModifier()/1.4));
+    legendTR.setX( getCurrentWrapper().minimums.at(AABB::XDIM) + scaleModifier()*5);
+    legendTR.setY( getCurrentWrapper().maximums.at(AABB::YDIM) + (scaleModifier()/1.4));
 
     double lRange = legendTR.x() - legendTL.x();
     double colorRange = cm.getUpperRange() - cm.getLowerRange();
@@ -1353,9 +1373,9 @@ void Canvas::drawLegend( ColourManager cm )
     std::string lower = QString::number( cm.getLowerRange(), 'f',
                                          1 ).toUtf8().constData();
 
-    glPrintString( getWrapper().minimums.at(AABB::XDIM) - (scaleModifier()/10),
+    glPrintString( getCurrentWrapper().minimums.at(AABB::XDIM) - (scaleModifier()/10),
                    legendBR.y() - (scaleModifier()/2.8) , lower );
-    glPrintString( getWrapper().minimums.at(AABB::XDIM) + (scaleModifier()*5.1) ,
+    glPrintString( getCurrentWrapper().minimums.at(AABB::XDIM) + (scaleModifier()*5.1) ,
                    legendBR.y()- (scaleModifier()/2.8) , upper ) ;
 
     return;
@@ -1438,18 +1458,18 @@ void Canvas::setLoadedPolygons(const QVector<Polygon> &loadedPolygons)
 
 void Canvas::setDefaultOrtho(OGREnvelope wrapper)
 {
-    setWrapper( AABB( wrapper.MinX,wrapper.MaxX,
+    setOriginalWrapper( AABB( wrapper.MinX,wrapper.MaxX,
                                   wrapper.MinY,wrapper.MaxY ) );
 }
 
-AABB Canvas::getWrapper() const
+AABB Canvas::getOriginalWrapper() const
 {
-    return wrapper;
+    return m_originalWrapper;
 }
 
-void Canvas::setWrapper(const AABB &value)
+void Canvas::setOriginalWrapper(const AABB &value)
 {
-    wrapper = value;
+    m_originalWrapper = value;
 }
 
 float Canvas::getLength() const
@@ -1523,15 +1543,23 @@ void Canvas::setOrtho()
                   1,
                   1, 1.0 );
 
-    setLength( std::max( wrapper.length( AABB::XDIM ),
-                             wrapper.length( AABB::YDIM ) ) );
+    setLength( std::max( getOriginalWrapper().length( AABB::XDIM ),
+                         getOriginalWrapper().length( AABB::YDIM ) ) );
 
-    glOrtho( wrapper.minimums.at(AABB::XDIM) - scaleModifier(),
-             wrapper.minimums.at(AABB::XDIM)+ getLength() + scaleModifier(),
-             wrapper.minimums.at(AABB::YDIM) - scaleModifier(),
-             wrapper.minimums.at(AABB::YDIM)+ getLength() + scaleModifier(),
+    double currentScale = ( getZoom() * getLength() ) / 2;
+
+    setCurrentWrapper( AABB(getOriginalWrapper().minimums.at(AABB::XDIM) + currentScale - scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - currentScale + scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + currentScale - scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - currentScale + scaleModifier()));
+
+    glOrtho( getOriginalWrapper().minimums.at(AABB::XDIM) + currentScale - scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - currentScale + scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + currentScale - scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - currentScale + scaleModifier(),
              -1.0, 1.0 );
 
+    setLength( getCurrentWrapper().length( AABB::XDIM )) ;
     glClear( GL_COLOR_BUFFER_BIT );
     return;
 }

@@ -56,8 +56,8 @@ public:
 
     void setDefaultOrtho(OGREnvelope wrapper);
 
-    AABB getWrapper() const;
-    void setWrapper(const AABB &value);
+    AABB getOriginalWrapper() const;
+    void setOriginalWrapper(const AABB &value);
 
     float getLength() const;
     void setLength(float value);
@@ -130,6 +130,12 @@ public:
     QVector<BarChart> getBarCharts() const;
     void setBarCharts(const QVector<BarChart> &barCharts);
 
+    float getZoom() const;
+    void setZoom(float zoom);
+
+    AABB getCurrentWrapper() const;
+    void setCurrentWrapper(const AABB &currentWrapper);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -142,7 +148,8 @@ private:
     QVector<WheelGlyph> m_wheelGlyphs;
     QVector<BarChart> m_barCharts;
 
-    AABB wrapper;
+    AABB m_originalWrapper;
+    AABB m_currentWrapper;
     float length;
     float valueUpper;
     float valueLower;
@@ -154,6 +161,7 @@ private:
     QVector<TreeNode> m_transitionRemove;
     float currentTransitionSize = 0.0f;
     float m_areaOpacity = 0.0f;
+    float m_zoom = 0.0f;
 
     int m_hiddenIndicator = 0;
 
