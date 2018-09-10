@@ -137,6 +137,8 @@ void MainInterfaceWindow::on_radioButton_released()
 
 void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
 {
+    ui->verticalSlider->setEnabled(false);
+    ui->virtualzoom->setEnabled(false);
     double transitionFrames = 25;
     double frameSkip = 2;
     double minScreenSpace = double(value) / 100;
@@ -145,15 +147,22 @@ void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
     splitVisible(visiblePolygons);
     ui->OpenGLWidget->setGroomedPolygons( visiblePolygons );
 
-     ui->OpenGLWidget->setTransitionState(true);
-    float incrementer = ui->OpenGLWidget->getGlyphSize() / transitionFrames;
-    for( int i = 0; i < transitionFrames; i+=frameSkip )
+    if(visiblePolygons.size() != ui->OpenGLWidget->getTransitionNeutral().size())
     {
-        ui->OpenGLWidget->setCurrentTransitionSize(incrementer*i);
-        ui->OpenGLWidget->repaint();
-        qApp->processEvents();
+        ui->OpenGLWidget->setTransitionState(true);
+        float incrementer = ui->OpenGLWidget->getGlyphSize() / transitionFrames;
+        for( int i = 0; i < transitionFrames; i+=frameSkip )
+        {
+            ui->OpenGLWidget->setCurrentTransitionSize(incrementer*i);
+            ui->OpenGLWidget->repaint();
+            qApp->processEvents();
+        }
+
+        ui->OpenGLWidget->setTransitionState(false);
     }
-    ui->OpenGLWidget->setTransitionState(false);
+    ui->virtualzoom->setEnabled(true);
+    ui->verticalSlider->setEnabled(true);
+    ui->virtualzoom->setFocus();
     ui->OpenGLWidget->update();
 
 }
@@ -345,5 +354,6 @@ void MainInterfaceWindow::on_verticalSlider_valueChanged(int value)
 
 //        ui->OpenGLWidget->setOrtho();
         on_virtualzoom_valueChanged(ui->virtualzoom->value());
+        ui->verticalSlider->setFocus();
         ui->OpenGLWidget->update();
 }
