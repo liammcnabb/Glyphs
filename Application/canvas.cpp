@@ -838,15 +838,13 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     int totalNooks = 7;
     int nook;
     int nookSegment = max / totalNooks;
+    double indicate = 0;
 
     float x,y;
     for( int i = 0; i < list.size(); ++ i )
     {
-
         StarGlyph s = list.at(i);
-        glColor4f( 0.8, 0.8, 0.8, 1 );
-        glBegin( GL_TRIANGLE_FAN );
-        glVertex2f( s.centroid().x(), s.centroid().y() );
+        float valueRotation = (2*M_PI) / s.points().size();
 
         double size;
         if( s.state() == s.ADD )
@@ -856,47 +854,100 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         else /** if p.state() == p.NEUTRAL */
             size = (getGlyphSize()*1.5);
 
-        //Fill
-        float valueRotation = (2*M_PI) / s.points().size();
-        for( float j = 0; j < s.points().size(); ++j )
+        /** Outline (Standard) */
+        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
+                getHiddenIndicator() == HIDDEN_SIZE ||
+                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            nook = cm.getClassColourIndex(s.points().at(j))/2;
-            x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+            if(getHiddenIndicator() == HIDDEN_OUTLINE ||
+                    getHiddenIndicator() == HIDDEN_SIZE )
+            {
+                indicate = 1+s.size();
+            }
+            else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+            {
+                indicate = (1+s.size())*1.5;
+            }
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+            glBegin( GL_TRIANGLE_FAN );
+            glVertex2f( s.centroid().x(), s.centroid().y() );
+            for( float j = 0; j < s.points().size(); ++j )
+            {
+                nook = cm.getClassColourIndex(s.points().at(j))/2;
+                x = s.centroid().x() + sin( valueRotation * j ) *
+                        ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                y = s.centroid().y() + cos( valueRotation * j ) *
+                        ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                glVertex2f( x, y );
+            }
+            nook = cm.getClassColourIndex(s.points().at(0))/2;
+            x = s.centroid().x() + sin( 0 ) *
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+            y = s.centroid().y() + cos( 0 ) *
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
+
+            glEnd();
         }
-        nook = cm.getClassColourIndex(s.points().at(0))/2;
-        x = s.centroid().x() + sin( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-        y = s.centroid().y() + cos( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-        glVertex2f( x, y );
+        else
+        {
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+            glLineWidth(2);
+            int rings = floor(s.size() / ((s.SIZE_MODIFIER) * 4) );
+            for( int k = 1; k <= rings; ++k )
+            {
+                glBegin( GL_TRIANGLE_FAN );
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+                for( float j = 0; j < s.points().size(); ++j )
+                {
+                    nook = cm.getClassColourIndex(s.points().at(j))/2;
+                    x = s.centroid().x() + sin( valueRotation * j ) *
+                            ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
+                    y = s.centroid().y() + cos( valueRotation * j ) *
+                            ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
+                    glVertex2f( x, y );
+                }
+                nook = cm.getClassColourIndex(s.points().at(0))/2;
+                x = s.centroid().x() + sin( 0 ) *
+                        ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
+                y = s.centroid().y() + cos( 0 ) *
+                        ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
+                glVertex2f( x, y );
+                glEnd();
+            }
+            glLineWidth(1);
+        }
 
-        glEnd();
+        indicate = 1;
+        if( getHiddenIndicator() == HIDDEN_SIZE ||
+                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+        {
+            indicate = 1+s.size();
+        }
+        glColor4f( 0.8, 0.8, 0.8, 1 );
 
-        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-        //Outlines
-        glBegin( GL_LINE_STRIP );
+        //Fill
+        glBegin(GL_TRIANGLE_FAN);
         glVertex2f( s.centroid().x(), s.centroid().y() );
         for( float j = 0; j < s.points().size(); ++j )
         {
             nook = cm.getClassColourIndex(s.points().at(j))/2;
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate *( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  *indicate * ( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         nook = cm.getClassColourIndex(s.points().at(0))/2;
         x = s.centroid().x() + sin( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
         y = s.centroid().y() + cos( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
+
+        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
 
         //Lines at Points
         glBegin( GL_LINES );
@@ -913,9 +964,9 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             nook = cm.getClassColourIndex(s.points().at(j))/2;
             glVertex2f( s.centroid().x(), s.centroid().y() );
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate *( nookSegment * ( 1+nook ) ) );
             glVertex2f( x, y );
         }
         glEnd();
@@ -935,9 +986,9 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         }
         nook = cm.getClassColourIndex(0)/2;
         x = s.centroid().x() + sin( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
         y = s.centroid().y() + cos( 0 ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
         glVertex2f( x, y );
 
         glEnd();
@@ -1101,19 +1152,19 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             if(getHiddenIndicator() == HIDDEN_OUTLINE ||
                     getHiddenIndicator() == HIDDEN_SIZE )
             {
-                indicate = p.size();
+                indicate = 1+p.size();
             }
             else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
             {
-                indicate = p.size()*1.5;
+                indicate = (1+p.size())*1.5;
             }
             for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
             {
 
                 float x = p.centroid().x() + sin( angle ) *
-                        ( size * ( rad * ( 1 + indicate ) ) );
+                        ( size * ( rad * ( indicate ) ) );
                 float y = p.centroid().y() + cos( angle ) *
-                        ( size * ( rad * ( 1 + indicate ) ) );
+                        ( size * ( rad * ( indicate ) ) );
 
                 glVertex3f( x, y, 0.5 );
             }
@@ -1179,11 +1230,11 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         glLineWidth(1);
 
 
-        indicate = 0;
+        indicate = 1;
         if( getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            indicate = p.size();
+            indicate = 1+p.size();
         }
         changeColorMap(this->CATEGORICAL);
         float currentAngle = 0;
@@ -1204,10 +1255,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( size * ( ( rad * ( 1 + indicate ) ) ) );
+                          ( size * ( ( rad * indicate  ) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( size * ( ( rad * ( 1 + indicate )) ) );
+                          ( size * ( ( rad * indicate ) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );

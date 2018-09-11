@@ -17,8 +17,6 @@ public:
     QVector<float> points() const;
     void setPoints(const QVector<float> &points);
 
-    float size() const;
-    void setSize(float size);
 
 private:
     QVector<float> m_points;
