@@ -1,10 +1,11 @@
 #include "starglyph.h"
 
-StarGlyph::StarGlyph() : Glyph ( QPointF( 0.0f, 0.0f ), 0.0f, NEUTRAL )
+StarGlyph::StarGlyph() :
+    Glyph ( QPointF( 0.0f, 0.0f ), 0.0f, NEUTRAL, QPointF( 0.0f, 0.0f ) )
 {}
 
-StarGlyph::StarGlyph(QPointF centroid, float size, int state)
-    : Glyph ( centroid, size, state )
+StarGlyph::StarGlyph(QPointF centroid, float size, int state, QPointF parent)
+    : Glyph ( centroid, size, state, parent )
 {}
 
 

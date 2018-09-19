@@ -33,7 +33,7 @@ public:
     static const int EQUAL_SLICES = 1;
 
     PieChart();
-    PieChart(QPointF centroid, float size, int state);
+    PieChart(QPointF centroid, float size, int state, QPointF parent);
     void initialize(QStringList values);
     float size() const;
     void setSize(float size);

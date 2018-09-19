@@ -12,7 +12,7 @@ public:
     int REMOVE = -1;
     int ADD = 1;
 
-    Glyph( QPointF centroid, float size, int state );
+    Glyph( QPointF centroid, float size, int state, QPointF origin );
     QPointF centroid() const;
     void setCentroid(const QPointF &centroid);
 
@@ -22,8 +22,12 @@ public:
     float size() const;
     void setSize(float size);
 
+    QPointF parent() const;
+    void setParent(const QPointF &parent);
+
 private:
     QPointF m_centroid;
+    QPointF m_parent;
     float m_size = 0.0f;
     int m_state;
 

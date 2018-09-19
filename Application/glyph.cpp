@@ -1,10 +1,11 @@
 #include "glyph.h"
 
-Glyph::Glyph(QPointF centroid , float size, int state)
+Glyph::Glyph(QPointF centroid , float size, int state, QPointF origin)
 {
     setCentroid( centroid );
     setState( state );
     setSize(size * SIZE_MODIFIER);
+    setParent( origin );
 }
 
 QPointF Glyph::centroid() const
@@ -35,4 +36,14 @@ float Glyph::size() const
 void Glyph::setSize(float size)
 {
     m_size = size;
+}
+
+QPointF Glyph::parent() const
+{
+    return m_parent;
+}
+
+void Glyph::setParent(const QPointF &parent)
+{
+    m_parent = parent;
 }

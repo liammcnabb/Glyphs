@@ -1,10 +1,11 @@
 #include "wheelglyph.h"
 
-WheelGlyph::WheelGlyph() : Glyph( QPointF( 0.0f, 0.0f ), 0.0f, NEUTRAL )
+WheelGlyph::WheelGlyph() :
+    Glyph( QPointF( 0.0f, 0.0f ), 0.0f, NEUTRAL, QPointF( 0.0f, 0.0f ) )
 { }
 
-WheelGlyph::WheelGlyph(QPointF centroid, float size, int state) :
-    Glyph( centroid, size, state )
+WheelGlyph::WheelGlyph(QPointF centroid, float size, int state, QPointF origin) :
+    Glyph( centroid, size, state, origin )
 { }
 
 float WheelGlyph::size() const

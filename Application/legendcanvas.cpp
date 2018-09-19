@@ -49,7 +49,7 @@ void LegendCanvas::initializeVariablePie( QVector<float> averages )
 {
 //    int seed = 0;
 //    srand(seed);
-    PieChart p(QPointF(50,50),3,PieChart::NEUTRAL);
+    PieChart p(QPointF(50,50),3,PieChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for(int i =0; i < SAMPLE_POINTS; ++i)
         samplePoints.append(QString::number(averages.at(i)) );
@@ -63,7 +63,7 @@ void LegendCanvas::initalizeStarGlyph( QVector<float> averages)
 {
 //    int seed = 670;//13 //57
 //    srand(seed);
-    StarGlyph s(QPointF(50,50),3,StarGlyph::NEUTRAL);
+    StarGlyph s(QPointF(50,50),3,StarGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     QVector<float> mean;
     for( int i = 0; i < SAMPLE_POINTS; ++i )
@@ -79,7 +79,7 @@ void LegendCanvas::initalizeWheelGlyph(QVector<float> averages)
 {
 //    int seed = 13;
 //    srand(seed);
-    WheelGlyph s(QPointF(50,50),3,WheelGlyph::NEUTRAL);
+    WheelGlyph s(QPointF(50,50),3,WheelGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for( int i = 0; i < SAMPLE_POINTS; ++i )
     {
@@ -94,7 +94,7 @@ void LegendCanvas::initializeBarChart(QVector<float> averages)
 {
 //    int seed = 0;
 //    srand(seed);
-    BarChart b(QPointF(50,60),3,BarChart::NEUTRAL);
+    BarChart b(QPointF(50,60),3,BarChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for(int i =0; i < SAMPLE_POINTS; ++i)
         samplePoints.append(QString::number(averages.at(i)) );

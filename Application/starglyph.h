@@ -10,7 +10,7 @@ class StarGlyph : public Glyph
 {
 public:
     StarGlyph();
-    StarGlyph( QPointF centroid, float size, int state );
+    StarGlyph(QPointF centroid, float size, int state , QPointF parent);
     void initialize(QStringList values, float upperBound, float lowerBound);
     void initialize(QStringList values, QVector<float> means);
 

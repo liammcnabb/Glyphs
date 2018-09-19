@@ -12,7 +12,7 @@ class BarChart : public Glyph
 {
 public:
     BarChart();
-    BarChart(QPointF centroid, float size, int state);
+    BarChart(QPointF centroid, float size, int state, QPointF parent);
     void initialize(QStringList list);
 
     QVector<float> values() const;

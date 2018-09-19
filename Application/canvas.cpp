@@ -776,7 +776,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            PieChart pie( *p.centroid(), p.getLevel(), state );
+            PieChart pie( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
             if(pieType == GLYPH_EQUAL_PIE)
                 pie.setSliceType(PieChart::EQUAL_SLICES);
             else
@@ -801,7 +801,7 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            StarGlyph star( *p.centroid(), p.getLevel(), state );
+            StarGlyph star( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
 //            star.initialize(values, getValueUpper(), getValueLower());
             star.initialize(values, getMeans());
             stars.append(star);
@@ -821,8 +821,7 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            WheelGlyph w( *p.centroid(), p.getLevel(), state );
-//            star.initialize(values, getValueUpper(), getValueLower());
+            WheelGlyph w( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid() );
             w.initialize(values);
             wheels.append(w);
         }
@@ -841,7 +840,7 @@ QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            BarChart bar( *p.centroid(), p.getLevel(), state );
+            BarChart bar( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
             bar.initialize(values);
             bars.append(bar);
         }

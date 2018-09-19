@@ -10,7 +10,7 @@ class WheelGlyph : public Glyph
 {
 public:
     WheelGlyph();
-    WheelGlyph( QPointF centroid, float size, int state );
+    WheelGlyph(QPointF centroid, float size, int state , QPointF origin);
 
     float size() const;
     void setSize(float size);
