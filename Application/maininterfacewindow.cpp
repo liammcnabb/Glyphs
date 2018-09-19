@@ -41,7 +41,8 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     for( int i = 0; i < ignoredValues; ++i )
         valueHeaders.removeFirst();
 //    ui->lstHeaders->addItems(valueHeaders);
-
+    setValueHeaders(valueHeaders);
+    ui->GlLegend->setValueHeaders(valueHeaders);
     initializeTable(valueHeaders);
 
     Map map( shpreader.getMapData(), data, recipeLoc );
@@ -51,29 +52,52 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     setFullHierarchies( map.getHierarchies() );
     on_virtualzoom_valueChanged(0);
 //    ui->OpenGLWidget->setGroomedPolygons( map.getHierarchies() );
-    calculateStandardDeviation(map.getHierarchies());
+    calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
+
     return;
 }
 
 void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
 {
+
     QVector<float> means;
+    QVector<float> maxes;
+    QVector<float> mins;
 
     for( int i = 4; i < list.first().getValues().size(); ++i )
     {
+        float max = -std::numeric_limits<float>::max();
+        float min = std::numeric_limits<float>::max();
         float currentMean = 0;
         for( int j = 0; j < list.size(); ++j )
         {
+            max = std::max( max, list.at(j).getValues().at(i).toFloat() );
+            min = std::min( min, list.at(j).getValues().at(i).toFloat() );
             currentMean += list.at(j).getValues().at(i).toFloat();
         }
         currentMean = currentMean / list.size();
         means.append(currentMean);
-        qDebug() << means.last();
+        maxes.append(max);
+        mins.append(min);
     }
 
+
+
     ui->OpenGLWidget->setMeans(means);
+    ui->OpenGLWidget->setMaxes(maxes);
+    ui->OpenGLWidget->setMins(mins);
+
+    ui->GlLegend->setMeans(means);
+    ui->GlLegend->setMaxes(maxes);
+    ui->GlLegend->setMins(mins);
+
+    ui->GlLegend->initializeLegend(means);
+
     return;
 }
+
+
+
 
 void MainInterfaceWindow::on_lstHeaders_doubleClicked(const QModelIndex &index)
 {
@@ -229,6 +253,16 @@ QVector<TreeNode> MainInterfaceWindow::getFullHierarchies() const
 void MainInterfaceWindow::setFullHierarchies(const QVector<TreeNode> &fullHierarchies)
 {
     m_fullHierarchies = fullHierarchies;
+}
+
+QStringList MainInterfaceWindow::getValueHeaders() const
+{
+    return m_valueHeaders;
+}
+
+void MainInterfaceWindow::setValueHeaders(const QStringList &valueHeaders)
+{
+    m_valueHeaders = valueHeaders;
 }
 
 QVector<TreeNode> MainInterfaceWindow::declareVisiblePolygons(

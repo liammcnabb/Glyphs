@@ -29,6 +29,18 @@ void WheelGlyph::initialize(QStringList values, QVector<float> means)
     setRads(points);
 }
 
+void WheelGlyph::initialize(QStringList values)
+{
+    QVector<float> points;
+    float point;
+    for( int i = 0; i < values.size(); ++i )
+    {
+        point = values.at(i).toFloat();
+        points.append(point);
+    }
+    setRads(points);
+}
+
 QVector<float> WheelGlyph::getRads() const
 {
     return rads;

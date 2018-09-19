@@ -18,6 +18,7 @@ public:
     void setPoints(const QVector<float> &points);
 
 
+    void initialize(QStringList values);
 private:
     QVector<float> m_points;
 };

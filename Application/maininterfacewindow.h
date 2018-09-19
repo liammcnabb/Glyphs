@@ -28,10 +28,15 @@ public:
     QVector<TreeNode> getFullHierarchies() const;
     void setFullHierarchies(const QVector<TreeNode> &fullHierarchies);
 
+
+
+    QStringList getValueHeaders() const;
+    void setValueHeaders(const QStringList &valueHeaders);
+
 private slots:
     void on_actionEngland_Example_triggered();
 
-//    void on_lstHeaders_itemDoubleClicked(QListWidgetItem *item);
+    //    void on_lstHeaders_itemDoubleClicked(QListWidgetItem *item);
 
 
     void on_rdo_DebugCentroids_released();
@@ -71,6 +76,8 @@ private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
     QVector<TreeNode> m_fullHierarchies;
+    QStringList m_valueHeaders;
+
 
     QVector<TreeNode> visibleNodes(double minScreenSpace, TreeNode node);
     void visibleNodes(double minScreenSpace, TreeNode *node, QVector<TreeNode> *currentList);

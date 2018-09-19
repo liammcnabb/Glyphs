@@ -15,11 +15,12 @@ public:
     float size() const;
     void setSize(float size);
 
-    void initialize(QStringList values, QVector<float> means);
+    void initialize(QStringList values);
 
     QVector<float> getRads() const;
     void setRads(const QVector<float> &value);
 
+    void initialize(QStringList values, QVector<float> means);
 private:
     float m_size = 0.0f;
     QVector<float> rads;

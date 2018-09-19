@@ -351,6 +351,26 @@ void Canvas::setCurrentWrapper(const AABB &currentWrapper)
     m_currentWrapper = currentWrapper;
 }
 
+QVector<float> Canvas::getMaxes() const
+{
+    return m_maxes;
+}
+
+void Canvas::setMaxes(const QVector<float> &maxes)
+{
+    m_maxes = maxes;
+}
+
+QVector<float> Canvas::getMins() const
+{
+    return m_mins;
+}
+
+void Canvas::setMins(const QVector<float> &mins)
+{
+    m_mins = mins;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -803,7 +823,7 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
                 values.removeFirst();
             WheelGlyph w( *p.centroid(), p.getLevel(), state );
 //            star.initialize(values, getValueUpper(), getValueLower());
-            w.initialize(values, getMeans());
+            w.initialize(values);
             wheels.append(w);
         }
     }
@@ -834,7 +854,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 {
     Colour color;
     changeColorMap(this->CATEGORICAL);
-    double max = getLength() / 100;
+    double value, max = getLength() / 100;
     int totalNooks = 7;
     int nook;
     int nookSegment = max / totalNooks;
@@ -870,21 +890,24 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             }
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
             glBegin( GL_TRIANGLE_FAN );
-            glVertex2f( s.centroid().x(), s.centroid().y() );
+//            glVertex2f( s.centroid().x(), s.centroid().y() );
             for( float j = 0; j < s.points().size(); ++j )
             {
+                value = (s.points().at(j) - getMins().at(j)) /
+                        (getMaxes().at(j) - getMins().at(j) );
                 nook = cm.getClassColourIndex(s.points().at(j))/2;
                 x = s.centroid().x() + sin( valueRotation * j ) *
-                        ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                         max * value * size * indicate ;
                 y = s.centroid().y() + cos( valueRotation * j ) *
-                        ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                         max * value * size * indicate ;
                 glVertex2f( x, y );
             }
-            nook = cm.getClassColourIndex(s.points().at(0))/2;
+            value = (s.points().at(0) - getMins().at(0)) /
+                    (getMaxes().at(0) - getMins().at(0) );
             x = s.centroid().x() + sin( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
             y = s.centroid().y() + cos( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
             glVertex2f( x, y );
 
             glEnd();
@@ -931,18 +954,20 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         glVertex2f( s.centroid().x(), s.centroid().y() );
         for( float j = 0; j < s.points().size(); ++j )
         {
-            nook = cm.getClassColourIndex(s.points().at(j))/2;
+            value = (s.points().at(j) - getMins().at(j)) /
+                    (getMaxes().at(j) - getMins().at(j) );
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * indicate *( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  *indicate * ( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
             glVertex2f( x, y );
         }
-        nook = cm.getClassColourIndex(s.points().at(0))/2;
+        value = (s.points().at(0) - getMins().at(0)) /
+                (getMaxes().at(0) - getMins().at(0) );
         x = s.centroid().x() + sin( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                 max * value * size * indicate ;
         y = s.centroid().y() + cos( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                 max * value * size * indicate ;
         glVertex2f( x, y );
 
         glEnd();
@@ -950,7 +975,6 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
 
         //Lines at Points
-        glBegin( GL_LINES );
         for( float j = 0; j < s.points().size(); ++j )
         {
             if( getColorStarLines() )
@@ -961,35 +985,38 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             else
                 glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
 
-            nook = cm.getClassColourIndex(s.points().at(j))/2;
-            glVertex2f( s.centroid().x(), s.centroid().y() );
+            glBegin( GL_LINES );
+            value = (s.points().at(j) - getMins().at(j)) /
+                    (getMaxes().at(j) - getMins().at(j) );
             x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
             y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * indicate *( nookSegment * ( 1+nook ) ) );
+                     max * value * size * indicate ;
+            glVertex2f(s.centroid().x(), s.centroid().y());
             glVertex2f( x, y );
+            glEnd();
         }
         glEnd();
 
-        //Standard
-        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
-        glBegin( GL_LINE_STRIP );
-//        glVertex2f( s.centroid().x(), s.centroid().y() );
-        for( float j = 0; j < s.points().size(); ++j )
-        {
-            nook = cm.getClassColourIndex(0)/2;
-            x = s.centroid().x() + sin( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            y = s.centroid().y() + cos( valueRotation * j ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
-            glVertex2f( x, y );
-        }
-        nook = cm.getClassColourIndex(0)/2;
-        x = s.centroid().x() + sin( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
-        y = s.centroid().y() + cos( 0 ) *
-                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
-        glVertex2f( x, y );
+//        //Standard
+//        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
+//        glBegin( GL_LINE_STRIP );
+////        glVertex2f( s.centroid().x(), s.centroid().y() );
+//        for( float j = 0; j < s.points().size(); ++j )
+//        {
+//            nook = cm.getClassColourIndex(0)/2;
+//            x = s.centroid().x() + sin( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            y = s.centroid().y() + cos( valueRotation * j ) *
+//                    ( size  * ( nookSegment * ( 1+nook ) ) );
+//            glVertex2f( x, y );
+//        }
+//        nook = cm.getClassColourIndex(0)/2;
+//        x = s.centroid().x() + sin( 0 ) *
+//                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+//        y = s.centroid().y() + cos( 0 ) *
+//                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
+//        glVertex2f( x, y );
 
         glEnd();
     }
@@ -999,10 +1026,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 {
     Colour color;
     changeColorMap(this->CATEGORICAL);
-    double max = getLength() / 100;
-    int totalNooks = 11;
-    int nook;
-    int nookSegment = max / totalNooks;
+    double value, max = getLength() / 100;
 
     float x,y;
     for( int i = 0; i < list.size(); ++ i )
@@ -1023,48 +1047,38 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         int sliceNo = -1;
         //Fill
-//        qDebug() << s.getRads().size();
         float valueRotation = (2*M_PI) / s.getRads().size();
         for( float angle = 0; angle < 2*M_PI; angle += 0.01 )
         {
             if(sliceNo < s.getRads().size()-1 &&
                     int(angle*100) % int(roundf(valueRotation)*100) == 0)
             {
+                glVertex2f( s.centroid().x(), s.centroid().y() );
+                glEnd();
                 sliceNo++;
+                glBegin(GL_TRIANGLE_FAN);
+                color = cm.getColourFromIndex(sliceNo);
+                glColor3f(color.getR(), color.getG(), color.getB() );
                 glVertex2f( s.centroid().x(), s.centroid().y() );
             }
+            value = ( s.getRads().at(sliceNo) - getMins().at(sliceNo) ) /
+                    ( getMaxes().at(sliceNo) - getMins().at(sliceNo) ) ;
             color = cm.getColourFromIndex(sliceNo);
             glColor3f(color.getR(), color.getG(), color.getB() );
-            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
             x = s.centroid().x() + sin( angle ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                     max  * value * size;
             y = s.centroid().y() + cos( angle ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                     max  * value * size;
             glVertex2f( x, y );
         }
         x = s.centroid().x() + sin( 0 ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
+                max  * value * size;
         y = s.centroid().y() + cos( 0 ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
+               max  * value * size;
         glVertex2f(x,y);
         glVertex2f( s.centroid().x(), s.centroid().y() );
 
         glEnd();
-
-//        //Lines at Points
-//        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-//        glBegin( GL_LINES );
-//        for( float j = 0; j < s.points().size(); ++j )
-//        {
-//            nook = cm.getClassColourIndex(s.points().at(j))/2;
-//            glVertex2f( s.centroid().x(), s.centroid().y() );
-//            x = s.centroid().x() + sin( valueRotation * j ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//            y = s.centroid().y() + cos( valueRotation * j ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//            glVertex2f( x, y );
-//        }
-//        glEnd();
 
         sliceNo = -1;
         //Outlines
@@ -1076,48 +1090,26 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
                     int(angle*100) % int(roundf(valueRotation)*100) == 0)
             {
                 sliceNo++;
+//                cm = ColourManager(mins().at(sliceNo), maxes().at(sliceNo));
                 glVertex2f( s.centroid().x(), s.centroid().y() );
             }
-//            color = cm.getColourFromIndex(sliceNo);
-//            glColor3f(color.getR(), color.getG(), color.getB() );
-            nook = cm.getClassColourIndex(s.getRads().at(sliceNo));
+            value = ( s.getRads().at(sliceNo) - getMins().at(sliceNo) ) /
+                    ( getMaxes().at(sliceNo) - getMins().at(sliceNo) );
             x = s.centroid().x() + sin( angle ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    max  * value * size;
             y = s.centroid().y() + cos( angle ) *
-                    ( size  * ( nookSegment * ( 1+nook ) ) );
+                    max  * value * size;
             glVertex2f( x, y );
         }
         x = s.centroid().x() + sin( 0 ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
+                max  * value * size;
         y = s.centroid().y() + cos( 0 ) *
-                ( size  * ( nookSegment * ( 1+nook ) ) );
+                max  * value * size;
         glVertex2f(x,y);
         glVertex2f( s.centroid().x(), s.centroid().y() );
-
-
-
-//        //Standard
-//        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
-//        glBegin( GL_LINE_STRIP );
-//        glVertex2f( s.centroid().x(), s.centroid().y() );
-//        for( float j = 0; j < s.points().size(); ++j )
-//        {
-//            nook = cm.getClassColourIndex(0)/2;
-//            x = s.centroid().x() + sin( valueRotation * j ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//            y = s.centroid().y() + cos( valueRotation * j ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//            glVertex2f( x, y );
-//        }
-//        nook = cm.getClassColourIndex(0)/2;
-//        x = s.centroid().x() + sin( 0 ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//        y = s.centroid().y() + cos( 0 ) *
-//                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//        glVertex2f( x, y );
-
         glEnd();
     }
+
     return;
 }
 
@@ -1129,7 +1121,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
-        double indicate = 0;
+        double indicate = 1;
         double size = 0;
         double rad = getLength() / 100;
 
@@ -1158,23 +1150,23 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             {
                 indicate = (1+p.size())*1.5;
             }
-            for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
+            for ( float angle = 0; angle <= (2*M_PI); angle += 0.01 )
             {
-
                 float x = p.centroid().x() + sin( angle ) *
-                        ( size * ( rad * ( indicate ) ) );
+                          ( size * ( ( rad * indicate  ) ) );
+
                 float y = p.centroid().y() + cos( angle ) *
-                        ( size * ( rad * ( indicate ) ) );
+                          ( size * ( ( rad * indicate ) ) );
 
-                glVertex3f( x, y, 0.5 );
+                glVertex2f( x, y );
             }
-
             float x = p.centroid().x() + sin( 0 ) *
-                    ( size * ( rad * ( 1 + indicate ) ) );
-            float y = p.centroid().y() + cos( 0 ) *
-                    ( size * ( rad * ( 1 + indicate ) ) );
+                      ( size * ( ( rad * indicate  ) ) );
 
-            glVertex3f( x, y, 0.5 );
+            float y = p.centroid().y() + cos( 0 ) *
+                      ( size * ( ( rad * indicate ) ) );
+
+            glVertex2f( x, y );
             glEnd();
         }
         else
@@ -1277,10 +1269,10 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
                 float x = p.centroid().x() + sin( angle ) *
-                          ( size * ( ( rad * ( 1 + indicate )) ) );
+                          ( size * ( ( rad * ( indicate )) ) );
 
                 float y = p.centroid().y() + cos( angle ) *
-                          ( size * ( ( rad * ( 1 + indicate )) ) );
+                          ( size * ( ( rad * ( indicate )) ) );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( p.centroid().x(), p.centroid().y() );
@@ -1316,15 +1308,17 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             size = (getGlyphSize()*1.5);
 
 
-        int barWidth = (max / bars) * (size * 0.5);
+        int barWidth = (max / bars) * (size * 0.4);
         //Fill
         float minX, width, minY, height;
         for( int j = 0; j < bars; ++j )
         {
-            minX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*j);
+            minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);
             width = barWidth;
-            minY = ( b.centroid().y() - ((max/4) * size) );
-            height = ( b.values().at(j) / getValueUpper() ) * (max *size);
+            minY = ( b.centroid().y() - ((max/3) * size) );
+    //        qDebug() << b.values().at(j) << maxes().at(j) << mins().at(j);
+            height = ( (b.values().at(j)-getMins().at(j)) /
+                       (getMaxes().at(j)-getMins().at(j)) )  * (max *size);
             color = cm.getColourFromIndex(j);
             glColor3f(color.getR(), color.getG(), color.getB());
 
@@ -1333,40 +1327,42 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             glVertex2f(minX, minY+height);
             glVertex2f(minX+width, minY+height);
             glVertex2f(minX+width,minY);
-//            glVertex2f(minX, minY);
+            //            glVertex2f(minX, minY);
             glEnd();
         }
 
-//        //Outlines
+        //Outlines
         glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
         for( int j = 0; j < bars; ++j )
         {
-            minX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*j);
+            minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);
             width = barWidth;
-            minY = ( b.centroid().y() - ((max/4) * size) );
-            height = ( b.values().at(j) / getValueUpper() ) * (max *size);
+            minY = ( b.centroid().y() - ((max/3) * size) );
+            height = ( (b.values().at(j)-getMins().at(j)) /
+                       (getMaxes().at(j)-getMins().at(j)) )  * (max *size);
 
             glBegin( GL_LINE_STRIP );
             glVertex2f(minX, minY);
             glVertex2f(minX, minY+height);
             glVertex2f(minX+width, minY+height);
             glVertex2f(minX+width,minY);
+            glVertex2f(minX, minY);
             glEnd();
         }
 
-        // Extents
-        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2);
-        minX = ( b.centroid().x() - ((max/4) * size) );
-        minY = ( b.centroid().y() - ((max/4) * size) );
-        int maxX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*bars);
-        int maxY = minY + (max*size);
+//        // Extents
+//        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2);
+//        minX = ( b.centroid().x() - ((max/4) * size) );
+//        minY = ( b.centroid().y() - ((max/4) * size) );
+//        int maxX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*bars);
+//        int maxY = minY + (max*size);
 
-        glBegin( GL_LINE_STRIP );
-        glVertex2f(minX, minY);
-        glVertex2f(minX, maxY);
-        glVertex2f(maxX, maxY);
-        glVertex2f(maxX,minY);
-        glEnd();
+//        glBegin( GL_LINE_STRIP );
+//        glVertex2f(minX, minY);
+//        glVertex2f(minX, maxY);
+//        glVertex2f(maxX, maxY);
+//        glVertex2f(maxX,minY);
+//        glEnd();
     }
 
     return;

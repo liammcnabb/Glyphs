@@ -136,6 +136,12 @@ public:
     AABB getCurrentWrapper() const;
     void setCurrentWrapper(const AABB &currentWrapper);
 
+    QVector<float> getMaxes() const;
+    void setMaxes(const QVector<float> &maxes);
+
+    QVector<float> getMins() const;
+    void setMins(const QVector<float> &mins);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -166,7 +172,8 @@ private:
     int m_hiddenIndicator = 0;
 
 
-    QVector<float> m_means;
+    QVector<float> m_means, m_maxes, m_mins;
+
 
     int m_clickedIndex = NEGATIVE_INDEX;
 

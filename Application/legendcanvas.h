@@ -52,8 +52,24 @@ public:
     BarChart barChart() const;
     void setBarChart(const BarChart &barChart);
 
+    QVector<float> means() const;
+    void setMeans(const QVector<float> &means);
+
+    QVector<float> maxes() const;
+    void setMaxes(const QVector<float> &maxes);
+
+    QVector<float> mins() const;
+    void setMins(const QVector<float> &mins);
+
+    void initializeLegend(QVector<float> averages);
+    QStringList valueHeaders() const;
+    void setValueHeaders(const QStringList &valueHeaders);
+
+    void glPrintVerticalString(void *font, const char *str, float x, float y);
+    void glPrintVerticalString(float x, float y, std::string str);
 private:
-    void initializeVariablePie();
+    void initializeVariablePie(QVector<float> averages);
+        void initializeBarChart(QVector<float> averages);
     void paintVariablePie();
     PieChart m_variablePie;
     StarGlyph m_starGlyph;
@@ -62,13 +78,15 @@ private:
     int m_currentGlyphType = 0;
     bool m_colorStarLines = false;
 
+    QStringList m_valueHeaders;
+    QVector<float> m_means, m_maxes, m_mins;
+
     void glPrintString(float x, float y, std::string str);
-    void glPrintString(void *font, const char *str);
+    void glPrintString(void *font, const char *str, float x, float y);
     void paintStarGlyph();
-    void initalizeStarGlyph();
+    void initalizeStarGlyph( QVector<float> averages);
     void paintWheelGlyph();
-    void initalizeWheelGlyph();
-    void initializeBarChart();
+    void initalizeWheelGlyph(QVector<float> averages);
     void paintBarChart();
 };
 
