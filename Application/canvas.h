@@ -44,7 +44,7 @@ public:
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;
     static const int OUTLINE = 3;
-    static const bool DEBUG = true;
+    static const bool DEBUG = false;
 
     Canvas(QWidget *parent);
     void initializeGL();
