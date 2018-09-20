@@ -371,6 +371,16 @@ void Canvas::setMins(const QVector<float> &mins)
     m_mins = mins;
 }
 
+int Canvas::getTransitionType() const
+{
+    return transitionType;
+}
+
+void Canvas::setTransitionType(int value)
+{
+    transitionType = value;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -769,6 +779,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
                                            int state )
 {
     QVector<PieChart> pies;
+
     foreach( TreeNode p, list)
     {
         if(p.getLevel() > -1)
@@ -776,7 +787,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            PieChart pie( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
+            PieChart pie( *p.centroid(), p.getLevel(), state, p.getParentCentroid()  );
             if(pieType == GLYPH_EQUAL_PIE)
                 pie.setSliceType(PieChart::EQUAL_SLICES);
             else
@@ -1117,19 +1128,48 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
     Colour color;
+    double movingTransition = 2.4;
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
         double indicate = 1;
         double size = 0;
         double rad = getLength() / 100;
+        QPointF currentCentroid;
+
 
         if( p.state() == p.ADD )
+        {
             size = getCurrentTransitionSize();
+            if(getTransitionType() == TRANSITION_IN)
+            {
+                currentCentroid = p.centroid();
+            }
+            else /** getTransitionType() == TRANSITION_OUT */
+            {
+                currentCentroid.setX(p.parent().x() - (p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setY(p.parent().y() - (p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+                qDebug() << (getCurrentTransitionSize()/movingTransition);
+            }
+        }
         else if (p.state() == p.REMOVE )
+        {
             size = getGlyphSize() - getCurrentTransitionSize();
+            if(getTransitionType() == TRANSITION_IN)
+            {
+                currentCentroid.setX(p.centroid().x() + (p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setY(p.centroid().y() + (p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+            }
+            else /** getTransitionType() == TRANSITION_OUT */
+            {
+                currentCentroid = p.centroid();
+            }
+        }
         else /** if p.state() == p.NEUTRAL */
+        {
             size = getGlyphSize();
+            currentCentroid = p.centroid();
+        }
 
 //        Colour c = outline.getInterpolatedColour(j);
         if(getHiddenIndicator() == HIDDEN_OUTLINE ||
@@ -1139,7 +1179,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             /* Outline (STANDARD) */
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
             glBegin( GL_TRIANGLE_FAN );
-            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             if(getHiddenIndicator() == HIDDEN_OUTLINE ||
                     getHiddenIndicator() == HIDDEN_SIZE )
             {
@@ -1151,18 +1191,18 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             }
             for ( float angle = 0; angle <= (2*M_PI); angle += 0.01 )
             {
-                float x = p.centroid().x() + sin( angle ) *
+                float x = currentCentroid.x() + sin( angle ) *
                           ( size * ( ( rad * indicate  ) ) );
 
-                float y = p.centroid().y() + cos( angle ) *
+                float y = currentCentroid.y() + cos( angle ) *
                           ( size * ( ( rad * indicate ) ) );
 
                 glVertex2f( x, y );
             }
-            float x = p.centroid().x() + sin( 0 ) *
+            float x = currentCentroid.x() + sin( 0 ) *
                       ( size * ( ( rad * indicate  ) ) );
 
-            float y = p.centroid().y() + cos( 0 ) *
+            float y = currentCentroid.y() + cos( 0 ) *
                       ( size * ( ( rad * indicate ) ) );
 
             glVertex2f( x, y );
@@ -1177,19 +1217,19 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             for ( int i = 1; i <= rings; ++i )
             {
                 glBegin(GL_TRIANGLE_FAN);
-                glVertex2f(p.centroid().x(),p.centroid().y());
+                glVertex2f(currentCentroid.x(),currentCentroid.y());
                 for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
                 {
-                    float x = p.centroid().x() + sin( angle ) *
+                    float x = currentCentroid.x() + sin( angle ) *
                             ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*rings) ) ) );
-                    float y = p.centroid().y() + cos( angle ) *
+                    float y = currentCentroid.y() + cos( angle ) *
                             ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*rings) ) ) );
                     glVertex3f( x, y, 0.5 );
                 }
 
-                float x = p.centroid().x() + sin( 0 ) *
+                float x = currentCentroid.x() + sin( 0 ) *
                         ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
-                float y = p.centroid().y() + cos( 0 ) *
+                float y = currentCentroid.y() + cos( 0 ) *
                         ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
                 glVertex3f( x, y, 0.5 );
                 glEnd();
@@ -1203,16 +1243,16 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 //                    glBegin(GL_LINE_STRIP);
 //                    for ( float angle = 0; angle <= (2*M_PI); angle += 0.1 )
 //                    {
-//                        float x = p.centroid().x() + sin( angle ) *
+//                        float x = currentCentroid.x() + sin( angle ) *
 //                                ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
-//                        float y = p.centroid().y() + cos( angle ) *
+//                        float y = currentCentroid.y() + cos( angle ) *
 //                                ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
 //                        glVertex3f( x, y, 0.5 );
 //                    }
 
-//                    float x = p.centroid().x() + sin( 0 ) *
+//                    float x = currentCentroid.x() + sin( 0 ) *
 //                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
-//                    float y = p.centroid().y() + cos( 0 ) *
+//                    float y = currentCentroid.y() + cos( 0 ) *
 //                            ( size * ( rad * ( 1 + (i*p.SIZE_MODIFIER*5) ) ) );
 //                    glVertex3f( x, y, 0.5 );
 //                    glEnd();
@@ -1240,19 +1280,19 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             /* Fill */
             glColor4f( color.getR(), color.getG(), color.getB(), 1 );
             glBegin( GL_TRIANGLE_FAN );
-            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
             for( float angle = currentAngle; angle <=
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
-                float x = p.centroid().x() + sin( angle ) *
+                float x = currentCentroid.x() + sin( angle ) *
                           ( size * ( ( rad * indicate  ) ) );
 
-                float y = p.centroid().y() + cos( angle ) *
+                float y = currentCentroid.y() + cos( angle ) *
                           ( size * ( ( rad * indicate ) ) );
                 glVertex3f( x, y, 0.5 );
             }
-            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             glEnd();
             currentAngle += ps.angle();
 //            color = cm.getColourFromSeed(int(currentAngle));
@@ -1262,19 +1302,19 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             PieSegment ps = p.pieSlices().at(i);
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.6 );
             glBegin( GL_LINE_STRIP );
-            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
             for( float angle = currentAngle; angle <=
                  currentAngle+ps.angle()+0.05; angle+=0.1 )
             {
-                float x = p.centroid().x() + sin( angle ) *
+                float x = currentCentroid.x() + sin( angle ) *
                           ( size * ( ( rad * ( indicate )) ) );
 
-                float y = p.centroid().y() + cos( angle ) *
+                float y = currentCentroid.y() + cos( angle ) *
                           ( size * ( ( rad * ( indicate )) ) );
                 glVertex3f( x, y, 0.5 );
             }
-            glVertex2f( p.centroid().x(), p.centroid().y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             glEnd();
             currentAngle += ps.angle();
         }

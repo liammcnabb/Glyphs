@@ -25,6 +25,7 @@ TreeNode::TreeNode( TreeNode* obj )
     value = obj->value;
     setValues(obj->getValues());
     setLevel(obj->getLevel());
+    setParentCentroid(obj->getParentCentroid());
 }
 
 TreeNode::~TreeNode()
@@ -51,6 +52,7 @@ TreeNode& TreeNode::operator=( const TreeNode& b )
     value = b.value;
     setValues(b.getValues());
     setLevel(b.getLevel());
+    setParentCentroid(b.getParentCentroid());
 
     sharedBoundary = b.getSharedBoundary();
     nonSharedBoundary = b.getNonSharedBoundary();
@@ -259,6 +261,16 @@ void TreeNode::calculateArea()
     return;
 }
 
+QPointF TreeNode::getParentCentroid() const
+{
+    return m_parentCentroid;
+}
+
+void TreeNode::setParentCentroid(const QPointF &parentCentroid)
+{
+    m_parentCentroid = parentCentroid;
+}
+
 int TreeNode::getLevel() const
 {
     return level;
@@ -380,6 +392,7 @@ TreeNode* TreeNode::getParent() const
 void TreeNode::setParent( TreeNode* value )
 {
     parent = value;
+    setParentCentroid(*value->centroid());
 }
 
 Boundary* TreeNode::getNonSharedBoundary() const

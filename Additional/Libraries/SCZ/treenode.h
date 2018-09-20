@@ -83,6 +83,9 @@ public:
     int getLevel() const;
     void setLevel(int value);
 
+    QPointF getParentCentroid() const;
+    void setParentCentroid(const QPointF &parentCentroid);
+
 private:
     void calculateArea();
 
@@ -92,6 +95,7 @@ private:
     TreeNode* leftChild = nullptr;
     TreeNode* rightChild = nullptr;
     QPointF* m_centroid = nullptr;
+    QPointF m_parentCentroid;
     AABB m_boundingBox;
 
 

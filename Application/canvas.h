@@ -44,6 +44,10 @@ public:
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;
     static const int OUTLINE = 3;
+
+    static const int TRANSITION_IN = 1;
+    static const int TRANSITION_OUT = -1;
+
     static const bool DEBUG = false;
 
     Canvas(QWidget *parent);
@@ -142,6 +146,9 @@ public:
     QVector<float> getMins() const;
     void setMins(const QVector<float> &mins);
 
+    int getTransitionType() const;
+    void setTransitionType(int value);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -166,6 +173,7 @@ private:
     QVector<TreeNode> m_transitionAdd;
     QVector<TreeNode> m_transitionRemove;
     float currentTransitionSize = 0.0f;
+    int transitionType = 1;
     float m_areaOpacity = 0.0f;
     float m_zoom = 0.0f;
 

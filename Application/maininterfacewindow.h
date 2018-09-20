@@ -33,6 +33,9 @@ public:
     QStringList getValueHeaders() const;
     void setValueHeaders(const QStringList &valueHeaders);
 
+    int getPreviousVirtualZoomValue() const;
+    void setPreviousVirtualZoomValue(int value);
+
 private slots:
     void on_actionEngland_Example_triggered();
 
@@ -77,7 +80,7 @@ private:
     int ignoredValues = 4;
     QVector<TreeNode> m_fullHierarchies;
     QStringList m_valueHeaders;
-
+    int previousVirtualZoomValue = 0;
 
     QVector<TreeNode> visibleNodes(double minScreenSpace, TreeNode node);
     void visibleNodes(double minScreenSpace, TreeNode *node, QVector<TreeNode> *currentList);
@@ -86,6 +89,7 @@ private:
     void splitVisible(QVector<TreeNode> list);
     QStringListModel model;
     void initializeTable(QStringList list);
+    void calculateNewlyVisible(int screenSpaceValue);
 };
 
 #endif // MAININTERFACEWINDOW_H

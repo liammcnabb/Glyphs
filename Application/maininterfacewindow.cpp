@@ -158,14 +158,13 @@ void MainInterfaceWindow::on_radioButton_released()
     ui->GlLegend->update();
 }
 
-
-void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
+void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
 {
     ui->verticalSlider->setEnabled(false);
     ui->virtualzoom->setEnabled(false);
     double transitionFrames = 25;
     double frameSkip = 2;
-    double minScreenSpace = double(value) / 100;
+    double minScreenSpace = double(screenSpaceValue) / 100;
     QVector<TreeNode> visiblePolygons;
     visiblePolygons = declareVisiblePolygons(getFullHierarchies(), minScreenSpace);
     splitVisible(visiblePolygons);
@@ -188,7 +187,18 @@ void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
     ui->verticalSlider->setEnabled(true);
     ui->virtualzoom->setFocus();
     ui->OpenGLWidget->update();
+}
 
+
+void MainInterfaceWindow::on_virtualzoom_valueChanged(int value) ///Transition
+{
+    if(getPreviousVirtualZoomValue() < value)
+        ui->OpenGLWidget->setTransitionType(ui->OpenGLWidget->TRANSITION_IN);
+    else
+        ui->OpenGLWidget->setTransitionType(ui->OpenGLWidget->TRANSITION_OUT);
+
+    setPreviousVirtualZoomValue(value);
+    calculateNewlyVisible(value);
 }
 
 
@@ -387,7 +397,22 @@ void MainInterfaceWindow::on_verticalSlider_valueChanged(int value)
             ui->OpenGLWidget->setZoom( pos );
 
 //        ui->OpenGLWidget->setOrtho();
-        on_virtualzoom_valueChanged(ui->virtualzoom->value());
+        if(pos < 0)
+            ui->OpenGLWidget->setTransitionType(ui->OpenGLWidget->TRANSITION_OUT);
+        else
+            ui->OpenGLWidget->setTransitionType(ui->OpenGLWidget->TRANSITION_OUT);
+
+        calculateNewlyVisible(ui->virtualzoom->value());
         ui->verticalSlider->setFocus();
         ui->OpenGLWidget->update();
+}
+
+int MainInterfaceWindow::getPreviousVirtualZoomValue() const
+{
+    return previousVirtualZoomValue;
+}
+
+void MainInterfaceWindow::setPreviousVirtualZoomValue(int value)
+{
+    previousVirtualZoomValue = value;
 }
