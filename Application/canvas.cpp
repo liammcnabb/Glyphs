@@ -421,8 +421,8 @@ void Canvas::redraw()
         {
             QVector<WheelGlyph> wheels;
             wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
-            wheels.append( createWheelGlyphs( getTransitionAdd(), 1) );
             wheels.append( createWheelGlyphs( getTransitionRemove(), -1) );
+            wheels.append( createWheelGlyphs( getTransitionAdd(), 1) );
             setWheelGlyphs(wheels);
         }
         else
@@ -452,8 +452,8 @@ void Canvas::redraw()
         {
             QVector<PieChart> pies;
             pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
-            pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 1) );
             pies.append( createPieGlyphs( getTransitionRemove(), GLYPH_VARIABLE_PIE, -1) );
+            pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 1) );
             setPieGlyphs(pies);
 
         }
@@ -486,8 +486,8 @@ void Canvas::redraw()
         {
             QVector<StarGlyph> stars;
             stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
-            stars.append( createStarGlyphs( getTransitionAdd(), 1 ) );
             stars.append( createStarGlyphs( getTransitionRemove(), -1 ) );
+            stars.append( createStarGlyphs( getTransitionAdd(), 1 ) );
             setStarGlyphs( stars );
         }
         else
@@ -518,8 +518,8 @@ void Canvas::redraw()
         {
             QVector<BarChart> bars;
             bars.append(createBarCharts(getTransitionNeutral(), 0));
-            bars.append(createBarCharts(getTransitionAdd(), 1));
             bars.append(createBarCharts(getTransitionRemove(), -1));
+            bars.append(createBarCharts(getTransitionAdd(), 1));
             setBarCharts(bars);
         }
         else if ( getTransitionNeutral().isEmpty() )
