@@ -188,6 +188,10 @@ void TreeBuilder::applyValue( TreeNode* node,
             values[i] = node->getRightChild()->getValues().at(i).toDouble() +
                     node->getLeftChild()->getValues().at(i).toDouble();
             break;
+        case CALC_BY_AVERAGE_SIMPLIFIED:
+            values[i] = (node->getRightChild()->getValues().at(i).toDouble() +
+                    node->getLeftChild()->getValues().at(i).toDouble()) /2;
+            break;
         default:
             values[i] = 0.0;
             break;

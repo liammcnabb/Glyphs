@@ -39,6 +39,7 @@ public:
     static const int CALC_BY_AREA_NORMALISED_SUM = 4;
     static const int CALC_BY_POPULATION_NORMALISED_SUM = 5;
     static const int CALC_BY_RATIO = 6;
+    static const int CALC_BY_AVERAGE_SIMPLIFIED = 7;
 
     static const int SMALLEST_NEIGHBOUR = 0;
     static const int CLOSEST_VALUE = 1;
