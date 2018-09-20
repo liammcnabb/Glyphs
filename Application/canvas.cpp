@@ -813,8 +813,7 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
             StarGlyph star( *p.centroid(), p.getLevel(), state, p.getParentCentroid()  );
-//            star.initialize(values, getValueUpper(), getValueLower());
-            star.initialize(values, getMeans());
+            star.initialize(values);
             stars.append(star);
         }
     }
@@ -851,7 +850,7 @@ QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            BarChart bar( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
+            BarChart bar( *p.centroid(), p.getLevel(), state, p.getParentCentroid()  );
             bar.initialize(values);
             bars.append(bar);
         }
@@ -927,24 +926,27 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             }
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
             glBegin( GL_TRIANGLE_FAN );
-//            glVertex2f( currentCentroid.x(), currentCentroid.y() );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             for( float j = 0; j < s.points().size(); ++j )
             {
                 value = (s.points().at(j) - getMins().at(j)) /
                         (getMaxes().at(j) - getMins().at(j) );
-                nook = cm.getClassColourIndex(s.points().at(j))/2;
-                x = currentCentroid.x() + sin( valueRotation * j ) *
-                         max * value * size * indicate ;
-                y = currentCentroid.y() + cos( valueRotation * j ) *
-                         max * value * size * indicate ;
+                if(value < 0.125)
+                    value = 0.125;
+                x = (currentCentroid.x() + sin( valueRotation * j ) *
+                         max * value * size * indicate) + (1+s.SIZE_MODIFIER*20) ;
+                y = (currentCentroid.y() + cos( valueRotation * j ) *
+                         max * value * size * indicate ) + (1+s.SIZE_MODIFIER*20) ;
                 glVertex2f( x, y );
             }
             value = (s.points().at(0) - getMins().at(0)) /
                     (getMaxes().at(0) - getMins().at(0) );
-            x = currentCentroid.x() + sin( 0 ) *
-                     max * value * size * indicate ;
-            y = currentCentroid.y() + cos( 0 ) *
-                     max * value * size * indicate ;
+            if(value < 0.125)
+                value = 0.125;
+            x = (currentCentroid.x() + sin( 0 ) *
+                     max * value * size * indicate) + (1+s.SIZE_MODIFIER*10) ;
+            y = (currentCentroid.y() + cos( 0 ) *
+                     max * value * size * indicate) + (1+s.SIZE_MODIFIER*10) ;
             glVertex2f( x, y );
 
             glEnd();
@@ -993,6 +995,8 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         {
             value = (s.points().at(j) - getMins().at(j)) /
                     (getMaxes().at(j) - getMins().at(j) );
+            if(value < 0.125)
+                value = 0.125;
             x = currentCentroid.x() + sin( valueRotation * j ) *
                      max * value * size * indicate ;
             y = currentCentroid.y() + cos( valueRotation * j ) *
@@ -1001,6 +1005,8 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         }
         value = (s.points().at(0) - getMins().at(0)) /
                 (getMaxes().at(0) - getMins().at(0) );
+        if(value < 0.125)
+            value = 0.125;
         x = currentCentroid.x() + sin( 0 ) *
                  max * value * size * indicate ;
         y = currentCentroid.y() + cos( 0 ) *
@@ -1025,6 +1031,8 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             glBegin( GL_LINES );
             value = (s.points().at(j) - getMins().at(j)) /
                     (getMaxes().at(j) - getMins().at(j) );
+            if(value <= 0.125)
+                value = 0.125;
             x = currentCentroid.x() + sin( valueRotation * j ) *
                      max * value * size * indicate ;
             y = currentCentroid.y() + cos( valueRotation * j ) *
@@ -1384,6 +1392,8 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
     //        qDebug() << b.values().at(j) << maxes().at(j) << mins().at(j);
             height = ( (b.values().at(j)-getMins().at(j)) /
                        (getMaxes().at(j)-getMins().at(j)) )  * (max *size);
+            qDebug() << ( (b.values().at(j)-getMins().at(j)) /
+                          (getMaxes().at(j)-getMins().at(j)) );
             color = cm.getColourFromIndex(j);
             glColor3f(color.getR(), color.getG(), color.getB());
 
