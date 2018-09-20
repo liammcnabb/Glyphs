@@ -864,7 +864,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     Colour color;
     changeColorMap(this->CATEGORICAL);
     double movingTransition = 2.4 /*25/getGlyphSize()*/;
-    double value, max = getLength() / 100;
+    double value, max = getLength() / 70;
     int totalNooks = 7;
     int nook;
     int nookSegment = max / totalNooks;
@@ -880,7 +880,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         double size;
         if( s.state() == s.ADD )
         {
-            size = (getCurrentTransitionSize()*1.5);
+            size = ( getCurrentTransitionSize() );
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid = s.centroid();
@@ -893,7 +893,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         }
         else if (s.state() == s.REMOVE )
         {
-            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+            size = ( getGlyphSize() ) - (getCurrentTransitionSize()*1.5);
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid.setX(s.centroid().x() + (s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
@@ -906,7 +906,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         }
         else /** if p.state() == p.NEUTRAL */
         {
-            size = (getGlyphSize()*1.5);
+            size = (getGlyphSize());
             currentCentroid = s.centroid();
         }
 
@@ -934,9 +934,9 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
                 if(value < 0.125)
                     value = 0.125;
                 x = (currentCentroid.x() + sin( valueRotation * j ) *
-                         max * value * size * indicate) + (1+s.SIZE_MODIFIER*20) ;
+                         max * value * size * indicate) ;
                 y = (currentCentroid.y() + cos( valueRotation * j ) *
-                         max * value * size * indicate ) + (1+s.SIZE_MODIFIER*20) ;
+                         max * value * size * indicate ) ;
                 glVertex2f( x, y );
             }
             value = (s.points().at(0) - getMins().at(0)) /
@@ -944,14 +944,14 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             if(value < 0.125)
                 value = 0.125;
             x = (currentCentroid.x() + sin( 0 ) *
-                     max * value * size * indicate) + (1+s.SIZE_MODIFIER*10) ;
+                     max * value * size * indicate);
             y = (currentCentroid.y() + cos( 0 ) *
-                     max * value * size * indicate) + (1+s.SIZE_MODIFIER*10) ;
+                     max * value * size * indicate);
             glVertex2f( x, y );
 
             glEnd();
         }
-        else
+        else /** Halos */
         {
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
             glLineWidth(2);
