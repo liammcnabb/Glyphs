@@ -812,7 +812,7 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            StarGlyph star( *p.centroid(), p.getLevel(), state, *p.getParent()->centroid()  );
+            StarGlyph star( *p.centroid(), p.getLevel(), state, p.getParentCentroid()  );
 //            star.initialize(values, getValueUpper(), getValueLower());
             star.initialize(values, getMeans());
             stars.append(star);
@@ -864,6 +864,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 {
     Colour color;
     changeColorMap(this->CATEGORICAL);
+    double movingTransition = 2.4 /*25/getGlyphSize()*/;
     double value, max = getLength() / 100;
     int totalNooks = 7;
     int nook;
@@ -874,15 +875,41 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     for( int i = 0; i < list.size(); ++ i )
     {
         StarGlyph s = list.at(i);
+        QPointF currentCentroid;
         float valueRotation = (2*M_PI) / s.points().size();
 
         double size;
         if( s.state() == s.ADD )
+        {
             size = (getCurrentTransitionSize()*1.5);
+            if(getTransitionType() == TRANSITION_IN)
+            {
+                currentCentroid = s.centroid();
+            }
+            else /** getTransitionType() == TRANSITION_OUT */
+            {
+                currentCentroid.setX(s.parent().x() - ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()/movingTransition)));
+                currentCentroid.setY(s.parent().y() - ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()/movingTransition)));
+            }
+        }
         else if (s.state() == s.REMOVE )
+        {
             size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+            if(getTransitionType() == TRANSITION_IN)
+            {
+                currentCentroid.setX(s.centroid().x() + (s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setY(s.centroid().y() + (s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+            }
+            else /** getTransitionType() == TRANSITION_OUT */
+            {
+                currentCentroid = s.centroid();
+            }
+        }
         else /** if p.state() == p.NEUTRAL */
+        {
             size = (getGlyphSize()*1.5);
+            currentCentroid = s.centroid();
+        }
 
         /** Outline (Standard) */
         if( getHiddenIndicator() == HIDDEN_OUTLINE ||
@@ -900,23 +927,23 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             }
             glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
             glBegin( GL_TRIANGLE_FAN );
-//            glVertex2f( s.centroid().x(), s.centroid().y() );
+//            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             for( float j = 0; j < s.points().size(); ++j )
             {
                 value = (s.points().at(j) - getMins().at(j)) /
                         (getMaxes().at(j) - getMins().at(j) );
                 nook = cm.getClassColourIndex(s.points().at(j))/2;
-                x = s.centroid().x() + sin( valueRotation * j ) *
+                x = currentCentroid.x() + sin( valueRotation * j ) *
                          max * value * size * indicate ;
-                y = s.centroid().y() + cos( valueRotation * j ) *
+                y = currentCentroid.y() + cos( valueRotation * j ) *
                          max * value * size * indicate ;
                 glVertex2f( x, y );
             }
             value = (s.points().at(0) - getMins().at(0)) /
                     (getMaxes().at(0) - getMins().at(0) );
-            x = s.centroid().x() + sin( 0 ) *
+            x = currentCentroid.x() + sin( 0 ) *
                      max * value * size * indicate ;
-            y = s.centroid().y() + cos( 0 ) *
+            y = currentCentroid.y() + cos( 0 ) *
                      max * value * size * indicate ;
             glVertex2f( x, y );
 
@@ -930,20 +957,20 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             for( int k = 1; k <= rings; ++k )
             {
                 glBegin( GL_TRIANGLE_FAN );
-                glVertex2f( s.centroid().x(), s.centroid().y() );
+                glVertex2f( currentCentroid.x(), currentCentroid.y() );
                 for( float j = 0; j < s.points().size(); ++j )
                 {
                     nook = cm.getClassColourIndex(s.points().at(j))/2;
-                    x = s.centroid().x() + sin( valueRotation * j ) *
+                    x = currentCentroid.x() + sin( valueRotation * j ) *
                             ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                    y = s.centroid().y() + cos( valueRotation * j ) *
+                    y = currentCentroid.y() + cos( valueRotation * j ) *
                             ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
                     glVertex2f( x, y );
                 }
                 nook = cm.getClassColourIndex(s.points().at(0))/2;
-                x = s.centroid().x() + sin( 0 ) *
+                x = currentCentroid.x() + sin( 0 ) *
                         ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                y = s.centroid().y() + cos( 0 ) *
+                y = currentCentroid.y() + cos( 0 ) *
                         ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
                 glVertex2f( x, y );
                 glEnd();
@@ -961,22 +988,22 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 
         //Fill
         glBegin(GL_TRIANGLE_FAN);
-        glVertex2f( s.centroid().x(), s.centroid().y() );
+        glVertex2f( currentCentroid.x(), currentCentroid.y() );
         for( float j = 0; j < s.points().size(); ++j )
         {
             value = (s.points().at(j) - getMins().at(j)) /
                     (getMaxes().at(j) - getMins().at(j) );
-            x = s.centroid().x() + sin( valueRotation * j ) *
+            x = currentCentroid.x() + sin( valueRotation * j ) *
                      max * value * size * indicate ;
-            y = s.centroid().y() + cos( valueRotation * j ) *
+            y = currentCentroid.y() + cos( valueRotation * j ) *
                      max * value * size * indicate ;
             glVertex2f( x, y );
         }
         value = (s.points().at(0) - getMins().at(0)) /
                 (getMaxes().at(0) - getMins().at(0) );
-        x = s.centroid().x() + sin( 0 ) *
+        x = currentCentroid.x() + sin( 0 ) *
                  max * value * size * indicate ;
-        y = s.centroid().y() + cos( 0 ) *
+        y = currentCentroid.y() + cos( 0 ) *
                  max * value * size * indicate ;
         glVertex2f( x, y );
 
@@ -998,11 +1025,11 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             glBegin( GL_LINES );
             value = (s.points().at(j) - getMins().at(j)) /
                     (getMaxes().at(j) - getMins().at(j) );
-            x = s.centroid().x() + sin( valueRotation * j ) *
+            x = currentCentroid.x() + sin( valueRotation * j ) *
                      max * value * size * indicate ;
-            y = s.centroid().y() + cos( valueRotation * j ) *
+            y = currentCentroid.y() + cos( valueRotation * j ) *
                      max * value * size * indicate ;
-            glVertex2f(s.centroid().x(), s.centroid().y());
+            glVertex2f(currentCentroid.x(), currentCentroid.y());
             glVertex2f( x, y );
             glEnd();
         }
@@ -1011,20 +1038,20 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 //        //Standard
 //        glColor4f( 1, 0.105882353, 0.105882353, 0.3);
 //        glBegin( GL_LINE_STRIP );
-////        glVertex2f( s.centroid().x(), s.centroid().y() );
+////        glVertex2f( currentCentroid.x(), currentCentroid.y() );
 //        for( float j = 0; j < s.points().size(); ++j )
 //        {
 //            nook = cm.getClassColourIndex(0)/2;
-//            x = s.centroid().x() + sin( valueRotation * j ) *
+//            x = currentCentroid.x() + sin( valueRotation * j ) *
 //                    ( size  * ( nookSegment * ( 1+nook ) ) );
-//            y = s.centroid().y() + cos( valueRotation * j ) *
+//            y = currentCentroid.y() + cos( valueRotation * j ) *
 //                    ( size  * ( nookSegment * ( 1+nook ) ) );
 //            glVertex2f( x, y );
 //        }
 //        nook = cm.getClassColourIndex(0)/2;
-//        x = s.centroid().x() + sin( 0 ) *
+//        x = currentCentroid.x() + sin( 0 ) *
 //                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
-//        y = s.centroid().y() + cos( 0 ) *
+//        y = currentCentroid.y() + cos( 0 ) *
 //                    ( size  * indicate * ( nookSegment * ( 1+nook ) ) );
 //        glVertex2f( x, y );
 
@@ -1128,7 +1155,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
     Colour color;
-    double movingTransition = 2.4;
+    double movingTransition = 2.4 /*25/getGlyphSize()*/;
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
@@ -1147,9 +1174,8 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
-                currentCentroid.setX(p.parent().x() - (p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
-                currentCentroid.setY(p.parent().y() - (p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
-                qDebug() << (getCurrentTransitionSize()/movingTransition);
+                currentCentroid.setX(p.parent().x() - ((p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition)));
+                currentCentroid.setY(p.parent().y() - ((p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition)));
             }
         }
         else if (p.state() == p.REMOVE )
