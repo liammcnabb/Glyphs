@@ -8,16 +8,6 @@ WheelGlyph::WheelGlyph(QPointF centroid, float size, int state, QPointF origin) 
     Glyph( centroid, size, state, origin )
 { }
 
-float WheelGlyph::size() const
-{
-    return m_size;
-}
-
-void WheelGlyph::setSize(float size)
-{
-    m_size = size;
-}
-
 void WheelGlyph::initialize(QStringList values, QVector<float> means)
 {
     QVector<float> points;

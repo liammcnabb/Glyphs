@@ -162,21 +162,23 @@ void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
 {
     ui->verticalSlider->setEnabled(false);
     ui->virtualzoom->setEnabled(false);
-    double transitionFrames = 25;
-    double frameSkip = 2;
+    double transitionFrames = 12;
+    double frameSkip = 1;
     double minScreenSpace = double(screenSpaceValue) / 100;
     QVector<TreeNode> visiblePolygons;
     visiblePolygons = declareVisiblePolygons(getFullHierarchies(), minScreenSpace);
     splitVisible(visiblePolygons);
     ui->OpenGLWidget->setGroomedPolygons( visiblePolygons );
 
+//    calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
+
     if(visiblePolygons.size() != ui->OpenGLWidget->getTransitionNeutral().size())
     {
         ui->OpenGLWidget->setTransitionState(true);
-        float incrementer = ui->OpenGLWidget->getGlyphSize() / transitionFrames;
+//        float incrementer = ui->OpenGLWidget->getGlyphSize() / transitionFrames;
         for( int i = 0; i < transitionFrames; i+=frameSkip )
         {
-            ui->OpenGLWidget->setCurrentTransitionSize(incrementer*i);
+            ui->OpenGLWidget->setCurrentTransitionSize(i);
             ui->OpenGLWidget->repaint();
             qApp->processEvents();
         }

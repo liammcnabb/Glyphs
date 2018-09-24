@@ -291,7 +291,7 @@ private:
      *  the sum of the two children, average which gives the average of the two
      * children, largest which saves the largest area's value (always right branch's child)
      */
-    void applyValue( TreeNode* node, int calculationType );
+    QStringList applyValue( TreeNode* node, int calculationType );
 
     /**
      * @brief calculateValueByAverage recursively check the all leaf nodes of

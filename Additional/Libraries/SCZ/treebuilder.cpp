@@ -131,9 +131,10 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
         parent->setLeftChild( list->first() );
         parent->setRightChild( list->at( neighbour ) );
         parent->setValues(parent->getRightChild()->getValues());
+//        qDebug() << parent->getValues().at(1) <<
         parent->setLevel(parent->getLeftChild()->getLevel() +
                          parent->getRightChild()->getLevel() );
-//        applyValue( parent, getCalculationType() );
+        parent->setValues(applyValue( parent, getCalculationType() ));
 
 //        if ( Segment::getDebugMode() )
 //        {
@@ -163,7 +164,7 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
     return;
 }
 
-void TreeBuilder::applyValue( TreeNode* node,
+QStringList TreeBuilder::applyValue( TreeNode* node,
                                  int calculationType )
 {
     QStringList values = node->getValues();
@@ -189,14 +190,15 @@ void TreeBuilder::applyValue( TreeNode* node,
                     node->getLeftChild()->getValues().at(i).toDouble();
             break;
         case CALC_BY_AVERAGE_SIMPLIFIED:
-            values[i] = (node->getRightChild()->getValues().at(i).toDouble() +
-                    node->getLeftChild()->getValues().at(i).toDouble()) /2;
+            values[i] = QString::number((node->getRightChild()->getValues().at(i).toFloat() +
+                    node->getLeftChild()->getValues().at(i).toFloat()) /2.0f);
             break;
         default:
             values[i] = 0.0;
             break;
         }
     }
+    return values;
 }
 
 int TreeBuilder::calculateValueByFrequency( TreeNode* node,
