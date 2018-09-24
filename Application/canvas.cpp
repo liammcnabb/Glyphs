@@ -1075,11 +1075,13 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 
 void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 {
-    double movingTransition = 2.4 /*25/getGlyphSize()*/;
+    float transitionMod = 1.0f/12.0f;
     Colour color;
     changeColorMap(this->CATEGORICAL);
     double value, max = getLength() / 70;
     double indicate = 1;
+    float currentOpacity = 1;
+    double size= getGlyphSize();
 
     float x,y;
     for( int i = 0; i < list.size(); ++ i )
@@ -1087,27 +1089,29 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         WheelGlyph s = list.at(i);
         QPointF currentCentroid;
-        double size;
+
         if( s.state() == s.ADD )
         {
-            size = (getCurrentTransitionSize());
+//            size = (getCurrentTransitionSize());
+            currentOpacity = float(getCurrentTransitionSize())*float(transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid = s.centroid();
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
-                currentCentroid.setX(s.parent().x() - ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()/movingTransition)));
-                currentCentroid.setY(s.parent().y() - ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()/movingTransition)));
+                currentCentroid.setX(s.parent().x() - ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*transitionMod)));
+                currentCentroid.setY(s.parent().y() - ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*transitionMod)));
             }
         }
         else if (s.state() == s.REMOVE )
         {
-            size = (getGlyphSize()) - (getCurrentTransitionSize()*1.5);
+//            size = (getGlyphSize()) - (getCurrentTransitionSize()*1.5);
+            currentOpacity = 1.0f-float(getCurrentTransitionSize()*transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
-                currentCentroid.setX(s.centroid().x() + (s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
-                currentCentroid.setY(s.centroid().y() + (s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setX(s.centroid().x() + ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*transitionMod)));
+                currentCentroid.setY(s.centroid().y() + ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*transitionMod)));
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
@@ -1116,8 +1120,9 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
         }
         else /** if p.state() == p.NEUTRAL */
         {
-            size = (getGlyphSize());
+//            size = (getGlyphSize());
             currentCentroid = s.centroid();
+            currentOpacity = 1.0f;
         }
 
         int sliceNo = -1;
@@ -1137,7 +1142,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
             {
                 indicate = (1+s.size())*1.5;
             }
-            glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+            glColor4f(0.105882353, 0.105882353, 0.105882353, currentOpacity);
             glBegin( GL_TRIANGLE_FAN );
             for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
             {
@@ -1192,7 +1197,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
             value = ( s.getRads().at(sliceNo) - getMins().at(sliceNo) ) /
                     ( getMaxes().at(sliceNo) - getMins().at(sliceNo) ) ;
             color = cm.getColourFromIndex(sliceNo);
-            glColor3f(color.getR(), color.getG(), color.getB() );
+            glColor4f(color.getR(), color.getG(), color.getB(), currentOpacity );
             x = currentCentroid.x() + sin( angle ) *
                      max  * value * size * indicate;
             y = currentCentroid.y() + cos( angle ) *
@@ -1210,7 +1215,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         sliceNo = -1;
         glLineWidth(1);
-        glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+        glColor4f(0.105882353, 0.105882353, 0.105882353, currentOpacity);
         glBegin( GL_LINE_STRIP );
         for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
         {
