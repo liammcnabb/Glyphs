@@ -862,8 +862,7 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 {
     Colour color;
     changeColorMap(this->CATEGORICAL);
-    float movingTransition = /*2.4*/ /*getGlyphSize()/*/1.0f/12.0f;
-    float opacityTransition =  1.0f / 12.0f;
+    float transitionMod = 1.0f/12.0f;
     double value, max = getLength() / 70;
     int totalNooks = 7;
     int nook;
@@ -882,25 +881,25 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
         if( s.state() == s.ADD )
         {
 //            size = ( getCurrentTransitionSize() );
-            currentOpacity = float(getCurrentTransitionSize())*float(opacityTransition);
+            currentOpacity = float(getCurrentTransitionSize())*float(transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid = s.centroid();
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
-                currentCentroid.setX(s.parent().x() - ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*movingTransition)));
-                currentCentroid.setY(s.parent().y() - ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*movingTransition)));
+                currentCentroid.setX(s.parent().x() - ((s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*transitionMod)));
+                currentCentroid.setY(s.parent().y() - ((s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*transitionMod)));
             }
         }
         else if (s.state() == s.REMOVE )
         {
 //            size = ( getGlyphSize() ) - (getCurrentTransitionSize()*1.5);
-            currentOpacity = 1.0f-float(getCurrentTransitionSize()*opacityTransition);
+            currentOpacity = 1.0f-float(getCurrentTransitionSize()*transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
-                currentCentroid.setX(s.centroid().x() + (s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*movingTransition));
-                currentCentroid.setY(s.centroid().y() + (s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*movingTransition));
+                currentCentroid.setX(s.centroid().x() + (s.parent().x() - s.centroid().x()) * (getCurrentTransitionSize()*transitionMod));
+                currentCentroid.setY(s.centroid().y() + (s.parent().y() - s.centroid().y()) * (getCurrentTransitionSize()*transitionMod));
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
@@ -1251,36 +1250,40 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 {
     Colour color;
-    double movingTransition = 2.4 /*25/getGlyphSize()*/;
+    double transitionMod = 1.0f/12.0f;
+    float currentOpacity = 1;
+
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
         double indicate = 1;
-        double size = 0;
+        double size = getGlyphSize();
         double rad = getLength() / 100;
         QPointF currentCentroid;
 
 
         if( p.state() == p.ADD )
         {
-            size = getCurrentTransitionSize();
+//            size = getCurrentTransitionSize();
+            currentOpacity = float(getCurrentTransitionSize())*float(transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid = p.centroid();
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
-                currentCentroid.setX(p.parent().x() - ((p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition)));
-                currentCentroid.setY(p.parent().y() - ((p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition)));
+                currentCentroid.setX(p.parent().x() - ((p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()*transitionMod)));
+                currentCentroid.setY(p.parent().y() - ((p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()*transitionMod)));
             }
         }
         else if (p.state() == p.REMOVE )
         {
-            size = getGlyphSize() - getCurrentTransitionSize();
+//            size = getGlyphSize() - getCurrentTransitionSize();
+            currentOpacity = 1-(float(getCurrentTransitionSize())*float(transitionMod));
             if(getTransitionType() == TRANSITION_IN)
             {
-                currentCentroid.setX(p.centroid().x() + (p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
-                currentCentroid.setY(p.centroid().y() + (p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setX(p.centroid().x() + (p.parent().x() - p.centroid().x()) * (getCurrentTransitionSize()*transitionMod));
+                currentCentroid.setY(p.centroid().y() + (p.parent().y() - p.centroid().y()) * (getCurrentTransitionSize()*transitionMod));
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
@@ -1289,8 +1292,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         }
         else /** if p.state() == p.NEUTRAL */
         {
-            size = getGlyphSize();
+//            size = getGlyphSize();
             currentCentroid = p.centroid();
+            currentOpacity=1;
         }
 
 //        Colour c = outline.getInterpolatedColour(j);
@@ -1299,7 +1303,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
             /* Outline (STANDARD) */
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
             if(getHiddenIndicator() == HIDDEN_OUTLINE ||
@@ -1400,7 +1404,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             else if(getGlyphType() == GLYPH_VARIABLE_PIE)
                 color = cm.getColourFromIndex(i);
             /* Fill */
-            glColor4f( color.getR(), color.getG(), color.getB(), 1 );
+            glColor4f( color.getR(), color.getG(), color.getB(), currentOpacity );
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
@@ -1422,7 +1426,7 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         for( int i = 0; i < p.pieSlices().size(); ++i )
         {
             PieSegment ps = p.pieSlices().at(i);
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.6 );
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
             glBegin( GL_LINE_STRIP );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
