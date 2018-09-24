@@ -249,7 +249,7 @@
            </font>
           </property>
           <property name="title">
-           <string>Hidden Area Indicator:</string>
+           <string>Merge Quantity Indicator:</string>
           </property>
           <widget class="QRadioButton" name="rdoOutline">
            <property name="geometry">
