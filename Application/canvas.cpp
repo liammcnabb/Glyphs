@@ -1261,7 +1261,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
     for( int j = 0; j < list.size(); ++j )
     {
         PieChart p = list.at(j);
+        double indicateSize = 1;
         double indicate = 1;
+
         double size = getGlyphSize();
         double rad = getLength() / 100;
         QPointF currentCentroid;
