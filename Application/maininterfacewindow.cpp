@@ -418,3 +418,11 @@ void MainInterfaceWindow::setPreviousVirtualZoomValue(int value)
 {
     previousVirtualZoomValue = value;
 }
+
+void MainInterfaceWindow::on_btnAutomatic_released()
+{
+    double glyphSize = ui->OpenGLWidget->getGlyphSize()*10;
+
+    ui->virtualzoom->setValue(glyphSize);
+//    on_virtualzoom_valueChanged(glyphSize);
+}

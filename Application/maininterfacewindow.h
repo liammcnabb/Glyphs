@@ -75,6 +75,8 @@ private slots:
 
     void on_verticalSlider_valueChanged(int value);
 
+    void on_btnAutomatic_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
