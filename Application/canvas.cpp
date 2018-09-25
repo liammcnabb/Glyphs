@@ -1476,46 +1476,50 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 
 void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
 {
-    double movingTransition = 2.4 /*25/getGlyphSize()*/;
+    float transitionMod = 1.0f/12.0f;
     Colour color;
     changeColorMap(this->CATEGORICAL);
-    double max = getLength() / 50;
+    double max = getLength() / 30;
     int bars = list.first().values().size();
-    double indicateNeg = 1, indicatePos = 1;
     float minX, width, minY, height;
     float value;
-
+    float currentOpacity = 1;
+    double indicateSize = 1;
+    double indicateOutline = 1;
+    QPointF currentCentroid;
+    double size = getGlyphSize();
+    int barWidth = (max / bars);
 
     for( int i = 0; i < list.size(); ++ i )
     {
 
         BarChart b = list.at(i);
-        QPointF currentCentroid;
-        glColor4f( 0.8, 0.8, 0.8, 1 );
+        glColor4f( 0.8, 0.8, 0.8, currentOpacity );
 
         //        glVertex2f( s.centroid().x(), s.centroid().y() );
 
-        double size;
         if( b.state() == b.ADD )
         {
-            size = (getCurrentTransitionSize()*1.5);
+//            size = (getCurrentTransitionSize()*1.5);
+            currentOpacity = float(getCurrentTransitionSize())*float(transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
                 currentCentroid = b.centroid();
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
-                currentCentroid.setX(b.parent().x() - ((b.parent().x() - b.centroid().x()) * (getCurrentTransitionSize()/movingTransition)));
-                currentCentroid.setY(b.parent().y() - ((b.parent().y() - b.centroid().y()) * (getCurrentTransitionSize()/movingTransition)));
+                currentCentroid.setX(b.parent().x() - ((b.parent().x() - b.centroid().x()) * (getCurrentTransitionSize()*transitionMod)));
+                currentCentroid.setY(b.parent().y() - ((b.parent().y() - b.centroid().y()) * (getCurrentTransitionSize()*transitionMod)));
             }
         }
         else if (b.state() == b.REMOVE )
         {
-            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+//            size = (getGlyphSize()*1.5) - (getCurrentTransitionSize()*1.5);
+            currentOpacity = 1.0f-float(getCurrentTransitionSize()*transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
-                currentCentroid.setX(b.centroid().x() + (b.parent().x() - b.centroid().x()) * (getCurrentTransitionSize()/movingTransition));
-                currentCentroid.setY(b.centroid().y() + (b.parent().y() - b.centroid().y()) * (getCurrentTransitionSize()/movingTransition));
+                currentCentroid.setX(b.centroid().x() + (b.parent().x() - b.centroid().x()) * (getCurrentTransitionSize()*transitionMod));
+                currentCentroid.setY(b.centroid().y() + (b.parent().y() - b.centroid().y()) * (getCurrentTransitionSize()*transitionMod));
             }
             else /** getTransitionType() == TRANSITION_OUT */
             {
@@ -1524,42 +1528,37 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
         }
         else /** if b.state() == b.NEUTRAL */
         {
-            size = (getGlyphSize()*1.5);
+//            size = (getGlyphSize()*1.5);
             currentCentroid = b.centroid();
+            currentOpacity = 1.0f;
         }
-
-        int barWidth = (max / bars) * (size * 0.4);
-
 
         //Outlines
         if( getHiddenIndicator() == HIDDEN_OUTLINE ||
                 getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            if(getHiddenIndicator() == HIDDEN_OUTLINE ||
-                    getHiddenIndicator() == HIDDEN_SIZE )
-            {
-                indicatePos = 1+b.size();
-                indicateNeg = 1-b.size();
-            }
-            else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-            {
-                indicatePos = (1+b.size())*1.5;
-                indicateNeg = (1-b.size())*1.5;
-            }
-            barWidth = (max / bars) * (size * 0.4) * indicatePos;
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+            if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+                indicateOutline = (1+b.size() * (getLength()*0.01))*1.75;
+            else
+                indicateOutline = 1+b.size() * (getLength()*0.01);
+
+            barWidth = (max + ( indicateOutline ) ) / bars;
+//            barWidth = (max / bars) * (size * 0.4);
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
             for( int j = 0; j < bars; ++j )
             {
                 value = ( (b.values().at(j)-getMins().at(j)) /
                           (getMaxes().at(j)-getMins().at(j)) );
-                if( value < 0.1)
+                if( value < 0.1 )
                     value = 0.1;
-
-                minX = ( currentCentroid.x() - ((max/5) * size) ) + (barWidth*j);
+                if( j == 0 )
+                    minX = ( currentCentroid.x() - ( ( max/5 ) * size) ) + ( barWidth*j ) - ( indicateOutline / 2 );
+                else
+                    minX += width;
                 width = barWidth;
-                minY = currentCentroid.y();
-                height = value  * (max *size) * indicatePos;
+                minY = currentCentroid.y() -  ( indicateOutline / 2 );
+                height = value  * ( max *size ) + indicateOutline;
 
                 glBegin( GL_QUADS );
                 glVertex2f(minX, minY);
@@ -1570,42 +1569,55 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             }
         }
 
-        indicatePos = 1;
-        indicateNeg = 1;
+        indicateOutline = 1;
+        indicateSize = 1;
+        barWidth =  max / bars;
         if( getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            indicatePos = 1+b.size();
-            indicateNeg = 1-b.size();
-            barWidth = (max / bars) * (size * 0.4);
+            indicateSize = 1+b.size() * (getLength()*0.01);
+            indicateOutline = 1+b.size() * (getLength()*0.01);
+            barWidth = (max + (indicateSize)) / bars;
         }
         //Fill
         for( int j = 0; j < bars; ++j )
         {
-            value = ( (b.values().at(j)-getMins().at(j)) /
-                      (getMaxes().at(j)-getMins().at(j)) );
-            if( value < 0.1)
+            value = ( ( b.values().at( j ) - getMins().at(j) ) /
+                      ( getMaxes().at( j ) - getMins().at( j ) ) );
+            if( value < 0.1 )
                 value = 0.1;
 
-            minX = ( currentCentroid.x() - ((max/5) * size) ) + (barWidth*j);
-            width = barWidth *indicatePos;
-            minY =  currentCentroid.y();
-            height = value * (max *size) * indicatePos;
-            color = cm.getColourFromIndex(j);
-            glColor3f(color.getR(), color.getG(), color.getB());
+            if(j == 0)
+                minX = ( currentCentroid.x() - ( ( max/5) * size ) ) + ( barWidth * j ) - ( indicateSize / 2 );
+            else
+                minX += width;
 
+            width = barWidth;
+            minY = currentCentroid.y() -  ( indicateSize / 2 );
+            height = value  * ( max * size ) + indicateSize;
+
+            color = cm.getColourFromIndex(j);
+            glColor4f(color.getR(), color.getG(), color.getB(),currentOpacity);
             glBegin( GL_QUADS );
             glVertex2f(minX, minY);
             glVertex2f(minX, minY+height);
             glVertex2f(minX+width, minY+height);
             glVertex2f(minX+width,minY);
+            glVertex2f(minX, minY);
+            glEnd();
+
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
+            glBegin( GL_LINE_STRIP );
+            glVertex2f(minX, minY);
+            glVertex2f(minX, minY+height);
+            glVertex2f(minX+width, minY+height);
+            glVertex2f(minX+width,minY);
+            glVertex2f(minX, minY);
             glEnd();
         }
 
-
-
         //        // Extents
-        //        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2);
+        //        glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
         //        minX = ( b.centroid().x() - ((max/4) * size) );
         //        minY = ( b.centroid().y() - ((max/4) * size) );
         //        int maxX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*bars);
