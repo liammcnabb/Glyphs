@@ -1108,17 +1108,19 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
     double indicate = 1;
     float currentOpacity = 1;
     double size= getGlyphSize();
+    QPointF currentCentroid;
+    double indicateSize = 1;
+    double indicateOutline = 1;
 
     float x,y;
     for( int i = 0; i < list.size(); ++ i )
     {
 
         WheelGlyph s = list.at(i);
-        QPointF currentCentroid;
 
         if( s.state() == s.ADD )
         {
-//            size = (getCurrentTransitionSize());
+            //            size = (getCurrentTransitionSize());
             currentOpacity = float(getCurrentTransitionSize())*float(transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
@@ -1132,7 +1134,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
         }
         else if (s.state() == s.REMOVE )
         {
-//            size = (getGlyphSize()) - (getCurrentTransitionSize()*1.5);
+            //            size = (getGlyphSize()) - (getCurrentTransitionSize()*1.5);
             currentOpacity = 1.0f-float(getCurrentTransitionSize()*transitionMod);
             if(getTransitionType() == TRANSITION_IN)
             {
@@ -1146,7 +1148,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
         }
         else /** if p.state() == p.NEUTRAL */
         {
-//            size = (getGlyphSize());
+            //            size = (getGlyphSize());
             currentCentroid = s.centroid();
             currentOpacity = 1.0f;
         }
@@ -1159,15 +1161,11 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
                 getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            if(getHiddenIndicator() == HIDDEN_OUTLINE ||
-                    getHiddenIndicator() == HIDDEN_SIZE )
-            {
-                indicate = 1+s.size();
-            }
-            else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-            {
-                indicate = (1+s.size())*1.5;
-            }
+            if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+                indicateOutline = (1+s.size() * (getLength()*0.01))*1.75;
+            else
+                indicateOutline = 1+s.size() * (getLength()*0.01);
+
             glColor4f(0.105882353, 0.105882353, 0.105882353, currentOpacity);
             glBegin( GL_TRIANGLE_FAN );
             for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
@@ -1184,26 +1182,29 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
                 value = ( s.getRads().at(sliceNo) - getMins().at(sliceNo) ) /
                         ( getMaxes().at(sliceNo) - getMins().at(sliceNo) );
                 x = currentCentroid.x() + sin( angle ) *
-                        max  * value * size * indicate;
+                        (size * ( max * value + (indicateSize * 1.5) ) + indicateOutline );
                 y = currentCentroid.y() + cos( angle ) *
-                        max  * value * size * indicate;
+                        (size * ( max * value + (indicateSize * 1.5) ) + indicateOutline );
                 glVertex2f( x, y );
             }
             x = currentCentroid.x() + sin( 0 ) *
-                    max  * value * size * indicate;
+                    (size * ( max * value + (indicateSize * 1.5) ) + indicateOutline );
             y = currentCentroid.y() + cos( 0 ) *
-                    max  * value * size * indicate;
+                    (size * ( max * value + (indicateSize * 1.5) ) + indicateOutline );
             glVertex2f(x,y);
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
             glEnd();
         }
 
-        indicate = 1;
+
+        indicateOutline = 1;
         if( getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            indicate = 1+s.size();
+            indicateSize = 1+s.size();
+            indicateOutline = 1+s.size() * (getLength()*0.01);
         }
+
         glLineWidth(1);
         //Fill
         sliceNo = -1;
@@ -1225,15 +1226,15 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
             color = cm.getColourFromIndex(sliceNo);
             glColor4f(color.getR(), color.getG(), color.getB(), currentOpacity );
             x = currentCentroid.x() + sin( angle ) *
-                     max  * value * size * indicate;
+                    (size * ( max * value + indicateSize ) + indicateOutline );
             y = currentCentroid.y() + cos( angle ) *
-                     max  * value * size * indicate;
+                    (size * ( max * value + indicateSize ) + indicateOutline );
             glVertex2f( x, y );
         }
         x = currentCentroid.x() + sin( 0 ) *
-                max  * value * size * indicate;
+                (size * ( max * value + indicateSize ) + indicateOutline );
         y = currentCentroid.y() + cos( 0 ) *
-               max  * value * size * indicate;
+                (size * ( max * value + indicateSize ) + indicateOutline );
         glVertex2f(x,y);
         glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
@@ -1257,22 +1258,19 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
             value = ( s.getRads().at(sliceNo) - getMins().at(sliceNo) ) /
                     ( getMaxes().at(sliceNo) - getMins().at(sliceNo) );
             x = currentCentroid.x() + sin( angle ) *
-                    max  * value * size * indicate;
+                    (size * ( max * value + indicateSize ) + indicateOutline );
             y = currentCentroid.y() + cos( angle ) *
-                    max  * value * size * indicate;
+                    (size * ( max * value + indicateSize ) + indicateOutline );
             glVertex2f( x, y );
         }
         x = currentCentroid.x() + sin( 0 ) *
-                max  * value * size * indicate;
+                (size * ( max * value + indicateSize ) + indicateOutline );
         y = currentCentroid.y() + cos( 0 ) *
-                max  * value * size * indicate;
+                (size * ( max * value + indicateSize ) + indicateOutline );
         glVertex2f(x,y);
         glVertex2f( currentCentroid.x(), currentCentroid.y() );
         glEnd();
     }
-
-
-
     return;
 }
 
