@@ -1313,30 +1313,27 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
-            if(getHiddenIndicator() == HIDDEN_OUTLINE ||
-                    getHiddenIndicator() == HIDDEN_SIZE )
-            {
-                indicate = 1+p.size();
-            }
-            else if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-            {
-                indicate = (1+p.size())*1.5;
-            }
+
+            if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+                indicate = (1+p.size() * (getLength()*0.01))*1.75;
+            else
+                indicate = 1+p.size() * (getLength()*0.01);
+
             for ( float angle = 0; angle <= (2*M_PI); angle += 0.01 )
             {
                 float x = currentCentroid.x() + sin( angle ) *
-                          ( size * ( ( rad * indicate  ) ) );
+                          ( size * ( rad + (indicateSize*1.5) ) + indicate );
 
                 float y = currentCentroid.y() + cos( angle ) *
-                          ( size * ( ( rad * indicate ) ) );
+                          ( size * ( ( rad + (indicateSize*1.5) ) ) + indicate ) ;
 
                 glVertex2f( x, y );
             }
             float x = currentCentroid.x() + sin( 0 ) *
-                      ( size * ( ( rad * indicate  ) ) );
+                      ( size * ( rad + (indicateSize) ) + indicate ) ;
 
             float y = currentCentroid.y() + cos( 0 ) *
-                      ( size * ( ( rad * indicate ) ) );
+                      ( size * ( rad + (indicateSize) ) + indicate ) ;
 
             glVertex2f( x, y );
             glEnd();
@@ -1398,7 +1395,8 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         if( getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            indicate = 1+p.size();
+            indicateSize = 1+p.size();
+            indicate = 1+p.size() * (getLength()*0.01);
         }
         changeColorMap(this->CATEGORICAL);
         float currentAngle = 0;
@@ -1415,14 +1413,14 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
-            for( float angle = currentAngle; angle <=
-                 currentAngle+ps.angle()+0.05; angle+=0.1 )
+            for( float angle = currentAngle; angle <
+                 currentAngle+ps.angle(); angle+=0.01 )
             {
                 float x = currentCentroid.x() + sin( angle ) *
-                          ( size * ( ( rad * indicate  ) ) );
+                          ( size * ( rad + indicateSize ) + indicate );
 
                 float y = currentCentroid.y() + cos( angle ) *
-                          ( size * ( ( rad * indicate ) ) );
+                          ( size * ( rad + indicateSize ) + indicate );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
@@ -1434,17 +1432,18 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         {
             PieSegment ps = p.pieSlices().at(i);
             glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
+            glLineWidth(1);
             glBegin( GL_LINE_STRIP );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
-            for( float angle = currentAngle; angle <=
-                 currentAngle+ps.angle()+0.05; angle+=0.1 )
+            for( float angle = currentAngle; angle <
+                 currentAngle + ps.angle(); angle += 0.01 )
             {
                 float x = currentCentroid.x() + sin( angle ) *
-                          ( size * ( ( rad * ( indicate )) ) );
+                          ( size * ( rad + indicateSize ) + indicate );
 
                 float y = currentCentroid.y() + cos( angle ) *
-                          ( size * ( ( rad * ( indicate )) ) );
+                          ( size * ( rad + indicateSize ) + indicate );
                 glVertex3f( x, y, 0.5 );
             }
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
