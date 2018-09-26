@@ -40,4 +40,4 @@ Makefile*
 Doxygen*
 Application/Application
 
-Additional/Materials/CCG/
+Additional/Materials/*
