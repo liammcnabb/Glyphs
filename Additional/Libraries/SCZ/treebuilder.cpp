@@ -167,6 +167,7 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
 QStringList TreeBuilder::applyValue( TreeNode* node,
                                  int calculationType )
 {
+//    qDebug() << "BEGIN:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
     QStringList values = node->getValues();
     for( int i = 0; i < values.size(); ++i )
     {
@@ -190,6 +191,7 @@ QStringList TreeBuilder::applyValue( TreeNode* node,
                     node->getLeftChild()->getValues().at(i).toDouble();
             break;
         case CALC_BY_AVERAGE_SIMPLIFIED:
+//            qDebug() << node->getRightChild()->getValues().at(i) << node->getLeftChild()->getValues().at(i);
             values[i] = QString::number((node->getRightChild()->getValues().at(i).toFloat() +
                     node->getLeftChild()->getValues().at(i).toFloat()) /2.0f);
             break;
@@ -198,6 +200,7 @@ QStringList TreeBuilder::applyValue( TreeNode* node,
             break;
         }
     }
+//        qDebug() << "END:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
     return values;
 }
 

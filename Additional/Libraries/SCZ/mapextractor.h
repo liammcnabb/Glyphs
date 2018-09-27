@@ -25,10 +25,15 @@ public:
      * @return A list of Polygons extracted from the the OGRLayer
      */
     QVector<Polygon> toVector();
+
+    QString name() const;
+    void setName(const QString &name);
+
 private:
     OGRLayer* layer;
     int dataType = 0;
     QString dataLoc = "";
+    QString m_name;
 
     /**
      * @brief SCZMapExtractor::accumulatePoints extract points and save to vector

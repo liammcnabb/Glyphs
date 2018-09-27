@@ -17,7 +17,7 @@
 class LegendCanvas : public QOpenGLWidget
 {
 public:
-    static const int SAMPLE_POINTS = 6;
+//    static const int SAMPLE_POINTS = 6;
     static const int SEQUENTIAL = 0;
     static const int DIVERGING = 1;
     static const int CATEGORICAL = 2;

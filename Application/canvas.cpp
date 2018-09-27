@@ -1479,7 +1479,7 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
     float transitionMod = 1.0f/12.0f;
     Colour color;
     changeColorMap(this->CATEGORICAL);
-    double max = getLength() / 30;
+    double max = getLength() /100.0f;
     int bars = list.first().values().size();
     float minX, width, minY, height;
     float value;
@@ -1488,7 +1488,7 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
     double indicateOutline = 1;
     QPointF currentCentroid;
     double size = getGlyphSize();
-    int barWidth = (max / bars);
+    int barWidth = (max * getGlyphSize() / bars);
 
     for( int i = 0; i < list.size(); ++ i )
     {

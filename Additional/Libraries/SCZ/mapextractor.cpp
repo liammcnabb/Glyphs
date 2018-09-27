@@ -10,6 +10,7 @@ QVector<Polygon> MapExtractor::toVector()
 {
     OGRFeature* feature;
     feature = layer->GetNextFeature();
+    setName(layer->GetName());
     QVector<Polygon> polygonList;
 
     while( ( feature != NULL ) )
@@ -24,9 +25,19 @@ QVector<Polygon> MapExtractor::toVector()
     return polygonList;
 }
 
+QString MapExtractor::name() const
+{
+    return m_name;
+}
+
+void MapExtractor::setName(const QString &name)
+{
+    m_name = name;
+}
+
 void MapExtractor::extractPolygonPoints( OGRFeature* feature,
-        QVector<Polygon>* polygonList,
-        QVector<QString>* fields )
+                                         QVector<Polygon>* polygonList,
+                                         QVector<QString>* fields )
 {
     Polygon currentPolygon = Polygon();
     OGRGeometry* geometry = feature->GetGeometryRef();
@@ -39,7 +50,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             OGRPolygon* polygon = ( OGRPolygon* ) geometry;
             OGRLinearRing *extRing = polygon->getExteriorRing();
             extRing->closeRings();
-            if ( extRing->getNumPoints() < 5 )
+            if ( name() != "cb_2016_us_county_20m" && extRing->getNumPoints() < 5 )
                 return;
             points = accumulatePoints( extRing );
 
@@ -49,7 +60,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
                 intRing->closeRings();
 
                 /** Hardcoded fix, comment and uncomment as necessary. **/
-                if ( intRing->getNumPoints() > 10 )
+                if ( name() == "cb_2016_us_county_20m" || intRing->getNumPoints() > 10 )
                     accumulatePoints( intRing, &points );
             }
 
@@ -65,13 +76,13 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             OGRGeometryCollection* collection =
                 ( OGRGeometryCollection* ) geometry;
 
-            for ( int i = 0; i < /*collection->getNumGeometries()*/1; i++ )
+            for ( int i = 0; i < collection->getNumGeometries(); i++ )
             {
                 OGRPolygon* poly = ( OGRPolygon* ) collection->getGeometryRef(
                                        i );
                 OGRLinearRing *extRing = poly->getExteriorRing();
                 extRing->closeRings();
-                if ( extRing->getNumPoints() < 5 )
+                if ( name() != "cb_2016_us_county_20m" && extRing->getNumPoints() < 5 )
                     return;
                 points = accumulatePoints( extRing );
 
@@ -81,7 +92,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
                     intRing->closeRings();
 
                     /** Hardcoded fix, comment and uncomment as necessary. **/
-                    if ( intRing->getNumPoints() > 10 )
+                    if ( name() == "cb_2016_us_county_20m" || intRing->getNumPoints() > 10 )
                         accumulatePoints( intRing, &points );
                 }
 

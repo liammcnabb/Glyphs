@@ -51,7 +51,7 @@ void LegendCanvas::initializeVariablePie( QVector<float> averages )
 //    srand(seed);
     PieChart p(QPointF(50,50),3,PieChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
-    for(int i =0; i < SAMPLE_POINTS; ++i)
+    for(int i =0; i < averages.size(); ++i)
         samplePoints.append(QString::number(averages.at(i)) );
     p.initialize(samplePoints);
 
@@ -65,12 +65,11 @@ void LegendCanvas::initalizeStarGlyph( QVector<float> averages)
 //    srand(seed);
     StarGlyph s(QPointF(50,50),3,StarGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
-    QVector<float> mean;
-    for( int i = 0; i < SAMPLE_POINTS; ++i )
+    for( int i = 0; i < averages.size(); ++i )
     {
         samplePoints.append(QString::number(averages.at(i)));
     }
-    s.initialize(samplePoints, mean);
+    s.initialize(samplePoints);
     setStarGlyph(s);
     return;
 }
@@ -81,7 +80,7 @@ void LegendCanvas::initalizeWheelGlyph(QVector<float> averages)
 //    srand(seed);
     WheelGlyph s(QPointF(50,50),3,WheelGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
-    for( int i = 0; i < SAMPLE_POINTS; ++i )
+    for( int i = 0; i < averages.size(); ++i )
     {
         samplePoints.append(QString::number(averages.at(i)) );
     }
@@ -96,7 +95,7 @@ void LegendCanvas::initializeBarChart(QVector<float> averages)
 //    srand(seed);
     BarChart b(QPointF(50,60),3,BarChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
-    for(int i =0; i < SAMPLE_POINTS; ++i)
+    for(int i =0; i < averages.size(); ++i)
         samplePoints.append(QString::number(averages.at(i)) );
     b.initialize(samplePoints);
 
@@ -143,8 +142,8 @@ void LegendCanvas::changeColorMap(int mapType)
 
 void LegendCanvas::paintVariablePie()
 {
-    ColourManager cm(0,SAMPLE_POINTS);
     PieChart p = variablePie();
+    ColourManager cm(0,p.pieSlices().size());
     Colour color;
     /* Outline */
     glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
@@ -531,9 +530,9 @@ void LegendCanvas::paintBarChart()
     changeColorMap(this->CATEGORICAL);
     double max = 60;
     int bars = barChart().values().size();
-
-    ColourManager cm(0, SAMPLE_POINTS);
     BarChart b = barChart();
+    ColourManager cm(0, b.values().size());
+
     glColor4f( 0.8, 0.8, 0.8, 1 );
 
     //        glVertex2f( s.centroid().x(), s.centroid().y() );

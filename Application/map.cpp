@@ -118,7 +118,18 @@ void Map::splitContiguousRegions( QVector<Polygon> list )
 
     ContiguityBuilder builder(0);
     QVector<ContiguousArea> contigs = builder.sortContiguously(list);
-    setContiguousRegions(contigs);
+
+    QVector<ContiguousArea> contig;
+    int lIndex = 0,largest = 0;
+    for(int i =0; i < contigs.size(); ++i)
+        if( contigs.at(i).polygons().size() > largest )
+        {
+            largest = contigs.at(i).polygons().size();
+            lIndex = i;
+        }
+
+    contig.append(contigs.at(lIndex));
+    setContiguousRegions(contig);
 
     if(DEBUG_CLASS)
         qDebug() << "End: void Map::splitContiguousRegions("
