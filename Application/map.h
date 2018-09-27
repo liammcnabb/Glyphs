@@ -62,7 +62,7 @@ private:
     QVector<ContiguousArea> m_contiguousRegions;
     QVector<TreeNode> m_hierarchies;
     QString m_recipeLoc;
-    int m_recipeType = RECIPE_SAVE;
+    int m_recipeType = RECIPE_LOAD;
 
     void copyInfoFromFile();
     void extractMap(OGRLayer *layer);
