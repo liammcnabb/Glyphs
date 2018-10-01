@@ -149,10 +149,14 @@ public:
     int getTransitionType() const;
     void setTransitionType(int value);
 
+    bool getExtents() const;
+    void setExtents(bool extents);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
     bool m_colorStarLines = false;
+    bool m_extents = false;
 
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
