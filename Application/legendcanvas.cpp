@@ -433,92 +433,162 @@ void LegendCanvas::paintWheelGlyph()
     Colour color;
     changeColorMap(this->CATEGORICAL);
     double value, max = 40;
-//    int totalNooks = 11;
-    int nook;
-//    int nookSegment = max / totalNooks;
 
     float x,y;
-        WheelGlyph s = wheelGlyph();
-        glColor4f( 0.8, 0.8, 0.8, 1 );
+    WheelGlyph s = wheelGlyph();
+    float valueRotation = (2*M_PI) / s.getRads().size();
+    //Extents
+    glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.3);
+    glBegin( GL_LINES );
+    //        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+    for(float angle = 0; angle < 2*M_PI; angle += 0.01)
+    {
+        x = s.centroid().x() + sin( angle ) *
+                max;
+        y = s.centroid().y() + cos( angle ) *
+                max;
+        glVertex2f(x,y);
+    }
+    glEnd();
+
+    //        glColor4f( 0.8, 0.8, 0.8, 1 );
+    cm = ColourManager(mins().at(0), maxes().at(0));
+    color = cm.getColourFromIndex(0);
+
+    float currentAngle = 0;
+
+    for ( int i = 0; i < s.getRads().size(); ++i )
+    {
+        cm = ColourManager(mins().at(i), maxes().at(i));
+        color = cm.getColourFromIndex(i);
+        glColor3f(color.getR(), color.getG(), color.getB() );
         glBegin( GL_TRIANGLE_FAN );
         glVertex2f( s.centroid().x(), s.centroid().y() );
-
-//        double size = 1;
-
-        int sliceNo = -1;
-        //Fill
-        float valueRotation = (2*M_PI) / s.getRads().size();
-        for( float angle = 0; angle < 2*M_PI; angle += 0.01 )
+        value = ( s.getRads().at(i) - mins().at(i) ) /
+                ( maxes().at(i) - mins().at(i) ) ;
+        //            qDebug() << value;
+        for( float angle = currentAngle;
+             angle < currentAngle + valueRotation; angle += 0.01)
         {
-            if(sliceNo < s.getRads().size()-1 &&
-                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
-            {
-                glVertex2f( s.centroid().x(), s.centroid().y() );
-                glEnd();
-                sliceNo++;
-                cm = ColourManager(mins().at(sliceNo), maxes().at(sliceNo));
-                color = cm.getColourFromIndex(sliceNo);
-                glColor3f(0.105882353, 0.105882353, 0.105882353 );
-                value = ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
-                        ( maxes().at(sliceNo) - mins().at(sliceNo) ) ;
-                float a = s.centroid().x() + sin( angle + (valueRotation/2) ) *
-                         max  * value * 1.7 ;
-                float b = s.centroid().y() + cos( angle + (valueRotation/2) ) *
-                         max  * value * 1.6 ;
-                std::string str = valueHeaders().at(sliceNo).toStdString().substr(0,9) + "...";
-                glPrintString(a,b,str);
-                glBegin(GL_TRIANGLE_FAN);
-                color = cm.getColourFromIndex(sliceNo);
-                glColor3f(color.getR(), color.getG(), color.getB() );
-                glVertex2f( s.centroid().x(), s.centroid().y() );
-            }
-            color = cm.getColourFromIndex(sliceNo);
-            glColor3f(color.getR(), color.getG(), color.getB() );
-            nook = cm.getClassColourIndex( ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
-                                          ( maxes().at(sliceNo) - mins().at(sliceNo) ) );
             x = s.centroid().x() + sin( angle ) *
-                     max  * value;
+                    max  * value;
             y = s.centroid().y() + cos( angle ) *
-                     max  * value ;
+                    max  * value;
             glVertex2f( x, y );
         }
-        x = s.centroid().x() + sin( 0 ) *
-                 max  * value;
-        y = s.centroid().y() + cos( 0 ) *
-                 max  * value ;
-        glVertex2f(x,y);
-        glVertex2f( s.centroid().x(), s.centroid().y() );
+        glEnd( );
+        currentAngle += valueRotation;
+    }
 
-        glEnd();
+    currentAngle = 0;
+    glColor4f( 0.105882353, 0.105882353, 0.105882353, 1);
 
-        sliceNo = -1;
-        //Outlines
-        glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+    for ( int i = 0; i < s.getRads().size(); ++i )
+    {
+        value = ( s.getRads().at(i) - mins().at(i) ) /
+                ( maxes().at(i) - mins().at(i) ) ;
+        float a = s.centroid().x() + sin( currentAngle + (valueRotation/2) ) *
+                max  * ( value + 0.4 ) ;
+        float b = s.centroid().y() + cos( currentAngle + (valueRotation/2) ) *
+                max  * ( value + 0.3 ) ;
+        std::string str = valueHeaders().at(i).toStdString().substr(0,9) + "...";
+        glPrintString(a,b,str);
+
+
         glBegin( GL_LINE_STRIP );
-        for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
+        glVertex2f( s.centroid().x(), s.centroid().y() );
+        for( float angle = currentAngle;
+             angle < currentAngle + valueRotation; angle += 0.01)
         {
-            if(sliceNo < s.getRads().size()-1 &&
-                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
-            {
-                sliceNo++;
-//                cm = ColourManager(mins().at(sliceNo), maxes().at(sliceNo));
-                glVertex2f( s.centroid().x(), s.centroid().y() );
-            }
-            value = ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
-                    ( maxes().at(sliceNo) - mins().at(sliceNo) );
             x = s.centroid().x() + sin( angle ) *
                     max  * value;
             y = s.centroid().y() + cos( angle ) *
                     max  * value;
             glVertex2f( x, y );
         }
-        x = s.centroid().x() + sin( 0 ) *
-                max  * value;
-        y = s.centroid().y() + cos( 0 ) *
-                max  * value;
-        glVertex2f(x,y);
         glVertex2f( s.centroid().x(), s.centroid().y() );
-        glEnd();
+        glEnd( );
+        currentAngle += valueRotation;
+    }
+
+
+
+
+    //        int sliceNo = -1;
+    //        //Fill
+
+    //        for( float angle = 0; angle < 2*M_PI; angle += 0.01 )
+    //        {
+    //            if(sliceNo < s.getRads().size()-1 &&
+    //                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+    //            {
+    //                glVertex2f( s.centroid().x(), s.centroid().y() );
+    //                glEnd();
+    //                sliceNo++;
+    //                cm = ColourManager(mins().at(sliceNo), maxes().at(sliceNo));
+    //                color = cm.getColourFromIndex(sliceNo);
+    //                glColor3f(0.105882353, 0.105882353, 0.105882353 );
+    //                value = ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
+    //                        ( maxes().at(sliceNo) - mins().at(sliceNo) ) ;
+    //                float a = s.centroid().x() + sin( angle + (valueRotation/2) ) *
+    //                         max  * value * 1.7 ;
+    //                float b = s.centroid().y() + cos( angle + (valueRotation/2) ) *
+    //                         max  * value * 1.6 ;
+    //                std::string str = valueHeaders().at(sliceNo).toStdString().substr(0,9) + "...";
+    //                glPrintString(a,b,str);
+    //                glBegin(GL_TRIANGLE_FAN);
+    //                color = cm.getColourFromIndex(sliceNo);
+    //                glColor3f(color.getR(), color.getG(), color.getB() );
+    //                glVertex2f( s.centroid().x(), s.centroid().y() );
+    //            }
+    //            color = cm.getColourFromIndex(sliceNo);
+    //            glColor3f(color.getR(), color.getG(), color.getB() );
+    //            nook = cm.getClassColourIndex( ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
+    //                                          ( maxes().at(sliceNo) - mins().at(sliceNo) ) );
+    //            x = s.centroid().x() + sin( angle ) *
+    //                     max  * value;
+    //            y = s.centroid().y() + cos( angle ) *
+    //                     max  * value ;
+    //            glVertex2f( x, y );
+    //        }
+    //        x = s.centroid().x() + sin( 0 ) *
+    //                 max  * value;
+    //        y = s.centroid().y() + cos( 0 ) *
+    //                 max  * value ;
+    //        glVertex2f(x,y);
+    //        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+    //        glEnd();
+
+    //        sliceNo = -1;
+    //        //Outlines
+    //        glColor4f(0.105882353, 0.105882353, 0.105882353, 0.8);
+    //        glBegin( GL_LINE_STRIP );
+    //        for( float angle = 0; angle <= 2*M_PI; angle += 0.01 )
+    //        {
+    //            if(sliceNo < s.getRads().size()-1 &&
+    //                    int(angle*100) % int(roundf(valueRotation)*100) == 0)
+    //            {
+    //                sliceNo++;
+    ////                cm = ColourManager(mins().at(sliceNo), maxes().at(sliceNo));
+    //                glVertex2f( s.centroid().x(), s.centroid().y() );
+    //            }
+    //            value = ( s.getRads().at(sliceNo) - mins().at(sliceNo) ) /
+    //                    ( maxes().at(sliceNo) - mins().at(sliceNo) );
+    //            x = s.centroid().x() + sin( angle ) *
+    //                    max  * value;
+    //            y = s.centroid().y() + cos( angle ) *
+    //                    max  * value;
+    //            glVertex2f( x, y );
+    //        }
+    //        x = s.centroid().x() + sin( 0 ) *
+    //                max  * value;
+    //        y = s.centroid().y() + cos( 0 ) *
+    //                max  * value;
+    //        glVertex2f(x,y);
+    //        glVertex2f( s.centroid().x(), s.centroid().y() );
+    //        glEnd();
 
     return;
 }
