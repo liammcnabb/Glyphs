@@ -15,8 +15,8 @@ void LegendCanvas::initializeGL()
     //    glEnable( GL_LINE_STIPPLE ); // Enables Dotted Line for use
     glEnable( GL_STENCIL ); //Rendering using stencil buffer (used to render concave polygons)
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-//    glClearColor( BACKGROUND_COL, BACKGROUND_COL, BACKGROUND_COL,
-//                  1.0 );
+    //    glClearColor( BACKGROUND_COL, BACKGROUND_COL, BACKGROUND_COL,
+    //                  1.0 );
     glClearColor(239.0f/255.0f,
                  235.0f/255.0f,
                  231.0f/255.0f,1);
@@ -47,8 +47,8 @@ void LegendCanvas::initializeLegend( QVector<float> averages )
 
 void LegendCanvas::initializeVariablePie( QVector<float> averages )
 {
-//    int seed = 0;
-//    srand(seed);
+    //    int seed = 0;
+    //    srand(seed);
     PieChart p(QPointF(50,50),3,PieChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for(int i =0; i < averages.size(); ++i)
@@ -61,8 +61,8 @@ void LegendCanvas::initializeVariablePie( QVector<float> averages )
 
 void LegendCanvas::initalizeStarGlyph( QVector<float> averages)
 {
-//    int seed = 670;//13 //57
-//    srand(seed);
+    //    int seed = 670;//13 //57
+    //    srand(seed);
     StarGlyph s(QPointF(50,50),3,StarGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for( int i = 0; i < averages.size(); ++i )
@@ -76,8 +76,8 @@ void LegendCanvas::initalizeStarGlyph( QVector<float> averages)
 
 void LegendCanvas::initalizeWheelGlyph(QVector<float> averages)
 {
-//    int seed = 13;
-//    srand(seed);
+    //    int seed = 13;
+    //    srand(seed);
     WheelGlyph s(QPointF(50,50),3,WheelGlyph::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for( int i = 0; i < averages.size(); ++i )
@@ -91,8 +91,8 @@ void LegendCanvas::initalizeWheelGlyph(QVector<float> averages)
 
 void LegendCanvas::initializeBarChart(QVector<float> averages)
 {
-//    int seed = 0;
-//    srand(seed);
+    //    int seed = 0;
+    //    srand(seed);
     BarChart b(QPointF(50,60),3,BarChart::NEUTRAL, QPointF( 0.0f, 0.0f ));
     QStringList samplePoints;
     for(int i =0; i < averages.size(); ++i)
@@ -155,9 +155,9 @@ void LegendCanvas::paintVariablePie()
     for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.01 )
     {
         float x = p.centroid().x() + sin( angle ) *
-                  ( size * ( rad * ( 1 + p.size() ) ) );
+                ( size * ( rad * ( 1 + p.size() ) ) );
         float y = p.centroid().y() + cos( angle ) *
-                  ( size * ( rad * ( 1 + p.size() ) ) );
+                ( size * ( rad * ( 1 + p.size() ) ) );
 
         glVertex3f( x, y, 0.5 );
     }
@@ -178,10 +178,10 @@ void LegendCanvas::paintVariablePie()
              ps.angle(); angle+=0.01 )
         {
             float x = p.centroid().x() + sin( currentAngle + angle ) *
-                      ( size * ( ( rad ) ) );
+                    ( size * ( ( rad ) ) );
 
             float y = p.centroid().y() + cos( currentAngle + angle ) *
-                      ( size * ( ( rad ) ) );
+                    ( size * ( ( rad ) ) );
             glVertex3f( x, y, 0.5 );
         }
         glVertex2f( p.centroid().x(), p.centroid().y() );
@@ -201,20 +201,20 @@ void LegendCanvas::paintVariablePie()
              currentAngle+ps.angle(); angle+=0.001 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                      ( size * ( ( rad ) ) );
+                    ( size * ( ( rad ) ) );
 
             float y = p.centroid().y() + cos( angle ) *
-                      ( size * ( ( rad ) ) );
+                    ( size * ( ( rad ) ) );
             glVertex3f( x, y, 0.5 );
         }
         glVertex2f( p.centroid().x(), p.centroid().y() );
         glEnd();
         currentAngle += ps.angle();
-//        qDebug() << currentAngle;
+        //        qDebug() << currentAngle;
         float a = p.centroid().x() + sin( currentAngle - (ps.angle()/2) ) *
-                  ( size * ( ( rad ) ) * 1.7 );
+                ( size * ( ( rad ) ) * 1.7 );
         float b = p.centroid().y() + cos( currentAngle - (ps.angle()/2) ) *
-                  ( size * ( ( rad ) ) * 1.6 );
+                ( size * ( ( rad ) ) * 1.6 );
         std::string s = valueHeaders().at(i).toStdString().substr(0,9) + "...";
         glPrintString(a,b,s);
     }
@@ -318,21 +318,21 @@ void LegendCanvas::paintStarGlyph()
     float valueRotation = (2*M_PI) / s.points().size();
     for( float j = 0; j < s.points().size(); ++j )
     {
-//        ColourManager cm(mins().at(j), maxes().at(j));
+        //        ColourManager cm(mins().at(j), maxes().at(j));
         value = (s.points().at(j) - mins().at(j)) /
                 (maxes().at(j) - mins().at(j) );
         x = s.centroid().x() + sin( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         y = s.centroid().y() + cos( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         glVertex2f( x, y );
     }
     value = (s.points().at(0) - mins().at(0)) /
             (maxes().at(0) - mins().at(0) );
     x = s.centroid().x() + sin( 0 ) *
-             max * value ;
+            max * value ;
     y = s.centroid().y() + cos( 0 ) *
-             max * value ;
+            max * value ;
     glVertex2f( x, y );
 
     glEnd();
@@ -345,17 +345,17 @@ void LegendCanvas::paintStarGlyph()
         value = (s.points().at(j) - mins().at(j)) /
                 (maxes().at(j) - mins().at(j) );
         x = s.centroid().x() + sin( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         y = s.centroid().y() + cos( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         glVertex2f( x, y );
     }
     value = (s.points().at(0) - mins().at(0)) /
             (maxes().at(0) - mins().at(0) );
     x = s.centroid().x() + sin( 0 ) *
-             max * value ;
+            max * value ;
     y = s.centroid().y() + cos( 0 ) *
-             max * value ;
+            max * value ;
     glVertex2f( x, y );
 
     glEnd();
@@ -377,53 +377,53 @@ void LegendCanvas::paintStarGlyph()
         value = (s.points().at(j) - mins().at(j)) /
                 (maxes().at(j) - mins().at(j) );
         x = s.centroid().x() + sin( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         y = s.centroid().y() + cos( valueRotation * j ) *
-                 max * value ;
+                max * value ;
         glVertex2f(s.centroid().x(), s.centroid().y());
         glVertex2f( x, y );
         glEnd();
 
         float a = s.centroid().x() + sin( valueRotation * j ) *
-                  max * value  * 1.6 ;
+                max * value  * 1.6 ;
         float b = s.centroid().y() + cos( valueRotation * j ) *
-                  max * value * 1.6;
+                max * value * 1.6;
         std::string s = valueHeaders().at(j).toStdString().substr(0,9) + "...";
         glPrintString(a,b,s);
 
     }
 
 
-//    //Standard
-//    glColor4f( 1, 0.105882353, 0.105882353, 0.3);
-//    glBegin( GL_LINE_STRIP );
-////    glVertex2f( s.centroid().x(), s.centroid().y() );
-//    for( float j = 0; j < s.points().size(); ++j )
-//    {
-//        nook = cm.getClassColourIndex(0);
-//        x = s.centroid().x() + sin( valueRotation * j ) *
-//                ( size  * ( nookSegment * ( 1+nook ) ) );
-//        y = s.centroid().y() + cos( valueRotation * j ) *
-//                ( size  * ( nookSegment * ( 1+nook ) ) );
-//        glVertex2f( x, y );
-//    }
-//    nook = cm.getClassColourIndex(0);
-//    x = s.centroid().x() + sin( 0 ) *
-//                ( size  * ( nookSegment * ( 1+nook ) ) );
-//    y = s.centroid().y() + cos( 0 ) *
-//                ( size  * ( nookSegment * ( 1+nook ) ) );
-//    glVertex2f( x, y );
+    //    //Standard
+    //    glColor4f( 1, 0.105882353, 0.105882353, 0.3);
+    //    glBegin( GL_LINE_STRIP );
+    ////    glVertex2f( s.centroid().x(), s.centroid().y() );
+    //    for( float j = 0; j < s.points().size(); ++j )
+    //    {
+    //        nook = cm.getClassColourIndex(0);
+    //        x = s.centroid().x() + sin( valueRotation * j ) *
+    //                ( size  * ( nookSegment * ( 1+nook ) ) );
+    //        y = s.centroid().y() + cos( valueRotation * j ) *
+    //                ( size  * ( nookSegment * ( 1+nook ) ) );
+    //        glVertex2f( x, y );
+    //    }
+    //    nook = cm.getClassColourIndex(0);
+    //    x = s.centroid().x() + sin( 0 ) *
+    //                ( size  * ( nookSegment * ( 1+nook ) ) );
+    //    y = s.centroid().y() + cos( 0 ) *
+    //                ( size  * ( nookSegment * ( 1+nook ) ) );
+    //    glVertex2f( x, y );
 
-//    glEnd();
+    //    glEnd();
 
     glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-//    glPrintString(1,1,"Red Line presents: Standard value per field");
-//    glPrintString(48.5,88,"1");
-//    glPrintString(80,80,"2");
-//    glPrintString(54,54,"3");
-//    glPrintString(48.5,37,"4");
-//    glPrintString(32,50,"5");
-//    glPrintString(15,76,"6");
+    //    glPrintString(1,1,"Red Line presents: Standard value per field");
+    //    glPrintString(48.5,88,"1");
+    //    glPrintString(80,80,"2");
+    //    glPrintString(54,54,"3");
+    //    glPrintString(48.5,37,"4");
+    //    glPrintString(32,50,"5");
+    //    glPrintString(15,76,"6");
 
 }
 
@@ -617,7 +617,7 @@ void LegendCanvas::paintBarChart()
         minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);
         width = barWidth;
         minY = ( b.centroid().y() - ((max/3) * size) );
-//        qDebug() << b.values().at(j) << maxes().at(j) << mins().at(j);
+        //        qDebug() << b.values().at(j) << maxes().at(j) << mins().at(j);
         height = ( (b.values().at(j)-mins().at(j)) /
                    (maxes().at(j)-mins().at(j)) )  * (max *size);
         color = cm.getColourFromIndex(j);
@@ -652,15 +652,15 @@ void LegendCanvas::paintBarChart()
 
         std::string s = valueHeaders().at(j).toStdString().substr(0,9) + "...";
 
-//        glBegin( GL_LINES );
-//        glVertex2f(minX+(width/2),35);
-//        glVertex2f(minX+(width/2),37-(3.6*j)-2);
-//        glEnd();
+        //        glBegin( GL_LINES );
+        //        glVertex2f(minX+(width/2),35);
+        //        glVertex2f(minX+(width/2),37-(3.6*j)-2);
+        //        glEnd();
         glPrintString(minX+(width/2),35-(5*j),s);
     }
 
     glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
-//    glPrintString(1,1,"Red Line presents: Standard value per field");
+    //    glPrintString(1,1,"Red Line presents: Standard value per field");
 
 }
 
@@ -684,15 +684,15 @@ void LegendCanvas::glPrintString(float x, float y, std::string str)
 void LegendCanvas::glPrintString( void* font, const char* str, float x, float y)
 {
 
-//    glRasterPos2f( x, y );
+    //    glRasterPos2f( x, y );
     int len, i, strWidth;
 
     len = ( int )strlen( str );
 
-//    for( i = 0; i < len; ++i )
-//        strWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, str[i]);
+    //    for( i = 0; i < len; ++i )
+    //        strWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, str[i]);
 
-//    qDebug() << strWidth;
+    //    qDebug() << strWidth;
     glRasterPos2f( x-(len), y );
 
     for ( i = 0; i < len; ++i )
@@ -709,15 +709,15 @@ void LegendCanvas::glPrintVerticalString(float x, float y, std::string str)
 void LegendCanvas::glPrintVerticalString( void* font, const char* str, float x, float y)
 {
 
-//    glRasterPos2f( x, y );
+    //    glRasterPos2f( x, y );
     int len, i, strWidth;
 
     len = ( int )strlen( str );
 
-//    for( i = 0; i < len; ++i )
-//        strWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, str[i]);
+    //    for( i = 0; i < len; ++i )
+    //        strWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, str[i]);
 
-//    qDebug() << strWidth;
+    //    qDebug() << strWidth;
 
     for ( i = 0; i < len; ++i )
     {
