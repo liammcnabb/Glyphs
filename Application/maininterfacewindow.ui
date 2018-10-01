@@ -500,6 +500,7 @@
      <string>Debug Options</string>
     </property>
     <addaction name="actionDebugMousePointer"/>
+    <addaction name="actionShow_Extents"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug_Options"/>
@@ -516,6 +517,14 @@
    </property>
    <property name="text">
     <string>DebugMousePointer</string>
+   </property>
+  </action>
+  <action name="actionShow_Extents">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Extents</string>
    </property>
   </action>
  </widget>

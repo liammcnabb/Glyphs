@@ -77,6 +77,8 @@ private slots:
 
     void on_btnAutomatic_released();
 
+    void on_actionShow_Extents_toggled(bool arg1);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

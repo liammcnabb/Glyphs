@@ -426,3 +426,9 @@ void MainInterfaceWindow::on_btnAutomatic_released()
     ui->virtualzoom->setValue(glyphSize);
 //    on_virtualzoom_valueChanged(glyphSize);
 }
+
+void MainInterfaceWindow::on_actionShow_Extents_toggled(bool arg1)
+{
+    ui->OpenGLWidget->setExtents(arg1);
+    ui->OpenGLWidget->update();
+}
