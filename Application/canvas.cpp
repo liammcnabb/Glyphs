@@ -380,6 +380,16 @@ void Canvas::setTransitionType(int value)
     transitionType = value;
 }
 
+bool Canvas::getExtents() const
+{
+    return m_extents;
+}
+
+void Canvas::setExtents(bool extents)
+{
+    m_extents = extents;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -863,18 +873,19 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
     Colour color;
     changeColorMap(this->CATEGORICAL);
     float transitionMod = 1.0f/12.0f;
-    double value, max = getLength() / 70;
+    double value, max = getLength() / 100;
     int totalNooks = 7;
     int nook;
     int nookSegment = max / totalNooks;
     float currentOpacity = 1;
-    double indicateSize = 1;
-    double indicateOutline = 1;
+    double indicateSize = 0;
+    double indicateOutline = 0;
 
     float x,y;
     for( int i = 0; i < list.size(); ++ i )
     {
         StarGlyph s = list.at(i);
+
         QPointF currentCentroid;
         float valueRotation = (2*M_PI) / s.points().size();
 
@@ -913,6 +924,25 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             currentCentroid = s.centroid();
             currentOpacity=1;
         }
+
+        if( getExtents() )
+        {
+            // Extents
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.3);
+            glBegin( GL_LINES );
+            //        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+            for(float angle = 0; angle < 2*M_PI; angle += 0.01)
+            {
+                x = currentCentroid.x() + sin( angle ) *
+                       size * max;
+                y = currentCentroid.y() + cos( angle ) *
+                       size * max;
+                glVertex2f(x,y);
+            }
+            glEnd();
+        }
+
 
         /** Outline (Standard) */
         if( getHiddenIndicator() == HIDDEN_OUTLINE ||
@@ -1117,6 +1147,7 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         WheelGlyph s = list.at(i);
 
+
         if( s.state() == s.ADD )
         {
             //            size = (getCurrentTransitionSize());
@@ -1154,6 +1185,25 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
 
         int sliceNo = -1;
         float valueRotation = (2*M_PI) / s.getRads().size();
+
+        if(getExtents())
+        {
+            //Extents
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.3);
+            glBegin( GL_LINES );
+            //        glVertex2f( s.centroid().x(), s.centroid().y() );
+
+            for(float angle = 0; angle < 2*M_PI; angle += 0.01)
+            {
+                x = s.centroid().x() + sin( angle ) *
+                        max * size;
+                y = s.centroid().y() + cos( angle ) *
+                        max * size;
+                glVertex2f(x,y);
+            }
+            glEnd();
+        }
+
         //Outlines
         /** Outline (Standard) */
         if( getHiddenIndicator() == HIDDEN_OUTLINE ||
@@ -1616,19 +1666,24 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             glEnd();
         }
 
-        //        // Extents
-        //        glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
-        //        minX = ( b.centroid().x() - ((max/4) * size) );
-        //        minY = ( b.centroid().y() - ((max/4) * size) );
-        //        int maxX = ( b.centroid().x() - ((max/4) * size) ) + (barWidth*bars);
-        //        int maxY = minY + (max*size);
+        if(getExtents())
+        {
+            // Extents
+            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
+            minX = (currentCentroid.x() - ((barWidth * bars)/2)* size) ;
+            minY = currentCentroid.y() -  ( max * size /2) ;
+            float maxX = minX + (barWidth*(bars))* size;
+            float maxY = minY + (max)*size*2;
 
-        //        glBegin( GL_LINE_STRIP );
-        //        glVertex2f(minX, minY);
-        //        glVertex2f(minX, maxY);
-        //        glVertex2f(maxX, maxY);
-        //        glVertex2f(maxX,minY);
-        //        glEnd();
+            glBegin( GL_LINE_STRIP );
+            glVertex2f(minX, minY);
+            glVertex2f(minX, maxY);
+            glVertex2f(maxX, maxY);
+            glVertex2f(maxX,minY);
+            glVertex2f(minX, minY);
+            glEnd();
+        }
+
     }
 
     return;
