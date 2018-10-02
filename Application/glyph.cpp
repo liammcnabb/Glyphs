@@ -4,7 +4,7 @@ Glyph::Glyph(QPointF centroid , float size, int state, QPointF origin)
 {
     setCentroid( centroid );
     setState( state );
-    setSize(size * SIZE_MODIFIER);
+    setSize(size);
     setParent( origin );
 }
 
