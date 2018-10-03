@@ -1523,12 +1523,9 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
     float barWidth = (max * 1.5 / bars);
 
     float indicateValue = getLength()*0.00015f;
-    qDebug() << indicateValue;
 
     if ( indicateValue < 0.00953304 && indicateValue > 0.00953302)
         indicateValue = 0.00953303/2.5;
-//    if(indicateValue < 0.0000768f)
-//        indicateValue = 0.0000768f;
 
     for( int i = 0; i < list.size(); ++ i )
     {

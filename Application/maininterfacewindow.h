@@ -22,6 +22,12 @@ class MainInterfaceWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    static const int RANGE_LEAF = 0;
+    static const int RANGE_SHOWN = 1;
+
+    static const int RANGE_PER_VALUE = 0;
+    static const int RANGE_OVERALL = 1;
+
     explicit MainInterfaceWindow(QWidget *parent = 0);
     ~MainInterfaceWindow();
 
@@ -36,6 +42,22 @@ public:
     int getPreviousVirtualZoomValue() const;
     void setPreviousVirtualZoomValue(int value);
 
+    QVector<float> getLeafMins() const;
+    void setLeafMins(const QVector<float> &leafMins);
+
+    QVector<float> getLeafMaxes() const;
+    void setLeafMaxes(const QVector<float> &leafMaxes);
+
+    int getRangeBreadth() const;
+    void setRangeBreadth(int rangeBreadth);
+
+    int getRangeDepth() const;
+    void setRangeDepth(int rangeDepth);
+
+    bool getSaved() const;
+    void setSaved(bool saved);
+
+    void calculateOverallRange(QVector<float> mins, QVector<float> maxes);
 private slots:
     void on_actionEngland_Example_triggered();
 
@@ -79,6 +101,14 @@ private slots:
 
     void on_actionShow_Extents_toggled(bool arg1);
 
+    void on_rdoRangebyLeaf_released();
+
+    void on_rdoRangeOfShown_released();
+
+    void on_rdoCalcPerValue_released();
+
+    void on_rdoCalcOverall_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
@@ -94,6 +124,14 @@ private:
     QStringListModel model;
     void initializeTable(QStringList list);
     void calculateNewlyVisible(int screenSpaceValue);
+
+    QVector<float> m_leafMins;
+    QVector<float> m_leafMaxes;
+
+    int m_rangeBreadth = 0;
+    int m_rangeDepth = 0;
+
+    bool m_saved = false;
 };
 
 #endif // MAININTERFACEWINDOW_H

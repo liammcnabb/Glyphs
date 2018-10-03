@@ -81,7 +81,12 @@ void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
         mins.append(min);
     }
 
-
+    if(!getSaved())
+    {
+        setLeafMaxes(maxes);
+        setLeafMins(mins);
+        setSaved(true);
+    }
 
     ui->OpenGLWidget->setMeans(means);
     ui->OpenGLWidget->setMaxes(maxes);
@@ -95,8 +100,6 @@ void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
 
     return;
 }
-
-
 
 
 void MainInterfaceWindow::on_lstHeaders_doubleClicked(const QModelIndex &index)
@@ -188,7 +191,91 @@ void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
     ui->virtualzoom->setEnabled(true);
     ui->verticalSlider->setEnabled(true);
     ui->virtualzoom->setFocus();
+
+    if(getRangeBreadth() == RANGE_SHOWN)
+        calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
+
+    if(getRangeDepth() == RANGE_OVERALL)
+        calculateOverallRange( ui->OpenGLWidget->getMins(),
+                               ui->OpenGLWidget->getMaxes() );
     ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::calculateOverallRange(QVector<float> mins, QVector<float> maxes)
+{
+    float max = -std::numeric_limits<float>::max();
+    float min = std::numeric_limits<float>::max();
+
+    QVector<float> newMins = mins;
+    QVector<float> newMaxes = maxes;
+
+    for( int i = 0; i < mins.size(); ++i )
+    {
+        max = std::max( max, maxes.at(i) );
+        min = std::min( min, mins.at(i) );
+    }
+
+    for( int i = 0; i < mins.size(); ++i )
+    {
+        newMins[i] = min;
+        newMaxes[i] = max;
+    }
+
+    ui->OpenGLWidget->setMaxes(newMaxes);
+    ui->OpenGLWidget->setMins(newMins);
+
+    ui->GlLegend->setMaxes(newMaxes);
+    ui->GlLegend->setMins(newMins);
+}
+
+bool MainInterfaceWindow::getSaved() const
+{
+    return m_saved;
+}
+
+void MainInterfaceWindow::setSaved(bool saved)
+{
+    m_saved = saved;
+}
+
+int MainInterfaceWindow::getRangeDepth() const
+{
+    return m_rangeDepth;
+}
+
+void MainInterfaceWindow::setRangeDepth(int rangeDepth)
+{
+    m_rangeDepth = rangeDepth;
+}
+
+int MainInterfaceWindow::getRangeBreadth() const
+{
+    return m_rangeBreadth;
+}
+
+void MainInterfaceWindow::setRangeBreadth(int rangeBreadth)
+{
+    m_rangeBreadth = rangeBreadth;
+}
+
+QVector<float> MainInterfaceWindow::getLeafMaxes() const
+{
+    return m_leafMaxes;
+}
+
+void MainInterfaceWindow::setLeafMaxes(const QVector<float> &leafMaxes)
+{
+    m_leafMaxes = leafMaxes;
+}
+
+QVector<float> MainInterfaceWindow::getLeafMins() const
+{
+    return m_leafMins;
+}
+
+void MainInterfaceWindow::setLeafMins(const QVector<float> &leafMins)
+{
+    m_leafMins = leafMins;
 }
 
 
@@ -430,5 +517,49 @@ void MainInterfaceWindow::on_btnAutomatic_released()
 void MainInterfaceWindow::on_actionShow_Extents_toggled(bool arg1)
 {
     ui->OpenGLWidget->setExtents(arg1);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoRangebyLeaf_released()
+{
+    setRangeBreadth(RANGE_LEAF);
+    ui->OpenGLWidget->setMaxes(getLeafMaxes());
+    ui->OpenGLWidget->setMins(getLeafMins());
+
+    ui->GlLegend->setMaxes(getLeafMaxes());
+    ui->GlLegend->setMins(getLeafMins());
+    if(getRangeDepth() == RANGE_OVERALL)
+        calculateOverallRange( getLeafMins(), getLeafMaxes() );
+
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoRangeOfShown_released()
+{
+    setRangeBreadth(RANGE_SHOWN);
+    calculateNewlyVisible(ui->virtualzoom->value());
+
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoCalcPerValue_released()
+{
+    setRangeDepth(RANGE_PER_VALUE);
+    if(getRangeBreadth() == RANGE_LEAF)
+        on_rdoRangebyLeaf_released();
+    else
+        calculateNewlyVisible(ui->virtualzoom->value());
+
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoCalcOverall_released()
+{
+    setRangeDepth(RANGE_OVERALL);
+    if(getRangeBreadth() == RANGE_LEAF)
+        on_rdoRangebyLeaf_released();
+    else
+        calculateNewlyVisible(ui->virtualzoom->value());
+
     ui->OpenGLWidget->update();
 }
