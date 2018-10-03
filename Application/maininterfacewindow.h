@@ -58,6 +58,9 @@ public:
     void setSaved(bool saved);
 
     void calculateOverallRange(QVector<float> mins, QVector<float> maxes);
+    QVector<bool> getValueFilters() const;
+    void setValueFilters(const QVector<bool> &valueFilters);
+
 private slots:
     void on_actionEngland_Example_triggered();
 
@@ -109,6 +112,7 @@ private slots:
 
     void on_rdoCalcOverall_released();
 
+    void on_lstHeaders_clicked(const QModelIndex &index);
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
@@ -132,6 +136,8 @@ private:
     int m_rangeDepth = 0;
 
     bool m_saved = false;
+
+    QVector<bool> m_valueFilters;
 };
 
 #endif // MAININTERFACEWINDOW_H

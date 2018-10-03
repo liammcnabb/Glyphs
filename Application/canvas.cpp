@@ -390,6 +390,16 @@ void Canvas::setExtents(bool extents)
     m_extents = extents;
 }
 
+QVector<bool> Canvas::getValueFilters() const
+{
+    return m_valueFilters;
+}
+
+void Canvas::setValueFilters(const QVector<bool> &valueFilters)
+{
+    m_valueFilters = valueFilters;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -789,20 +799,24 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
 {
     QVector<PieChart> pies;
 
+
     foreach( TreeNode p, list)
     {
+        QStringList usedValues;
         if(p.getLevel() > -1)
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
-            PieChart pie( *p.centroid(), p.getLevel()*(getLength()*0.001), state, p.getParentCentroid()  );
-            if(pieType == GLYPH_EQUAL_PIE)
-                pie.setSliceType(PieChart::EQUAL_SLICES);
-            else
-                pie.setSliceType(PieChart::FULL_SLICES);
 
-            pie.initialize(values);
+            for( int i = 0; i < values.size(); ++i )
+                if(getValueFilters().at(i))
+                    usedValues.append(values.at(i));
+
+            PieChart pie( *p.centroid(), p.getLevel()*(getLength()*0.001), state, p.getParentCentroid()  );
+            pie.setSliceType(PieChart::FULL_SLICES);
+
+            pie.initialize(usedValues);
             pies.append(pie);
         }
 

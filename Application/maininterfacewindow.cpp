@@ -43,6 +43,14 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
 //    ui->lstHeaders->addItems(valueHeaders);
     setValueHeaders(valueHeaders);
     ui->GlLegend->setValueHeaders(valueHeaders);
+    QVector<bool> valueF;
+    for(int i = 0; i < valueHeaders.size(); ++i )
+        valueF.append(true);
+
+    setValueFilters(valueF);
+    ui->GlLegend->setValueFilters(valueF);
+    ui->OpenGLWidget->setValueFilters(valueF);
+
     initializeTable(valueHeaders);
 
     Map map( shpreader.getMapData(), data, recipeLoc );
@@ -201,6 +209,16 @@ void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
     ui->OpenGLWidget->update();
 }
 
+QVector<bool> MainInterfaceWindow::getValueFilters() const
+{
+    return m_valueFilters;
+}
+
+void MainInterfaceWindow::setValueFilters(const QVector<bool> &valueFilters)
+{
+    m_valueFilters = valueFilters;
+}
+
 void MainInterfaceWindow::calculateOverallRange(QVector<float> mins, QVector<float> maxes)
 {
     float max = -std::numeric_limits<float>::max();
@@ -324,18 +342,25 @@ void MainInterfaceWindow::initializeTable(QStringList list)
 //    int lineIndex =0;
 
     QStringList headers;
-    /*headers.append("ID");*/ headers.append("ValueHeader");
+    headers.append("Shown");
+    headers.append("ValueHeader");
+
 
     model->setHorizontalHeaderLabels(headers);
+    ui->lstHeaders->resizeColumnsToContents();
     ui->lstHeaders->horizontalHeader()->setStretchLastSection(true);
 
     for( int i = 0; i < list.size(); ++i )
     {
-        QStandardItem* id, *title;
+        QStandardItem* checkbox, *title;
 //        id = new QStandardItem(QString::number(i));
         title = new QStandardItem(list.at(i));
+        checkbox = new QStandardItem(true);
+        checkbox->setCheckable(true);
+        checkbox->setCheckState(Qt::Checked);
 //        model->setItem(i,0,id);
-        model->setItem(i,0,title);
+        model->setItem(i,1,title);
+        model->setItem(i,0,checkbox);
     }
     ui->lstHeaders->setModel(model);
     ui->lstHeaders->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -562,4 +587,14 @@ void MainInterfaceWindow::on_rdoCalcOverall_released()
         calculateNewlyVisible(ui->virtualzoom->value());
 
     ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_lstHeaders_clicked(const QModelIndex &index)
+{
+    m_valueFilters[index.row()] =  index.data(Qt::CheckStateRole).toBool();
+    ui->OpenGLWidget->setValueFilters(getValueFilters());
+    ui->GlLegend->setValueFilters(getValueFilters());
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+//    qDebug() << index.column() << index.row() << index.data(Qt::CheckStateRole).toBool();
 }

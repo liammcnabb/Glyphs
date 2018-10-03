@@ -168,7 +168,10 @@ void LegendCanvas::paintVariablePie()
     for( int i = 0; i < p.pieSlices().size(); ++i )
     {
         PieSegment ps = p.pieSlices().at(i);
-        color = cm.getColourFromIndex(i);
+        if( valueFilters().at(i) )
+            color = cm.getColourFromIndex(i);
+        else
+            color = Colour(0.7,0.7,0.7,1);
         /* Fill */
         glColor4f( color.getR(), color.getG(), color.getB(), 1 );
         glBegin( GL_TRIANGLE_FAN );
@@ -224,6 +227,16 @@ void LegendCanvas::paintVariablePie()
     glPrintString(46,1,"Outline Thickness presents: Represented Areas");
 
     return;
+}
+
+QVector<bool> LegendCanvas::valueFilters() const
+{
+    return m_valueFilters;
+}
+
+void LegendCanvas::setValueFilters(const QVector<bool> &valueFilters)
+{
+    m_valueFilters = valueFilters;
 }
 
 QStringList LegendCanvas::valueHeaders() const

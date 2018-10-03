@@ -152,6 +152,9 @@ public:
     bool getExtents() const;
     void setExtents(bool extents);
 
+    QVector<bool> getValueFilters() const;
+    void setValueFilters(const QVector<bool> &valueFilters);
+
 private:
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
@@ -176,6 +179,7 @@ private:
     QVector<TreeNode> m_transitionNeutral;
     QVector<TreeNode> m_transitionAdd;
     QVector<TreeNode> m_transitionRemove;
+    QVector<bool> m_valueFilters;
     float currentTransitionSize = 0.0f;
     int transitionType = 1;
     float m_areaOpacity = 0.0f;
