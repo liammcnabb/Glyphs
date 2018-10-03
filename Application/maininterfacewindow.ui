@@ -470,7 +470,7 @@
            </size>
           </property>
           <property name="title">
-           <string>Range By:</string>
+           <string>Range Breadth:</string>
           </property>
           <widget class="QRadioButton" name="rdoRangebyLeaf">
            <property name="geometry">
@@ -512,7 +512,7 @@
            </size>
           </property>
           <property name="title">
-           <string>Range Calculation:</string>
+           <string>Range Depth:</string>
           </property>
           <widget class="QRadioButton" name="rdoCalcPerValue">
            <property name="geometry">
