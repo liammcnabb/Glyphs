@@ -109,6 +109,7 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
         if ( getRecipeType() == RECIPE_LOAD )
         {
             indexes = getLoadedRecipe()->first();
+//            qDebug() << indexes.neighbourIndex();
             getLoadedRecipe()->pop_front();
             neighbour = indexes.neighbourIndex();
             parent->initNonSharedBoundary( computeParentBoundaries(
@@ -167,7 +168,8 @@ void TreeBuilder::buildBinaryTree( LinkedList* list )
 QStringList TreeBuilder::applyValue( TreeNode* node,
                                  int calculationType )
 {
-//    qDebug() << "BEGIN:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
+    if(DEBUG_CLASS)
+    qDebug() << "BEGIN:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
     QStringList values = node->getValues();
     for( int i = 0; i < values.size(); ++i )
     {
@@ -200,7 +202,8 @@ QStringList TreeBuilder::applyValue( TreeNode* node,
             break;
         }
     }
-//        qDebug() << "END:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
+    if(DEBUG_CLASS)
+        qDebug() << "END:: QStringList TreeBuilder::applyValue( TreeNode* node, int calculationType )";
     return values;
 }
 
@@ -281,6 +284,8 @@ void TreeBuilder::calculateValueRange( LinkedList* list )
 
 int TreeBuilder::identifyNeighbour( LinkedList* list )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::identifyNeighbour( LinkedList* list )";
     int indexOfClosest = DEFAULT_INDEX;
     switch ( getNeighbourType() )
     {
@@ -288,7 +293,12 @@ int TreeBuilder::identifyNeighbour( LinkedList* list )
             for ( int i = 1; i < list->size(); ++i )
                 if ( NeighbourChecker::isNeighbour( list->first(), i,
                                                     list, Segment::searchType() ) )
+                {
+                    if(DEBUG_CLASS)
+                        qDebug() << "END: TreeBuilder::identifyNeighbour( LinkedList* list )";
                     return i;
+                }
+
             break;
         case CLOSEST_VALUE:
 
@@ -359,6 +369,8 @@ QVector<QPointF> TreeBuilder::computeParentBoundaries(
     TreeNode* current,
     TreeNode* neighbour )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::computeParentBoundaries( TreeNode* current, TreeNode* neighbour )";
     QVector<QPointF> parentNonSharedVertices;
     splitBoundary( current, neighbour );
     splitBoundary( neighbour, current );
@@ -375,6 +387,8 @@ QVector<QPointF> TreeBuilder::computeParentBoundaries(
         parentNonSharedVertices.append(
             neighbour->getNonSharedBoundary()->getBoundary().at( i ) );
 
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::computeParentBoundaries( TreeNode* current, TreeNode* neighbour )";
     return parentNonSharedVertices;
 }
 
@@ -382,6 +396,8 @@ QVector<QPointF> TreeBuilder::computeParentBoundaries(
     TreeNode* current,
     TreeNode* neighbour, CrfRow indexes )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::computeParentBoundaries(TreeNode* current, TreeNode* neighbour, CrfRow indexes )";
     QVector<QPointF> parentNonSharedVertices;
     splitBoundary( current, neighbour,
                    indexes.pOneStartIndex(), indexes.pOneEndIndex() );
@@ -400,14 +416,21 @@ QVector<QPointF> TreeBuilder::computeParentBoundaries(
         parentNonSharedVertices.append(
             neighbour->getNonSharedBoundary()->getBoundary().at( i ) );
 
+    if(DEBUG_CLASS)
+        qDebug() << "END: TreeBuilder::computeParentBoundaries(TreeNode* current, TreeNode* neighbour, CrfRow indexes )";
+
     return parentNonSharedVertices;
 }
 
 bool TreeBuilder::splitBoundary( TreeNode* current,
                                     TreeNode* neighbour )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::splitBoundary( TreeNode* current,TreeNode* neighbour )";
     findSharedBoundary( current, neighbour );
     findNonSharedBoundary( current, neighbour );
+    if(DEBUG_CLASS)
+        qDebug() << "END: TreeBuilder::splitBoundary( TreeNode* current,TreeNode* neighbour )";
 
     return true;
 }
@@ -425,6 +448,8 @@ bool TreeBuilder::splitBoundary( TreeNode* current,
 void TreeBuilder::findSharedBoundary( TreeNode* current,
         TreeNode* neighbour )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::findSharedBoundary( TreeNode* current, TreeNode* neighbour )";
     int startIndex, endIndex;
     startIndex = endIndex = DEFAULT_INDEX;
     identifyBoundaryRange( &startIndex, &endIndex, current,
@@ -440,7 +465,11 @@ void TreeBuilder::findSharedBoundary( TreeNode* current,
             current->getNonSharedBoundary()->getBoundary().at( i ) );
 
         if ( i == endIndex )
+        {
+            if(DEBUG_CLASS)
+                qDebug() << "END: TreeBuilder::findSharedBoundary( TreeNode* current, TreeNode* neighbour )";
             return;
+        }
     }
 
     for ( int i = 0; i <= endIndex; ++i )
@@ -448,7 +477,8 @@ void TreeBuilder::findSharedBoundary( TreeNode* current,
         current->getSharedBoundary()->getBoundary().append(
             current->getNonSharedBoundary()->getBoundary().at( i ) );
     }
-
+    if(DEBUG_CLASS)
+        qDebug() << "END: TreeBuilder::findSharedBoundary( TreeNode* current, TreeNode* neighbour )";
     return;
 }
 
@@ -680,9 +710,13 @@ void TreeBuilder::updateList( LinkedList* list,
                                  TreeNode* parent,
                                  int neighbour )
 {
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::updateList( LinkedList* list, TreeNode* parent, int neighbour )";
     list->removeAt( neighbour );
     list->removeFirst();
     addParentToList( list, parent, neighbour );
+    if(DEBUG_CLASS)
+        qDebug() << "BEGIN: TreeBuilder::updateList( LinkedList* list, TreeNode* parent, int neighbour )";
     return;
 }
 

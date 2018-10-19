@@ -571,6 +571,31 @@ public:
         spectral.addColour(Colour("#5e4fa2"));
         ColourMapList().addColourMap(spectral);
 
+        ColourMap colorgorical20;
+        colorgorical20.setMapName("colorgorical20");
+        colorgorical20.setClassification(QUALITATIVE);
+        colorgorical20.addColour(Colour("#6A8799"));
+        colorgorical20.addColour(Colour("#B6DAE4"));
+        colorgorical20.addColour(Colour("#354C55"));
+        colorgorical20.addColour(Colour("#91E4AB"));
+        colorgorical20.addColour(Colour("#518148"));
+        colorgorical20.addColour(Colour("#B3CE6A"));
+        colorgorical20.addColour(Colour("#7C874C"));
+        colorgorical20.addColour(Colour("#A4E462"));
+        colorgorical20.addColour(Colour("#455DAF"));
+        colorgorical20.addColour(Colour("#B79FF3"));
+        colorgorical20.addColour(Colour("#714FAF"));
+        colorgorical20.addColour(Colour("#D384CC"));
+        colorgorical20.addColour(Colour("#7E6278"));
+        colorgorical20.addColour(Colour("#853B59"));
+        colorgorical20.addColour(Colour("#D465EF"));
+        colorgorical20.addColour(Colour("#4E3BEA"));
+        colorgorical20.addColour(Colour("#D5C478"));
+        colorgorical20.addColour(Colour("#684E24"));
+        colorgorical20.addColour(Colour("#E6CDCA"));
+        colorgorical20.addColour(Colour("#B75D29"));
+        ColourMapList().addColourMap(colorgorical20);
+
         //Add indexes to the colour maps
         ColourMapList().setupIndexesInList();
 

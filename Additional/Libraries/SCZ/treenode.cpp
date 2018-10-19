@@ -4,14 +4,14 @@ TreeNode::TreeNode()
 {
     sharedBoundary = new Boundary();
     nonSharedBoundary = new Boundary();
-    neighbours = new QVector<TreeNode*>();
+//    neighbours = new QVector<TreeNode*>();
 }
 
 TreeNode::TreeNode( TreeNode* obj )
 {
     sharedBoundary = obj->getSharedBoundary();
     nonSharedBoundary = obj->getNonSharedBoundary();
-    neighbours = obj->getNeighbours();
+//    neighbours = obj->getNeighbours();
     m_boundingBox = obj->getBoundingBox();
 
     area = obj->getArea();
@@ -58,10 +58,10 @@ TreeNode& TreeNode::operator=( const TreeNode& b )
     nonSharedBoundary = b.getNonSharedBoundary();
     m_boundingBox = b.getBoundingBox();
 
-    neighbours->resize( b.getNeighbours()->size() );
-    std::copy( b.getNeighbours()->begin(),
-               b.getNeighbours()->end(),
-               neighbours->begin() );
+//    neighbours->resize( b.getNeighbours()->size() );
+//    std::copy( b.getNeighbours()->begin(),
+//               b.getNeighbours()->end(),
+//               neighbours->begin() );
     return *this;
 }
 
@@ -70,7 +70,7 @@ TreeNode::TreeNode( QVector<QPointF> points, double area )
 {
     sharedBoundary = new Boundary();
     nonSharedBoundary = new Boundary( points );
-    neighbours = new QVector<TreeNode*>();
+//    neighbours = new QVector<TreeNode*>();
 
     this->area = area;
     initBounds();
@@ -87,7 +87,7 @@ TreeNode::TreeNode( Polygon polygon )
                              polygon.getBoundingBox().minimums[AABB::YDIM],
                              polygon.getBoundingBox().maximums[AABB::YDIM] );
     initNonSharedBoundary( polygon.getPoints() );
-    neighbours = new QVector<TreeNode*>();
+//    neighbours = new QVector<TreeNode*>();
     setArea( polygon.area() );
     setValues(polygon.getValues());
     setLevel(0);
@@ -136,32 +136,32 @@ QVector<QPointF> TreeNode::fullBoundary()
     return full;
 }
 
-void TreeNode::updateNeighbours()
-{
-    if ( leftChild != nullptr && rightChild != nullptr )
-    {
-        getNeighbours()->clear();
-        for( int i = 0; i < leftChild->getNeighbours()->size(); ++i )
-        {
-            qDebug() << leftChild->getNeighbours()->at( i ) << rightChild;
-            if ( *leftChild->getNeighbours()->at( i ) != *rightChild )
-                getNeighbours()->append( leftChild->getNeighbours()->at( i ) );
-        }
-        for( int i = 0; i < rightChild->getNeighbours()->size(); ++i )
-            if( *rightChild->getNeighbours()->at( i ) != *leftChild &&
-                    !getNeighbours()->contains( rightChild->getNeighbours()->at(
-                                                    i ) ) )
-                getNeighbours()->append( rightChild->getNeighbours()->at( i ) );
+//void TreeNode::updateNeighbours()
+//{
+//    if ( leftChild != nullptr && rightChild != nullptr )
+//    {
+//        getNeighbours()->clear();
+//        for( int i = 0; i < leftChild->getNeighbours()->size(); ++i )
+//        {
+//            qDebug() << leftChild->getNeighbours()->at( i ) << rightChild;
+//            if ( *leftChild->getNeighbours()->at( i ) != *rightChild )
+//                getNeighbours()->append( leftChild->getNeighbours()->at( i ) );
+//        }
+//        for( int i = 0; i < rightChild->getNeighbours()->size(); ++i )
+//            if( *rightChild->getNeighbours()->at( i ) != *leftChild &&
+//                    !getNeighbours()->contains( rightChild->getNeighbours()->at(
+//                                                    i ) ) )
+//                getNeighbours()->append( rightChild->getNeighbours()->at( i ) );
 
-        getNeighbours()->squeeze();
-        qDebug() << getNeighbours()->size() <<
-                 " != " << leftChild->getNeighbours()->size() +
-                 rightChild->getNeighbours()->size();
-    }
-    else
-        qDebug() << E << NEIGHBOURS_UPDATE;
-    return;
-}
+//        getNeighbours()->squeeze();
+//        qDebug() << getNeighbours()->size() <<
+//                 " != " << leftChild->getNeighbours()->size() +
+//                 rightChild->getNeighbours()->size();
+//    }
+//    else
+//        qDebug() << E << NEIGHBOURS_UPDATE;
+//    return;
+//}
 
 void TreeNode::initNonSharedBoundary( QVector<QPointF> value )
 {
@@ -292,15 +292,7 @@ void TreeNode::setBoundingBox( AABB boundingBox )
 }
 
 
-QVector<TreeNode*>* TreeNode::getNeighbours() const
-{
-    return neighbours;
-}
 
-void TreeNode::setNeighbours( QVector<TreeNode*>* value )
-{
-    neighbours = value;
-}
 
 QPointF* TreeNode::centroid() const
 {

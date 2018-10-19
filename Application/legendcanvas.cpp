@@ -123,9 +123,9 @@ void LegendCanvas::changeColorMap(int mapType)
     }
     case this->CATEGORICAL :
     {
-        if( ColourManager::InvertColourMapFlag() )
+        if( !ColourManager::InvertColourMapFlag() )
             ColourManager::InvertColourMap();
-        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[0];
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[3];
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
@@ -215,9 +215,9 @@ void LegendCanvas::paintVariablePie()
         currentAngle += ps.angle();
         //        qDebug() << currentAngle;
         float a = p.centroid().x() + sin( currentAngle - (ps.angle()/2) ) *
-                ( size * ( ( rad ) ) * 1.7 );
-        float b = p.centroid().y() + cos( currentAngle - (ps.angle()/2) ) *
                 ( size * ( ( rad ) ) * 1.6 );
+        float b = p.centroid().y() + cos( currentAngle - (ps.angle()/2) ) *
+                ( size * ( ( rad ) ) * 1.7 );
         std::string s = valueHeaders().at(i).toStdString().substr(0,9) + "...";
         glPrintString(a,b,s);
     }

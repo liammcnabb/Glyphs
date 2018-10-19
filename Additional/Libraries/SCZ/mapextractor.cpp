@@ -42,7 +42,6 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
     Polygon currentPolygon = Polygon();
     OGRGeometry* geometry = feature->GetGeometryRef();
     QVector<QPointF> points = QVector<QPointF>();
-
     switch( wkbFlatten( geometry->getGeometryType() ) )
     {
         case wkbPolygon:
@@ -50,7 +49,8 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
             OGRPolygon* polygon = ( OGRPolygon* ) geometry;
             OGRLinearRing *extRing = polygon->getExteriorRing();
             extRing->closeRings();
-            if ( name() != "cb_2016_us_county_20m" && extRing->getNumPoints() < 5 )
+            if ( (name() != "cb_2016_us_county_20m" || name() != "ireland")
+                 && extRing->getNumPoints() < 5 )
                 return;
             points = accumulatePoints( extRing );
 
@@ -60,7 +60,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
                 intRing->closeRings();
 
                 /** Hardcoded fix, comment and uncomment as necessary. **/
-                if ( name() == "cb_2016_us_county_20m" || intRing->getNumPoints() > 10 )
+                if ( (name() != "cb_2016_us_county_20m" || name() != "ireland")  || intRing->getNumPoints() > 10 )
                     accumulatePoints( intRing, &points );
             }
 
@@ -82,7 +82,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
                                        i );
                 OGRLinearRing *extRing = poly->getExteriorRing();
                 extRing->closeRings();
-                if ( name() != "cb_2016_us_county_20m" && extRing->getNumPoints() < 5 )
+                if ( (name() != "cb_2016_us_county_20m" || name() != "ireland")  && extRing->getNumPoints() < 5 )
                     return;
                 points = accumulatePoints( extRing );
 
@@ -92,7 +92,7 @@ void MapExtractor::extractPolygonPoints( OGRFeature* feature,
                     intRing->closeRings();
 
                     /** Hardcoded fix, comment and uncomment as necessary. **/
-                    if ( name() == "cb_2016_us_county_20m" || intRing->getNumPoints() > 10 )
+                    if ( (name() != "cb_2016_us_county_20m" || name() != "ireland")  || intRing->getNumPoints() > 10 )
                         accumulatePoints( intRing, &points );
                 }
 

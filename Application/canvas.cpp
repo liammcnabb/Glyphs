@@ -113,9 +113,9 @@ void Canvas::changeColorMap(int mapType)
     }
     case this->CATEGORICAL :
     {
-        if( ColourManager::InvertColourMapFlag() )
+        if( !ColourManager::InvertColourMapFlag() )
             ColourManager::InvertColourMap();
-        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[0];
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[3];
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
@@ -717,7 +717,7 @@ void Canvas::drawPolygon(TreeNode polygon)
 void Canvas::drawPolygons(QVector<TreeNode> list)
 {
     ColourManager cm(getValueLower(),getValueUpper());
-
+    changeColorMap(this->DIVERGING);
     if(getAreaOpacity() > 0.0f)
     {
         for( int i = 0; i < list.size(); ++i )
@@ -762,11 +762,12 @@ void Canvas::drawPolygons(QVector<TreeNode> list)
     for ( int i = 0; i < list.size(); ++i )
     {
         TreeNode polygon = list.at( i );
-        glLineWidth( 2 );
+        glLineWidth( 1 );
         glBegin( GL_LINE_STRIP );
 
         Colour c = cm.getClassColour(polygon.getValues().at(VALUE_INDEX).toFloat());
-        glColor4f( c.darker().getR(), c.darker().getG(), c.darker().getB(), 0.8 );
+//        glColor4f( c.darker().darker().getR(), c.darker().darker().getG(), c.darker().darker().getB(), 0.8 );
+        glColor4f(0.0f,0.0f,0.0f,1.0f);
         //        glColor4f( 0, 0, 0, 0.5 );
 
         for( QVector<QPointF>::const_iterator it =

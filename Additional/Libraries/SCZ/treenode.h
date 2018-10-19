@@ -50,9 +50,6 @@ public:
     TreeNode* getRightChild() const;
     void setRightChild( TreeNode* value );
 
-    QVector<TreeNode*>* getNeighbours() const;
-    void setNeighbours( QVector<TreeNode*>* value );
-
     AABB getBoundingBox() const;
     void setBoundingBox( AABB boundingBox );
 
@@ -99,7 +96,7 @@ private:
     AABB m_boundingBox;
 
 
-    QVector<TreeNode*>* neighbours = nullptr;
+//    QVector<TreeNode*>* neighbours = nullptr;
 
 
     float maxX = 0, maxY = 0, minX = 0, minY = 0;

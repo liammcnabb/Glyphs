@@ -23,6 +23,7 @@
 class TreeBuilder : public Segment
 {
 public:
+    static const bool DEBUG_CLASS = false;
     static const int DEFAULT_INDEX = -1;
 
     static const int RECIPE_NONE = 0;
