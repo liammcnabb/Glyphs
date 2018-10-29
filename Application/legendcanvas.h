@@ -71,7 +71,12 @@ public:
     QVector<bool> valueFilters() const;
     void setValueFilters(const QVector<bool> &valueFilters);
 
+    int colorMap() const;
+    void setColorMap(int colorMap);
+
 private:
+
+
     void initializeVariablePie(QVector<float> averages);
     void initializeBarChart(QVector<float> averages);
     void paintVariablePie();
@@ -85,6 +90,8 @@ private:
     QStringList m_valueHeaders;
     QVector<float> m_means, m_maxes, m_mins;
     QVector<bool> m_valueFilters;
+
+    int m_colorMap = 0;
 
     void glPrintString(float x, float y, std::string str);
     void glPrintString(void *font, const char *str, float x, float y);

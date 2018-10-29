@@ -22,6 +22,9 @@ void LegendCanvas::initializeGL()
                  231.0f/255.0f,1);
     glOrtho(0,100,0,100,1,-1);
 
+    changeColorMap( this->DIVERGING );
+    ColourManager::InvertColourMap();
+
 
 }
 
@@ -125,7 +128,7 @@ void LegendCanvas::changeColorMap(int mapType)
     {
         if( !ColourManager::InvertColourMapFlag() )
             ColourManager::InvertColourMap();
-        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[3];
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[colorMap()];
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
@@ -227,6 +230,16 @@ void LegendCanvas::paintVariablePie()
     glPrintString(46,1,"Outline Thickness presents: Represented Areas");
 
     return;
+}
+
+int LegendCanvas::colorMap() const
+{
+    return m_colorMap;
+}
+
+void LegendCanvas::setColorMap(int colorMap)
+{
+    m_colorMap = colorMap;
 }
 
 QVector<bool> LegendCanvas::valueFilters() const

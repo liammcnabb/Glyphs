@@ -83,3 +83,6 @@ FORMS    += maininterfacewindow.ui
 LIBS += -lgdal -lGL -lGLU -lglut
 
 INCLUDEPATH += ../Additional/Libraries/
+
+RESOURCES += \
+    buttons.qrc

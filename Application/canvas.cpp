@@ -22,9 +22,8 @@ void Canvas::initializeGL()
     //                  1.0 );
     glClearColor(1,1,1,1);
 
-    changeColorMap( this->DIVERGING );
     ColourManager::InvertColourMap();
-
+    changeColorMap( this->DIVERGING );
     QWidget::setMouseTracking(true);
 
 
@@ -104,8 +103,8 @@ void Canvas::changeColorMap(int mapType)
     }
     case this->DIVERGING :
     {
-        if( !ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
+//        if( !ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
         ColourMap cMap = CMList::getMapList(CMClassification::DIVERGING)[COLORMAP_INDEX];
         ColourManager::setCurrentColourMap(cMap);
 
@@ -113,16 +112,16 @@ void Canvas::changeColorMap(int mapType)
     }
     case this->CATEGORICAL :
     {
-        if( !ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
-        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[3];
+//        if( !ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
+        ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[getColorMap()];
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
     case this->OUTLINE :
     {
-        if( ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
+//        if( ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
         ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[1];
         ColourManager::setCurrentColourMap(cMap);
         break;
@@ -400,6 +399,26 @@ void Canvas::setValueFilters(const QVector<bool> &valueFilters)
     m_valueFilters = valueFilters;
 }
 
+int Canvas::getColorMap() const
+{
+    return m_colorMap;
+}
+
+void Canvas::setColorMap(int colorMap)
+{
+    m_colorMap = colorMap;
+}
+
+bool Canvas::getIndicatorMatches() const
+{
+    return m_indicatorMatches;
+}
+
+void Canvas::setIndicatorMatches(bool indicatorMatches)
+{
+    m_indicatorMatches = indicatorMatches;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -413,12 +432,37 @@ void Canvas::redraw()
     prepareDraw();
     calculateValueBounds( getGroomedPolygons() );
     drawPolygons( loadedPolygons() );
+
     if(getTransitionNeutral().isEmpty())
-        drawPolygons( getGroomedPolygons() );
+    {
+        float min = std::numeric_limits<float>::max();
+        float max = -std::numeric_limits<float>::max();
+
+        for( int i=0; i<getGroomedPolygons().size(); ++i )
+        {
+            min = std::min((float)getGroomedPolygons().at(i).getArea(), min);
+            max = std::max((float)getGroomedPolygons().at(i).getArea(), max);
+        }
+        setValueLower(min);
+        setValueUpper(max);
+        drawPolygons( &m_groomedPolygons );
+    }
     else
     {
-        drawPolygons( getTransitionNeutral() );
-        drawPolygons( getTransitionAdd() );
+        QVector<TreeNode> temp = getTransitionNeutral() + getTransitionAdd();
+        float min = std::numeric_limits<float>::max();
+        float max = -std::numeric_limits<float>::max();
+
+        for( int i=0; i<temp.size(); ++i )
+        {
+            min = std::min((float)temp.at(i).getArea(), min);
+            max = std::max((float)temp.at(i).getArea(), max);
+        }
+        setValueLower(min);
+        setValueUpper(max);
+
+        drawPolygons( &m_transitionNeutral );
+        drawPolygons( &m_transitionAdd );
     }
     
     glLineWidth( 1 );
@@ -714,17 +758,18 @@ void Canvas::drawPolygon(TreeNode polygon)
     glEnd();
 }
 
-void Canvas::drawPolygons(QVector<TreeNode> list)
+void Canvas::drawPolygons(QVector<TreeNode>
+                          *list)
 {
     ColourManager cm(getValueLower(),getValueUpper());
     changeColorMap(this->DIVERGING);
     if(getAreaOpacity() > 0.0f)
     {
-        for( int i = 0; i < list.size(); ++i )
+        for( int i = 0; i < list->size(); ++i )
         {
-            TreeNode polygon = list.at( i );
+            TreeNode polygon = list->at( i );
             QVector<QPointF> points = polygon.fullBoundary();
-            Colour c = cm.getClassColour(polygon.getValues().at(VALUE_INDEX).toFloat());
+            Colour c = cm.getClassColour(polygon.getArea());
             glColor4f( c.getR(), c.getG(), c.getB(), getAreaOpacity() );
 
             glEnable( GL_STENCIL_TEST );
@@ -759,15 +804,19 @@ void Canvas::drawPolygons(QVector<TreeNode> list)
     }
 
 
-    for ( int i = 0; i < list.size(); ++i )
+    for ( int i = 0; i < list->size(); ++i )
     {
-        TreeNode polygon = list.at( i );
-        glLineWidth( 1 );
+        TreeNode polygon = list->at( i );
+        glLineWidth( 1.5 );
         glBegin( GL_LINE_STRIP );
 
-        Colour c = cm.getClassColour(polygon.getValues().at(VALUE_INDEX).toFloat());
-//        glColor4f( c.darker().darker().getR(), c.darker().darker().getG(), c.darker().darker().getB(), 0.8 );
-        glColor4f(0.0f,0.0f,0.0f,1.0f);
+        Colour c = cm.getClassColour(polygon.getArea());
+        (*list)[i].setR(c.darker().getR());
+        (*list)[i].setG(c.darker().getG());
+        (*list)[i].setB(c.darker().getB());
+//                       qDebug() << "Polygon:" << polygon.getArea() <<  getValueLower() << getValueUpper() << c.darker().darker().getR() << c.darker().darker().getG() << c.darker().darker().getB();
+        glColor4f( c.darker().darker().getR(), c.darker().darker().getG(), c.darker().darker().getB(), 0.8 );
+//        glColor4f(0.0f,0.0f,0.0f,1.0f);
         //        glColor4f( 0, 0, 0, 0.5 );
 
         for( QVector<QPointF>::const_iterator it =
@@ -799,7 +848,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
                                            int state )
 {
     QVector<PieChart> pies;
-
+    ColourManager cm(getValueLower(),getValueUpper());
 
     foreach( TreeNode p, list)
     {
@@ -817,6 +866,15 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
             PieChart pie( *p.centroid(), p.getLevel()*(getLength()*0.001), state, p.getParentCentroid()  );
             pie.setSliceType(PieChart::FULL_SLICES);
 
+//            if(getIndicatorMatches())
+//            {
+
+//                Colour c = cm.getClassColour(p.getArea());
+//                qDebug() << "Glyph:" << p.getArea() << getValueLower() << getValueUpper() << c.darker().darker().getR() << c.darker().darker().getG() << c.darker().darker().getB();
+                pie.setR(p.getR());
+                pie.setG(p.getG());
+                pie.setB(p.getB());
+//            }
             pie.initialize(usedValues);
             pies.append(pie);
         }
@@ -837,6 +895,9 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
             StarGlyph star( *p.centroid(), p.getLevel()*(getLength()*0.001), state, p.getParentCentroid()  );
+            star.setR(p.getR());
+            star.setG(p.getG());
+            star.setB(p.getB());
             star.initialize(values);
             stars.append(star);
         }
@@ -856,6 +917,9 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
             WheelGlyph w( *p.centroid(), p.getLevel()*(getLength()*0.001), state, p.getParentCentroid() );
+            w.setR(p.getR());
+            w.setG(p.getG());
+            w.setB(p.getB());
             w.initialize(values);
             wheels.append(w);
         }
@@ -875,6 +939,9 @@ QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
             for( int i = 0; i < 4; ++i )
                 values.removeFirst();
             BarChart bar( *p.centroid(), p.getLevel(), state, p.getParentCentroid()  );
+            bar.setR(p.getR());
+            bar.setG(p.getG());
+            bar.setB(p.getB());
             bar.initialize(values);
             bars.append(bar);
         }
@@ -965,21 +1032,28 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
 
 
         /** Outline (Standard) */
-        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
-                getHiddenIndicator() == HIDDEN_SIZE ||
-                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-        {
             if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-                indicateOutline = (float(s.size()) * indicateValue)*1.75;
+                indicateOutline = (float(s.size()) * indicateValue)*1.75f;
+            else if (getHiddenIndicator() == HIDDEN_RINGS )
+                indicateOutline = (float(s.size()) * indicateValue)*2.0f;
             else
                 indicateOutline = float(s.size()) * indicateValue;
 
 
-            qDebug() << indicateOutline;
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
+//            qDebug() << indicateOutline;
+            if(!getIndicatorMatches())
+                glColor4f(outline_r, outline_g, outline_b, currentOpacity);
+            else
+                glColor4f(s.r(),s.g(), s.b(),currentOpacity);
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
-
+            if(getHiddenIndicator() == HIDDEN_RINGS)
+            {
+                if(!getIndicatorMatches())
+                    glColor4f(outline_r, outline_g, outline_b, 0.0f);
+                else
+                    glColor4f(s.r(),s.g(),s.b(),0.0f);
+            }
             for( float j = 0; j < s.points().size(); ++j )
             {
                 value = (s.points().at(j) - getMins().at(j)) /
@@ -1003,35 +1077,6 @@ void Canvas::drawStarGlyphs( QVector<StarGlyph> list, ColourManager cm)
             glVertex2f( x, y );
 
             glEnd();
-        }
-        else /** Halos */
-        {
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
-            glLineWidth(2);
-            int rings = floor(s.size() / ((s.SIZE_MODIFIER) * 4) );
-            for( int k = 1; k <= rings; ++k )
-            {
-                glBegin( GL_TRIANGLE_FAN );
-                glVertex2f( currentCentroid.x(), currentCentroid.y() );
-                for( float j = 0; j < s.points().size(); ++j )
-                {
-                    nook = cm.getClassColourIndex(s.points().at(j))/2;
-                    x = currentCentroid.x() + sin( valueRotation * j ) *
-                            ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                    y = currentCentroid.y() + cos( valueRotation * j ) *
-                            ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                    glVertex2f( x, y );
-                }
-                nook = cm.getClassColourIndex(s.points().at(0))/2;
-                x = currentCentroid.x() + sin( 0 ) *
-                        ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                y = currentCentroid.y() + cos( 0 ) *
-                        ( size  * (1+k*s.SIZE_MODIFIER*rings) * ( nookSegment * ( 1+nook ) ) );
-                glVertex2f( x, y );
-                glEnd();
-            }
-            glLineWidth(1);
-        }
 
         indicateOutline = 0;
         if( getHiddenIndicator() == HIDDEN_SIZE ||
@@ -1229,20 +1274,33 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
         currentAngle = 0;
         //Outlines
         /** Outline (Standard) */
-        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
-                getHiddenIndicator() == HIDDEN_SIZE ||
-                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-        {
+//        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
+//                getHiddenIndicator() == HIDDEN_SIZE ||
+//                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+//        {
             if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
                 indicateOutline = (s.size() * indicateValue ) * 1.75f;
+            else if (getHiddenIndicator() == HIDDEN_RINGS )
+                indicateOutline = (s.size() * indicateValue * 2.0f);
             else
                 indicateOutline = s.size() * indicateValue;
 
-            glColor4f(0.105882353, 0.105882353, 0.105882353, currentOpacity);
+            if(!getIndicatorMatches())
+                glColor4f(outline_r, outline_g, outline_b, currentOpacity);
+            else
+                glColor4f(s.r(),s.g(), s.b(),currentOpacity);
+            glBegin( GL_TRIANGLE_FAN );
+            glVertex2f( currentCentroid.x(), currentCentroid.y() );
+            if(getHiddenIndicator() == HIDDEN_RINGS)
+            {
+                if(!getIndicatorMatches())
+                    glColor4f(outline_r, outline_g, outline_b, 0.0f);
+                else
+                    glColor4f(s.r(),s.g(),s.b(),0.0f);
+            }
+
             for ( int i = 0; i < s.getRads().size(); ++i )
             {
-                glBegin( GL_TRIANGLE_FAN );
-                glVertex2f( currentCentroid.x(), currentCentroid.y() );
                 value = ( s.getRads().at(i) - getMins().at(i) ) /
                         ( getMaxes().at(i) - getMins().at(i) ) ;
                 for( float angle = currentAngle;
@@ -1254,10 +1312,19 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
                             (max  * value * size + indicateOutline) ;
                     glVertex2f( x, y );
                 }
-                glEnd( );
+
                 currentAngle += valueRotation;
             }
-        }
+            value = ( s.getRads().at(0) - getMins().at(0) ) /
+                    ( getMaxes().at(0) - getMins().at(0) ) ;
+            x = currentCentroid.x() + sin( 0 ) *
+                    (max  * value * size + indicateOutline) ;
+            y = currentCentroid.y() + cos( 0 ) *
+                    (max  * value * size + indicateOutline) ;
+            glVertex2f( x, y );
+
+            glEnd( );
+//        }
 
         currentAngle = 0;
 //        indicateOutline = 0;
@@ -1296,20 +1363,26 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
         for ( int i = 0; i < s.getRads().size(); ++i )
         {
 
-            glColor4f( 0, 0, 0, currentOpacity);
-            glBegin( GL_LINE_LOOP );
+            glColor4f(0.85f, 0.85f, 0.85f, currentOpacity);
+            glBegin( GL_LINES );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
             value = ( s.getRads().at(i) - getMins().at(i) ) /
                     ( getMaxes().at(i) - getMins().at(i) ) ;
-            for( float angle = currentAngle;
-                 angle < currentAngle + valueRotation; angle += 0.01f)
-            {
-                x = currentCentroid.x() + sin( angle ) *
-                        (max  * value * size + indicateOutline) ;
-                y = currentCentroid.y() + cos( angle ) *
-                        (max  * value * size + indicateOutline) ;
-                glVertex2f( x, y );
-            }
+
+            x = currentCentroid.x() + sin( currentAngle ) *
+                    (max  * value * size + indicateSize) ;
+            y = currentCentroid.y() + cos( currentAngle ) *
+                    (max  * value * size + indicateSize) ;
+            glVertex2f( x, y );
+//            for( float angle = currentAngle;
+//                 angle < currentAngle + valueRotation; angle += 0.01f)
+//            {
+//                x = currentCentroid.x() + sin( angle ) *
+//                        (max  * value * size + indicateOutline) ;
+//                y = currentCentroid.y() + cos( angle ) *
+//                        (max  * value * size + indicateOutline) ;
+//                glVertex2f( x, y );
+//            }
             glEnd( );
             currentAngle += valueRotation;
         }
@@ -1373,19 +1446,32 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         }
 
         //        Colour c = outline.getInterpolatedColour(j);
-        if(getHiddenIndicator() == HIDDEN_OUTLINE ||
-                getHiddenIndicator() == HIDDEN_SIZE ||
-                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-        {
+//        if(getHiddenIndicator() == HIDDEN_OUTLINE ||
+//                getHiddenIndicator() == HIDDEN_SIZE ||
+//                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+//        {
             /* Outline (STANDARD) */
             if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-                indicateOutline = (p.size() * indicateValue * 1.75);
+                indicateOutline = (p.size() * indicateValue * 1.75f);
+            else if (getHiddenIndicator() == HIDDEN_RINGS )
+                indicateOutline = (p.size() * indicateValue * 2.5f);
             else
                 indicateOutline = p.size() * indicateValue;
 
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
+            if(!getIndicatorMatches())
+                glColor4f(outline_r, outline_g, outline_b, currentOpacity);
+            else
+                glColor4f(p.r(),p.g(),p.b(),currentOpacity);
+
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
+            if(getHiddenIndicator() == HIDDEN_RINGS)
+            {
+                if(!getIndicatorMatches())
+                    glColor4f(outline_r, outline_g, outline_b, 0.0f);
+                else
+                    glColor4f(p.r(),p.g(),p.b(),0.0f);
+            }
 
             for ( float angle = 0; angle <= (2*M_PI); angle += 0.01 )
             {
@@ -1405,13 +1491,40 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
 
             glVertex2f( x, y );
             glEnd();
-        }
+
+            if(getIndicatorMatches())
+            {
+                glColor4f(outline_r, outline_g, outline_b, currentOpacity);
+                glBegin( GL_TRIANGLE_FAN );
+                glVertex2f( currentCentroid.x(), currentCentroid.y() );
+
+                for ( float angle = 0; angle <= (2*M_PI); angle += 0.01 )
+                {
+                    float x = currentCentroid.x() + sin( angle ) *
+                            ( size * rad );
+
+                    float y = currentCentroid.y() + cos( angle ) *
+                            ( size * rad ) ;
+
+                    glVertex2f( x, y );
+                }
+                float x = currentCentroid.x() + sin( 0 ) *
+                        ( size * rad ) ;
+
+                float y = currentCentroid.y() + cos( 0 ) *
+                        ( size * rad ) ;
+
+                glVertex2f( x, y );
+                glEnd();
+            }
+//        }
 //        else
 //        {
+////            indicateOutline =
 //            /* Outline (STEPS) */
-//            glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.2 );
+//            glColor4f( outline_r, outline_g, outline_b, 0.2 );
 //            glLineWidth(3);
-//            int rings = floor(p.size() / ((p.SIZE_MODIFIER)* 4) );
+//            int rings = p.size() * indicateValue * 10;
 //            for ( int i = 1; i <= rings; ++i )
 //            {
 //                glBegin(GL_TRIANGLE_FAN);
@@ -1480,8 +1593,8 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
             glBegin( GL_TRIANGLE_FAN );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
 
-            for( float angle = currentAngle; angle <
-                 currentAngle+ps.angle(); angle+=0.01 )
+            for( float angle = currentAngle; angle <=
+                 currentAngle+ps.angle(); angle+=0.001 )
             {
                 float x = currentCentroid.x() + sin( angle ) *
                         ( size * rad  + indicateSize );
@@ -1498,22 +1611,35 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
         for( int i = 0; i < p.pieSlices().size(); ++i )
         {
             PieSegment ps = p.pieSlices().at(i);
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity );
+            glColor4f(0.95f, 0.95f, 0.95f, currentOpacity);
             glLineWidth(1);
-            glBegin( GL_LINE_STRIP );
+//            glBegin( GL_LINE_STRIP );
+            glBegin( GL_LINES );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
+            float x = currentCentroid.x() + sin( currentAngle ) *
+                    ( size * rad + indicateSize );
 
-            for( float angle = currentAngle; angle <
-                 currentAngle + ps.angle(); angle += 0.01 )
-            {
-                float x = currentCentroid.x() + sin( angle ) *
-                        ( size * rad + indicateOutline );
-
-                float y = currentCentroid.y() + cos( angle ) *
-                        ( size * rad + indicateOutline );
-                glVertex3f( x, y, 0.5 );
-            }
+            float y = currentCentroid.y() + cos( currentAngle ) *
+                    ( size * rad + indicateSize );
             glVertex2f( currentCentroid.x(), currentCentroid.y() );
+            x = currentCentroid.x() + sin( currentAngle + ps.angle()) *
+                    ( size * rad + indicateSize );
+
+            y = currentCentroid.y() + cos( currentAngle + ps.angle()) *
+                    ( size * rad + indicateSize );
+
+
+//            for( float angle = currentAngle; angle <
+//                 currentAngle + ps.angle(); angle += 0.01 )
+//            {
+//                float x = currentCentroid.x() + sin( angle ) *
+//                        ( size * rad + indicateSize );
+
+//                float y = currentCentroid.y() + cos( angle ) *
+//                        ( size * rad + indicateSize );
+//                glVertex3f( x, y, 0.5 );
+//            }
+//            glVertex2f( currentCentroid.x(), currentCentroid.y() );
             glEnd();
             currentAngle += ps.angle();
         }
@@ -1586,18 +1712,24 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
         }
 
         //Outlines
-        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
-                getHiddenIndicator() == HIDDEN_SIZE ||
-                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-        {
+//        if( getHiddenIndicator() == HIDDEN_OUTLINE ||
+//                getHiddenIndicator() == HIDDEN_SIZE ||
+//                getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
+//        {
             if( getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
-                indicateOutline = (b.size() * indicateValue)*1.75;
+                indicateOutline = (b.size() * indicateValue);
+            else if ( getHiddenIndicator() == HIDDEN_RINGS )
+                indicateOutline = (b.size() * indicateValue)*1;
             else
-                indicateOutline = b.size() * indicateValue;
+                indicateOutline = b.size() * indicateValue / 2;
 
-            barWidth = (max * 1.5 + ( indicateOutline ) ) / bars;
+            if(!getIndicatorMatches())
+                glColor4f(outline_r, outline_g, outline_b, currentOpacity);
+            else
+                glColor4f(b.r(),b.g(),b.b(),currentOpacity);
+
+            barWidth = (max * 1.5 + ( indicateOutline*0.5 ) ) / bars;
 //            barWidth = (max / bars) * (size * 0.4);
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
             for( int j = 0; j < bars; ++j )
             {
                 value = ( ( b.values().at( j ) - getMins().at(j) ) /
@@ -1617,24 +1749,54 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
 
 //                color = cm.getColourFromIndex(j);
 //                glColor4f(color.getR(), color.getG(), color.getB(),currentOpacity);
-                glBegin( GL_QUADS );
+
+                if(getHiddenIndicator() != HIDDEN_RINGS)
+                {
+                    glBegin( GL_QUADS );
+                    glVertex2f(minX, minY);
+                    glVertex2f(minX, minY+height);
+                    glVertex2f(minX+width, minY+height);
+                    glVertex2f(minX+width,minY);
+                    glVertex2f(minX, minY);
+                    glEnd();
+                }
+            }
+            if(getHiddenIndicator() == HIDDEN_RINGS)
+            {
+                value = 1;
+
+                width = barWidth * size * bars;
+
+                minX = (currentCentroid.x() - ((barWidth * bars)/2)* size);
+                minY = currentCentroid.y() -  ( max * size /2) - (indicateOutline/2);
+                height = value  * ( max * size * 2 ) + (indicateOutline);
+
+
+                glBegin(GL_TRIANGLE_FAN);
+                glVertex2f(currentCentroid.x(), currentCentroid.y() -  ( max * size /2));
+                if(getHiddenIndicator() == HIDDEN_RINGS)
+                {
+                    if(!getIndicatorMatches())
+                        glColor4f(outline_r, outline_g, outline_b, 0.0f);
+                    else
+                        glColor4f(b.r(),b.g(),b.b(),0.0f);
+                }
                 glVertex2f(minX, minY);
                 glVertex2f(minX, minY+height);
                 glVertex2f(minX+width, minY+height);
                 glVertex2f(minX+width,minY);
                 glVertex2f(minX, minY);
-                glEnd();
-
             }
-        }
+
+//        }
 
         barWidth =  (max*1.5) / bars;
         if( getHiddenIndicator() == HIDDEN_SIZE ||
                 getHiddenIndicator() == HIDDEN_SIZEOUTLINE )
         {
-            indicateSize = b.size() * indicateValue;
+            indicateSize = b.size() * indicateValue / 2;
 //            indicateOutline = 1+b.size() * (getLength()*0.01);
-            barWidth = (max*1.5 + (indicateSize)) / bars;
+            barWidth = (max*1.5 + (indicateSize * 0.5)) / bars;
         }
 
         //Fill
@@ -1665,7 +1827,7 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
             glVertex2f(minX, minY);
             glEnd();
 
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
+            glColor4f(outline_r, outline_g, outline_b, currentOpacity);
             glBegin( GL_LINE_STRIP );
             glVertex2f(minX, minY);
             glVertex2f(minX, minY+height);
@@ -1678,7 +1840,7 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
         if(getExtents())
         {
             // Extents
-            glColor4f( 0.105882353, 0.105882353, 0.105882353, currentOpacity);
+            glColor4f(outline_r, outline_g, outline_b, currentOpacity);
             minX = (currentCentroid.x() - ((barWidth * bars)/2)* size) ;
             minY = currentCentroid.y() -  ( max * size /2) ;
             float maxX = minX + (barWidth*(bars))* size;

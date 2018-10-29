@@ -25,11 +25,21 @@ public:
     QPointF parent() const;
     void setParent(const QPointF &parent);
 
+    float r() const;
+    void setR(float r);
+
+    float g() const;
+    void setG(float g);
+
+    float b() const;
+    void setB(float b);
+
 private:
     QPointF m_centroid;
     QPointF m_parent;
     float m_size = 0.0f;
     int m_state;
+    float m_r, m_g, m_b;
 
 };
 

@@ -83,6 +83,15 @@ public:
     QPointF getParentCentroid() const;
     void setParentCentroid(const QPointF &parentCentroid);
 
+    float getR() const;
+    void setR(float r);
+
+    float getG() const;
+    void setG(float g);
+
+    float getB() const;
+    void setB(float b);
+
 private:
     void calculateArea();
 
@@ -94,6 +103,7 @@ private:
     QPointF* m_centroid = nullptr;
     QPointF m_parentCentroid;
     AABB m_boundingBox;
+    float m_r, m_g, m_b;
 
 
 //    QVector<TreeNode*>* neighbours = nullptr;

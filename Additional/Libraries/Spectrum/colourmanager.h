@@ -260,9 +260,19 @@ public:
     }
 
     inline Colour darker(){
-        return Colour(this->getR() - 0.07f,
-                      this->getG() - 0.07f,
-                      this->getB() - 0.07f,
+        float r = this->getR() - 0.2f,
+              g = this->getG() - 0.2f,
+              b = this->getB() - 0.2f;
+        if (r < 0.0f)
+            r = 0.0f;
+        if (g < 0.0f)
+            g = 0.0f;
+        if (b < 0.0f)
+            b = 0.0f;
+
+        return Colour(r,
+                      g,
+                      b,
                       this->getAlpha(),
                       this->getNameID()+":darker");
     }
@@ -595,6 +605,59 @@ public:
         colorgorical20.addColour(Colour("#E6CDCA"));
         colorgorical20.addColour(Colour("#B75D29"));
         ColourMapList().addColourMap(colorgorical20);
+
+        ColourMap colorgorical11;
+        colorgorical11.setMapName("colorgorical11");
+        colorgorical11.setClassification(QUALITATIVE);
+        colorgorical11.addColour(48,106,60,1.0f);
+        colorgorical11.addColour(173,230,79,1.0f);
+        colorgorical11.addColour(255,146,72,1.0f);
+        colorgorical11.addColour(229,173,130,1.0f);
+        colorgorical11.addColour(159,33,8,1.0f);
+        colorgorical11.addColour(247,96,21,1.0f);
+        colorgorical11.addColour(42,243,133,1.0f);
+        colorgorical11.addColour(142,0,73,1.0f);
+        colorgorical11.addColour(241,119,151,1.0f);
+        colorgorical11.addColour(255,0,135,1.0f);
+        colorgorical11.addColour(233,215,55,1.0f);
+        ColourMapList().addColourMap(colorgorical11);
+
+        ColourMap colorgorical9;
+        //["#f4aa42", "#1d686e", "#4cada6", "#92e986", "#238910", "#788c3b", "#e2d1cb", "#832522", "#ee6270"]
+        colorgorical9.setMapName("colorgorical9");
+        colorgorical9.setClassification(QUALITATIVE);
+        colorgorical9.addColour(Colour("#f4aa42"));
+        colorgorical9.addColour(Colour("#1d686e"));
+        colorgorical9.addColour(Colour("#4cada6"));
+        colorgorical9.addColour(Colour("#92e986"));
+        colorgorical9.addColour(Colour("#238910"));
+        colorgorical9.addColour(Colour("#788c3b"));
+        colorgorical9.addColour(Colour("#e2d1cb"));
+        colorgorical9.addColour(Colour("#832522"));
+        colorgorical9.addColour(Colour("#ee6270"));
+        ColourMapList().addColourMap(colorgorical9);
+
+        ColourMap colorgorical4;
+// ["#cee867", "#4c852e", "#46bdb3", "#247672"]
+        colorgorical4.setMapName("colorgorical4");
+        colorgorical4.setClassification(QUALITATIVE);
+        colorgorical4.addColour(Colour("#cee867"));
+        colorgorical4.addColour(Colour("#4c852e"));
+        colorgorical4.addColour(Colour("#46bdb3"));
+        colorgorical4.addColour(Colour("#247672"));
+        ColourMapList().addColourMap(colorgorical4);
+
+        ColourMap colorgorical6;
+// ["#aee39a", "#1d7583", "#aaa4e1", "#41369e", "#73c3e6", "#b14274"]
+        colorgorical6.setMapName("colorgorical4");
+        colorgorical6.setClassification(QUALITATIVE);
+        colorgorical6.addColour(Colour("#aee39a"));
+        colorgorical6.addColour(Colour("#1d7583"));
+        colorgorical6.addColour(Colour("#aaa4e1"));
+        colorgorical6.addColour(Colour("#41369e"));
+        colorgorical6.addColour(Colour("#73c3e6"));
+        colorgorical6.addColour(Colour("#b14274"));
+        ColourMapList().addColourMap(colorgorical6);
 
         //Add indexes to the colour maps
         ColourMapList().setupIndexesInList();

@@ -113,6 +113,22 @@ private slots:
     void on_rdoCalcOverall_released();
 
     void on_lstHeaders_clicked(const QModelIndex &index);
+    void on_toolButton_released();
+
+    void on_toolButton_2_released();
+
+    void on_toolButton_3_released();
+
+    void on_toolButton_4_released();
+
+    void on_toolButton_5_released();
+
+    void on_chkMatchingLines_toggled(bool checked);
+
+    void on_pushButton_6_released();
+
+    void on_pushButton_7_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

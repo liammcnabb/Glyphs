@@ -47,3 +47,33 @@ void Glyph::setParent(const QPointF &parent)
 {
     m_parent = parent;
 }
+
+float Glyph::r() const
+{
+    return m_r;
+}
+
+void Glyph::setR(float r)
+{
+    m_r = r;
+}
+
+float Glyph::g() const
+{
+    return m_g;
+}
+
+void Glyph::setG(float g)
+{
+    m_g = g;
+}
+
+float Glyph::b() const
+{
+    return m_b;
+}
+
+void Glyph::setB(float b)
+{
+    m_b = b;
+}

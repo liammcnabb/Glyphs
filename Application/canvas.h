@@ -155,7 +155,16 @@ public:
     QVector<bool> getValueFilters() const;
     void setValueFilters(const QVector<bool> &valueFilters);
 
+    int getColorMap() const;
+    void setColorMap(int colorMap);
+
+    bool getIndicatorMatches() const;
+    void setIndicatorMatches(bool indicatorMatches);
+
 private:
+    float outline_r = 0.388235294f;
+    float outline_g = 0.388235294f;
+    float outline_b = 0.388235294f;
     bool m_debugMousePointer = false;
     bool m_transitionState = false;
     bool m_colorStarLines = false;
@@ -186,7 +195,9 @@ private:
     float m_zoom = 0.0f;
 
     int m_hiddenIndicator = 0;
+    bool m_indicatorMatches = false;
 
+    int m_colorMap = 0;
 
     QVector<float> m_means, m_maxes, m_mins;
 
@@ -202,7 +213,7 @@ private:
 
     void redraw();
     void drawPolygons(QVector<Polygon> list);
-    void drawPolygons(QVector<TreeNode> polyList);
+    void drawPolygons(QVector<TreeNode> *polyList);
     void drawCentroids(QVector<TreeNode> list, ColourManager cm);
     bool debugCircle(double centerX, double centerY, Colour color, double size);
     float scaleModifier();

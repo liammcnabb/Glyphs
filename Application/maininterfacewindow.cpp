@@ -598,3 +598,67 @@ void MainInterfaceWindow::on_lstHeaders_clicked(const QModelIndex &index)
     ui->GlLegend->update();
 //    qDebug() << index.column() << index.row() << index.data(Qt::CheckStateRole).toBool();
 }
+
+void MainInterfaceWindow::on_chkMatchingLines_toggled(bool checked)
+{
+    ui->OpenGLWidget->setIndicatorMatches(checked);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_toolButton_released()
+{
+    ui->OpenGLWidget->setColorMap(0);
+    ui->GlLegend->setColorMap(0);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+void MainInterfaceWindow::on_toolButton_2_released()
+{
+    ui->OpenGLWidget->setColorMap(1);
+    ui->GlLegend->setColorMap(1);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+void MainInterfaceWindow::on_toolButton_3_released()
+{
+    ui->OpenGLWidget->setColorMap(3);
+    ui->GlLegend->setColorMap(3);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+void MainInterfaceWindow::on_toolButton_4_released()
+{
+    ui->OpenGLWidget->setColorMap(2);
+    ui->GlLegend->setColorMap(2);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+void MainInterfaceWindow::on_toolButton_5_released()
+{
+    ui->OpenGLWidget->setColorMap(5);
+    ui->GlLegend->setColorMap(5);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+
+
+void MainInterfaceWindow::on_pushButton_6_released()
+{
+    ui->OpenGLWidget->setColorMap(6);
+    ui->GlLegend->setColorMap(6);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
+
+void MainInterfaceWindow::on_pushButton_7_released()
+{
+    ui->OpenGLWidget->setColorMap(7);
+    ui->GlLegend->setColorMap(7);
+    ui->OpenGLWidget->update();
+    ui->GlLegend->update();
+}
