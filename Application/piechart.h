@@ -20,9 +20,13 @@ public:
     float value() const;
     void setValue(float value);
 
+    int getIndex() const;
+    void setIndex(int value);
+
 private:
     float m_angle = 1.0f;
     float m_value = 0.0f;
+    int index = 0;
 };
 
 class PieChart : public Glyph
@@ -47,6 +51,7 @@ public:
     int getSliceType() const;
     void setSliceType(int value);
 
+    void initialize(QStringList values, QVector<bool> filters);
 private:
 
 
@@ -58,6 +63,7 @@ private:
 
     void createEqualSlices(QStringList values);
     void createVariableSlices(QStringList values);
+    void createVariableSlices(QStringList values, QVector<bool> filters);
 };
 
 #endif // PIECHART_H

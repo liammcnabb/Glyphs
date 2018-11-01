@@ -14,7 +14,7 @@ public:
     BarChart();
     BarChart(QPointF centroid, float size, int state, QPointF parent);
     void initialize(QStringList list);
-
+    void initialize(QStringList list, QVector<bool> filter);
     QVector<float> values() const;
     void setValues(const QVector<float> &values);
 

@@ -19,6 +19,7 @@ public:
 
 
     void initialize(QStringList values);
+    void initialize(QStringList values, QVector<bool> filters);
 private:
     QVector<float> m_points;
 };

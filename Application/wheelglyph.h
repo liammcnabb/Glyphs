@@ -18,6 +18,7 @@ public:
     void setRads(const QVector<float> &value);
 
     void initialize(QStringList values, QVector<float> means);
+    void initialize(QStringList values, QVector<bool> filter);
 private:
     QVector<float> rads;
 };

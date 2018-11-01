@@ -662,3 +662,17 @@ void MainInterfaceWindow::on_pushButton_7_released()
     ui->OpenGLWidget->update();
     ui->GlLegend->update();
 }
+
+void MainInterfaceWindow::on_rdoFC1_released()
+{
+    //Do not map (Default)
+    ui->OpenGLWidget->setFocusContextType(0);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_rdoFC2_released()
+{
+    ui->OpenGLWidget->setFocusContextType(1);
+    ui->OpenGLWidget->update();
+    // GreyScale
+}

@@ -32,6 +32,11 @@ void PieChart::initialize(QStringList values)
     return;
 }
 
+void PieChart::initialize(QStringList values, QVector<bool> filters)
+{
+    createVariableSlices( values, filters );
+}
+
 void PieChart::createVariableSlices( QStringList values )
 {
     QVector<PieSegment> slices;
@@ -45,6 +50,35 @@ void PieChart::createVariableSlices( QStringList values )
         float percent = values.at(i).toFloat()/sum;
         float sliceAngle = (maxAngle())* percent;
         slices.append( PieSegment( sliceAngle, values.at(i).toFloat() ) );
+    }
+
+    setPieSlices(slices);
+    return;
+}
+
+void PieChart::createVariableSlices( QStringList values, QVector<bool> filters )
+{
+    QVector<PieSegment> slices;
+
+    float sum = 0;
+    for ( int i = 0; i < values.size(); ++i )
+        if (filters.at(i))
+            sum += values.at(i).toFloat();
+
+    for( int i = 0; i < values.size(); ++i )
+    {
+        PieSegment p;
+        p.setIndex(i);
+        float percent = 0;
+        if(filters.at(i))
+        {
+            percent = values.at(i).toFloat()/sum;
+            p.setAngle(maxAngle()* percent);
+            p.setValue(values.at(i).toFloat());
+
+        }
+
+        slices.append( p );
     }
 
     setPieSlices(slices);
@@ -121,6 +155,16 @@ float PieSegment::value() const
 void PieSegment::setValue(float value)
 {
     m_value = value;
+}
+
+int PieSegment::getIndex() const
+{
+    return index;
+}
+
+void PieSegment::setIndex(int value)
+{
+    index = value;
 }
 
 PieSegment::PieSegment()

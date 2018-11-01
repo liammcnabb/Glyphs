@@ -161,6 +161,9 @@ public:
     bool getIndicatorMatches() const;
     void setIndicatorMatches(bool indicatorMatches);
 
+    int getFocusContextType() const;
+    void setFocusContextType(int focusContextType);
+
 private:
     float outline_r = 0.388235294f;
     float outline_g = 0.388235294f;
@@ -201,8 +204,9 @@ private:
 
     QVector<float> m_means, m_maxes, m_mins;
 
-
     int m_clickedIndex = NEGATIVE_INDEX;
+
+    int m_focusContextType = 0;
 
     QStringList dataHeaders;
 

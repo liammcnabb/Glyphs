@@ -129,6 +129,10 @@ private slots:
 
     void on_pushButton_7_released();
 
+    void on_rdoFC1_released();
+
+    void on_rdoFC2_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

@@ -18,6 +18,22 @@ void BarChart::initialize(QStringList list)
     return;
 }
 
+void BarChart::initialize(QStringList list, QVector<bool> filter)
+{
+    QVector<float> floated;
+    float f;
+    for( int i = 0; i < list.size(); ++i )
+    {
+        if(filter.at(i))
+            floated.append( list.at(i).toFloat() );
+        else
+            floated.append(f);
+    }
+
+    setValues(floated);
+    return;
+}
+
 
 
 QVector<float> BarChart::values() const

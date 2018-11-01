@@ -44,6 +44,22 @@ void StarGlyph::initialize(QStringList values)
     setPoints(points);
 }
 
+void StarGlyph::initialize(QStringList values, QVector<bool> filter)
+{
+    QVector<float> points;
+    for( int i = 0; i < values.size(); ++i )
+    {
+        QVector<float> p;
+        if(filter.at(i))
+            points.append(values.at(i).toFloat());
+        else
+            points.append(p);
+    }
+
+
+    setPoints(points);
+}
+
 QVector<float> StarGlyph::points() const
 {
     return m_points;

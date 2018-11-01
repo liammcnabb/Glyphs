@@ -149,13 +149,13 @@ void LegendCanvas::paintVariablePie()
     ColourManager cm(0,p.pieSlices().size());
     Colour color;
     /* Outline */
-    glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8 );
+    glColor4f( 0.388235294, 0.388235294, 0.388235294, 1 );
     glBegin( GL_TRIANGLE_FAN );
     glVertex2f( p.centroid().x(), p.centroid().y() );
     double size = 1;
     double rad = 22.5;
 
-    for ( float angle = 0; angle <= (2*M_PI)+0.1; angle += 0.01 )
+    for ( float angle = 0; angle < (2*M_PI); angle += 0.001 )
     {
         float x = p.centroid().x() + sin( angle ) *
                 ( size * ( rad * ( 1 + p.size() ) ) );
@@ -168,59 +168,62 @@ void LegendCanvas::paintVariablePie()
 
     changeColorMap(this->CATEGORICAL);
     float currentAngle = 0;
+
     for( int i = 0; i < p.pieSlices().size(); ++i )
     {
         PieSegment ps = p.pieSlices().at(i);
         if( valueFilters().at(i) )
             color = cm.getColourFromIndex(i);
         else
-            color = Colour(0.7,0.7,0.7,1);
+            color = cm.getColourFromIndex(i).greyscale();
         /* Fill */
-        glColor4f( color.getR(), color.getG(), color.getB(), 1 );
+        glColor4f( color.getR(), color.getG(), color.getB(), 1.0f );
         glBegin( GL_TRIANGLE_FAN );
-        glVertex2f( p.centroid().x(), p.centroid().y() );
-
-        for( float angle = 0; angle <
-             ps.angle(); angle+=0.01 )
-        {
-            float x = p.centroid().x() + sin( currentAngle + angle ) *
-                    ( size * ( ( rad ) ) );
-
-            float y = p.centroid().y() + cos( currentAngle + angle ) *
-                    ( size * ( ( rad ) ) );
-            glVertex3f( x, y, 0.5 );
-        }
-        glVertex2f( p.centroid().x(), p.centroid().y() );
-        glEnd();
-        currentAngle += ps.angle();
-    }
-    /* Outline */
-    currentAngle = 0;
-    for( int i = 0; i < p.pieSlices().size(); ++i )
-    {
-        PieSegment ps = p.pieSlices().at(i);
-        glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.6 );
-        glBegin( GL_LINE_STRIP );
         glVertex2f( p.centroid().x(), p.centroid().y() );
 
         for( float angle = currentAngle; angle <=
              currentAngle+ps.angle(); angle+=0.001 )
         {
             float x = p.centroid().x() + sin( angle ) *
-                    ( size * ( ( rad ) ) );
+                    ( size * rad );
 
             float y = p.centroid().y() + cos( angle ) *
-                    ( size * ( ( rad ) ) );
+                    ( size * rad );
             glVertex3f( x, y, 0.5 );
         }
         glVertex2f( p.centroid().x(), p.centroid().y() );
         glEnd();
         currentAngle += ps.angle();
-        //        qDebug() << currentAngle;
+    }
+    for( int i = 0; i < p.pieSlices().size(); ++i )
+    {
+        PieSegment ps = p.pieSlices().at(i);
+        glColor4f(0.95f, 0.95f, 0.95f, 1.0f);
+        glLineWidth(1);
+        glBegin( GL_LINES );
+        glVertex2f( p.centroid().x(), p.centroid().y() );
+        float x =  p.centroid().x() + sin( currentAngle ) *
+                ( size * rad );
+
+        float y = p.centroid().y() + cos( currentAngle ) *
+                ( size * rad );
+        glVertex2f( p.centroid().x(), p.centroid().y() );
+        x = p.centroid().x() + sin( currentAngle + ps.angle()) *
+                ( size * rad );
+
+        y = p.centroid().y() + cos( currentAngle + ps.angle()) *
+                ( size * rad );
+        glEnd();
+        currentAngle += ps.angle();
+        glColor3f(0,0,0);
+        double mult = 1.7;
+        if(i >7)
+            mult = 2;
+
         float a = p.centroid().x() + sin( currentAngle - (ps.angle()/2) ) *
                 ( size * ( ( rad ) ) * 1.6 );
         float b = p.centroid().y() + cos( currentAngle - (ps.angle()/2) ) *
-                ( size * ( ( rad ) ) * 1.7 );
+                ( size * ( ( rad ) ) * mult );
         std::string s = valueHeaders().at(i).toStdString().substr(0,9) + "...";
         glPrintString(a,b,s);
     }

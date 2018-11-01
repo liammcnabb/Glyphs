@@ -122,7 +122,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -548,6 +548,51 @@
               </property>
               <property name="text">
                <string>Overall</string>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_10">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Focus+Context Option:</string>
+             </property>
+             <widget class="QRadioButton" name="rdoFC2">
+              <property name="geometry">
+               <rect>
+                <x>180</x>
+                <y>30</y>
+                <width>111</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Greyscale</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rdoFC1">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>30</y>
+                <width>111</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Do not map</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </widget>

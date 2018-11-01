@@ -252,9 +252,19 @@ public:
     }
 
     inline Colour brighter(){
-        return Colour(this->getR() + 0.07f,
-                      this->getG() + 0.07f,
-                      this->getB() + 0.07f,
+        float r = this->getR() + 0.25f,
+              g = this->getG() + 0.25f,
+              b = this->getB() + 0.25f;
+        if (r > 1.0f)
+            r = 1.0f;
+        if (g > 1.0f)
+            g = 1.0f;
+        if (b > 1.0f)
+            b = 1.0f;
+
+        return Colour(r,
+                      g,
+                      b,
                       this->getAlpha(),
                       this->getNameID()+":brighter");
     }
@@ -275,6 +285,16 @@ public:
                       b,
                       this->getAlpha(),
                       this->getNameID()+":darker");
+    }
+
+    inline Colour greyscale(){
+        float g = ( this->getR() + this->getG() + this->getB() ) / 3;
+
+        return Colour(g,
+                      g,
+                      g,
+                      this->getAlpha(),
+                      this->getNameID()+":greyscale");
     }
 
 private:
