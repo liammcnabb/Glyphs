@@ -44,16 +44,14 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
     }
     update();
 
-
-
 }
 
 float Canvas::convertedX( float windowX )
 {
     float newX;
-    newX = (getCurrentWrapper().minimums.at(AABB::XDIM) - scaleModifier()) +
+    newX = (getCurrentWrapper().minimums.at(AABB::XDIM) ) +
             ( ( windowX / this->width() ) *
-              ( getLength() + (scaleModifier()*2) ) ) ;
+              ( getLength() ) );
     return newX;
 }
 
@@ -62,9 +60,9 @@ float Canvas::convertedY( float windowY )
     float newY,reverseY;
     reverseY = -( windowY - 1 - this->height() );
 
-    newY = (getCurrentWrapper().minimums.at(AABB::YDIM) - scaleModifier()) +
+    newY = (getCurrentWrapper().minimums.at(AABB::YDIM) ) +
             ( ( reverseY / this->height() ) *
-              ( getLength() + (scaleModifier()*2) ) );
+              ( getLength() ) ) ;
     return newY;
 }
 
@@ -427,6 +425,16 @@ int Canvas::getFocusContextType() const
 void Canvas::setFocusContextType(int focusContextType)
 {
     m_focusContextType = focusContextType;
+}
+
+float Canvas::getCurrentScale() const
+{
+    return m_currentScale;
+}
+
+void Canvas::setCurrentScale(float currentScale)
+{
+    m_currentScale = currentScale;
 }
 
 void Canvas::paintGL()
@@ -2181,17 +2189,17 @@ void Canvas::setOrtho()
     setLength( std::max( getOriginalWrapper().length( AABB::XDIM ),
                          getOriginalWrapper().length( AABB::YDIM ) ) );
 
-    double currentScale = ( getZoom() * getLength() ) / 2;
+    setCurrentScale( ( getZoom() * getLength() ) / 2);
 
-    setCurrentWrapper( AABB(getOriginalWrapper().minimums.at(AABB::XDIM) + currentScale - scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - currentScale + scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::YDIM) + currentScale - scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - currentScale + scaleModifier()));
+    setCurrentWrapper( AABB(getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier(),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier()));
 
-    glOrtho( getOriginalWrapper().minimums.at(AABB::XDIM) + currentScale - scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - currentScale + scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::YDIM) + currentScale - scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - currentScale + scaleModifier(),
+    glOrtho( getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier(),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier(),
              -1.0, 1.0 );
 
     setLength( getCurrentWrapper().length( AABB::XDIM )) ;

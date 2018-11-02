@@ -164,6 +164,9 @@ public:
     int getFocusContextType() const;
     void setFocusContextType(int focusContextType);
 
+    float getCurrentScale() const;
+    void setCurrentScale(float currentScale);
+
 private:
     float outline_r = 0.388235294f;
     float outline_g = 0.388235294f;
@@ -196,6 +199,7 @@ private:
     int transitionType = 1;
     float m_areaOpacity = 0.0f;
     float m_zoom = 0.0f;
+    float m_currentScale = 0.0f;
 
     int m_hiddenIndicator = 0;
     bool m_indicatorMatches = false;
