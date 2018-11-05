@@ -32,6 +32,17 @@ void Canvas::initializeGL()
 }
 void Canvas::mouseMoveEvent( QMouseEvent *event )
 {
+    if(event->buttons() == Qt::RightButton )
+    {
+        float newX = convertedX( float( event->x() ) );
+        float newY = convertedY( float( event->y() ) );
+
+        if(getMouse().x() != newX || getMouse().y() != newY)
+        {
+            setTranslationX(getTranslationX() + getMouse().x() - newX);
+            setTranslationY(getTranslationY() + getMouse().y() - newY);
+        }
+    }
 
     setMouse(QPointF( convertedX( float( event->x() ) ),
                       convertedY( float( event->y() ) ) ) );
@@ -437,6 +448,26 @@ void Canvas::setCurrentScale(float currentScale)
     m_currentScale = currentScale;
 }
 
+float Canvas::getTranslationX() const
+{
+    return translationX;
+}
+
+void Canvas::setTranslationX(float value)
+{
+    translationX = value;
+}
+
+float Canvas::getTranslationY() const
+{
+    return translationY;
+}
+
+void Canvas::setTranslationY(float value)
+{
+    translationY = value;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -786,38 +817,41 @@ void Canvas::drawPolygons(QVector<TreeNode>
         for( int i = 0; i < list->size(); ++i )
         {
             TreeNode polygon = list->at( i );
-            QVector<QPointF> points = polygon.fullBoundary();
-            Colour c = cm.getClassColour(polygon.getArea());
-            glColor4f( c.getR(), c.getG(), c.getB(), getAreaOpacity() );
-
-            glEnable( GL_STENCIL_TEST );
-            glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-            glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
-            glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
-            glBegin( GL_TRIANGLES );
-
-            for( int j = 1; j < points.size() - 1; ++j )
+            if(getCurrentWrapper().intersects(polygon.getBoundingBox()))
             {
-                glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
-                glVertex2f( points.at( j ).x(), points.at( j ).y() );
-                glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
-            }
-            glEnd();
+                QVector<QPointF> points = polygon.fullBoundary();
+                Colour c = cm.getClassColour(polygon.getArea());
+                glColor4f( c.getR(), c.getG(), c.getB(), getAreaOpacity() );
 
-            // fill color buffer
-            //      glColor3ub( 0, 128, 0 );
-            glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-            glStencilFunc( GL_EQUAL, 0x1, 0x1 );
-            glBegin( GL_TRIANGLES );
-            for( int j = 1; j < points.size() - 1; ++j )
-            {
-                glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
-                glVertex2f( points.at( j ).x(), points.at( j ).y() );
-                glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
-            }
-            glEnd();
+                glEnable( GL_STENCIL_TEST );
+                glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+                glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
+                glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
+                glBegin( GL_TRIANGLES );
 
-            glDisable( GL_STENCIL_TEST );
+                for( int j = 1; j < points.size() - 1; ++j )
+                {
+                    glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
+                    glVertex2f( points.at( j ).x(), points.at( j ).y() );
+                    glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
+                }
+                glEnd();
+
+                // fill color buffer
+                //      glColor3ub( 0, 128, 0 );
+                glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+                glStencilFunc( GL_EQUAL, 0x1, 0x1 );
+                glBegin( GL_TRIANGLES );
+                for( int j = 1; j < points.size() - 1; ++j )
+                {
+                    glVertex2f( points.at( 0 ).x(), points.at( 0 ).y() );
+                    glVertex2f( points.at( j ).x(), points.at( j ).y() );
+                    glVertex2f( points.at( j + 1 ).x(), points.at( j + 1 ).y() );
+                }
+                glEnd();
+
+                glDisable( GL_STENCIL_TEST );
+            }
         }
     }
 
@@ -825,28 +859,31 @@ void Canvas::drawPolygons(QVector<TreeNode>
     for ( int i = 0; i < list->size(); ++i )
     {
         TreeNode polygon = list->at( i );
-        glLineWidth( 1.5 );
-        glBegin( GL_LINE_STRIP );
+        if(getCurrentWrapper().intersects(polygon.getBoundingBox()))
+        {
+            glLineWidth( 1.5 );
+            glBegin( GL_LINE_STRIP );
 
-        Colour c = cm.getClassColour(polygon.getArea());
-        (*list)[i].setR(c.darker().getR());
-        (*list)[i].setG(c.darker().getG());
-        (*list)[i].setB(c.darker().getB());
-//                       qDebug() << "Polygon:" << polygon.getArea() <<  getValueLower() << getValueUpper() << c.darker().darker().getR() << c.darker().darker().getG() << c.darker().darker().getB();
-        glColor4f( c.darker().darker().getR(), c.darker().darker().getG(), c.darker().darker().getB(), 0.8 );
-//        glColor4f(0.0f,0.0f,0.0f,1.0f);
-        //        glColor4f( 0, 0, 0, 0.5 );
+            Colour c = cm.getClassColour(polygon.getArea());
+            (*list)[i].setR(c.darker().getR());
+            (*list)[i].setG(c.darker().getG());
+            (*list)[i].setB(c.darker().getB());
+            //                       qDebug() << "Polygon:" << polygon.getArea() <<  getValueLower() << getValueUpper() << c.darker().darker().getR() << c.darker().darker().getG() << c.darker().darker().getB();
+            glColor4f( c.darker().darker().getR(), c.darker().darker().getG(), c.darker().darker().getB(), 0.8 );
+            //        glColor4f(0.0f,0.0f,0.0f,1.0f);
+            //        glColor4f( 0, 0, 0, 0.5 );
 
-        for( QVector<QPointF>::const_iterator it =
-             polygon.getNonSharedBoundary()->getBoundary().begin();
-             it < polygon.getNonSharedBoundary()->getBoundary().end(); ++it )
-            glVertex2f( it->x(), it->y() );
-        for( QVector<QPointF>::const_iterator it =
-             polygon.getSharedBoundary()->getBoundary().begin();
-             it < polygon.getSharedBoundary()->getBoundary().end(); ++it )
-            glVertex2f( it->x(), it->y() );
+            for( QVector<QPointF>::const_iterator it =
+                 polygon.getNonSharedBoundary()->getBoundary().begin();
+                 it < polygon.getNonSharedBoundary()->getBoundary().end(); ++it )
+                glVertex2f( it->x(), it->y() );
+            for( QVector<QPointF>::const_iterator it =
+                 polygon.getSharedBoundary()->getBoundary().begin();
+                 it < polygon.getSharedBoundary()->getBoundary().end(); ++it )
+                glVertex2f( it->x(), it->y() );
 
-        glEnd();
+            glEnd();
+        }
     }
 }
 
@@ -871,7 +908,7 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
     foreach( TreeNode p, list)
     {
         QStringList usedValues;
-        if(p.getLevel() > -1)
+        if(getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -903,7 +940,7 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
     foreach( TreeNode p, list )
     {
         QStringList usedValues;
-        if(p.getLevel() > -1)
+        if(getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -935,7 +972,7 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
     foreach( TreeNode p, list )
     {
         QStringList usedValues;
-        if(p.getLevel() > -1)
+        if(getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -966,7 +1003,7 @@ QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
     foreach( TreeNode p, list)
     {
         QStringList usedValues;
-        if(p.getLevel() > -1)
+        if(getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -2191,15 +2228,15 @@ void Canvas::setOrtho()
 
     setCurrentScale( ( getZoom() * getLength() ) / 2);
 
-    setCurrentWrapper( AABB(getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier(),
-                            getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier()));
+    setCurrentWrapper( AABB(getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier() +(getTranslationX()/2),
+                            getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier() +(getTranslationX()/2),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier() +(getTranslationY()/2),
+                            getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier() +(getTranslationY()/2)));
 
-    glOrtho( getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier(),
-             getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier(),
+    glOrtho( getOriginalWrapper().minimums.at(AABB::XDIM) + getCurrentScale() - scaleModifier() +(getTranslationX()/2),
+             getOriginalWrapper().minimums.at(AABB::XDIM)+ getLength() - getCurrentScale() + scaleModifier() +(getTranslationX()/2),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + getCurrentScale() - scaleModifier() +(getTranslationY()/2),
+             getOriginalWrapper().minimums.at(AABB::YDIM) + getLength() - getCurrentScale() + scaleModifier() +(getTranslationY()/2),
              -1.0, 1.0 );
 
     setLength( getCurrentWrapper().length( AABB::XDIM )) ;

@@ -167,6 +167,12 @@ public:
     float getCurrentScale() const;
     void setCurrentScale(float currentScale);
 
+    float getTranslationX() const;
+    void setTranslationX(float value);
+
+    float getTranslationY() const;
+    void setTranslationY(float value);
+
 private:
     float outline_r = 0.388235294f;
     float outline_g = 0.388235294f;
@@ -200,6 +206,8 @@ private:
     float m_areaOpacity = 0.0f;
     float m_zoom = 0.0f;
     float m_currentScale = 0.0f;
+    float translationX = 0.0f;
+    float translationY = 0.0f;
 
     int m_hiddenIndicator = 0;
     bool m_indicatorMatches = false;
