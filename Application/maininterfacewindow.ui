@@ -808,6 +808,7 @@
     </property>
     <addaction name="actionDebugMousePointer"/>
     <addaction name="actionShow_Extents"/>
+    <addaction name="actionGrid_Placement"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug_Options"/>
@@ -822,6 +823,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>DebugMousePointer</string>
    </property>
@@ -832,6 +836,14 @@
    </property>
    <property name="text">
     <string>Show Extents</string>
+   </property>
+  </action>
+  <action name="actionGrid_Placement">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Grid Placement</string>
    </property>
   </action>
  </widget>

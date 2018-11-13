@@ -92,6 +92,8 @@ public:
     float getB() const;
     void setB(float b);
 
+    void setCentroid(QPointF *centroid);
+
 private:
     void calculateArea();
 

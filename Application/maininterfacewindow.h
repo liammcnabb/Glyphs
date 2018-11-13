@@ -12,6 +12,7 @@
 #include "LM/shpreader.h"
 #include "LM/csvreader.h"
 #include "map.h"
+#include "gridamalgamate.h"
 
 namespace Ui {
 class MainInterfaceWindow;
@@ -60,6 +61,9 @@ public:
     void calculateOverallRange(QVector<float> mins, QVector<float> maxes);
     QVector<bool> getValueFilters() const;
     void setValueFilters(const QVector<bool> &valueFilters);
+
+    QVector<Polygon> getGridValues() const;
+    void setGridValues(const QVector<Polygon> &gridValues);
 
 private slots:
     void on_actionEngland_Example_triggered();
@@ -133,6 +137,8 @@ private slots:
 
     void on_rdoFC2_released();
 
+    void on_actionGrid_Placement_toggled(bool arg1);
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;
@@ -151,6 +157,7 @@ private:
 
     QVector<float> m_leafMins;
     QVector<float> m_leafMaxes;
+    QVector<Polygon> m_gridValues;
 
     int m_rangeBreadth = 0;
     int m_rangeDepth = 0;

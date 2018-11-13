@@ -173,6 +173,13 @@ public:
     float getTranslationY() const;
     void setTranslationY(float value);
 
+    bool getGrid() const;
+    void setGrid(bool grid);
+
+    QVector<TreeNode> getGridStructure() const;
+    void setGridStructure(const QVector<TreeNode> &gridStructure);
+
+    void drawBox(AABB box);
 private:
     float outline_r = 0.388235294f;
     float outline_g = 0.388235294f;
@@ -181,6 +188,7 @@ private:
     bool m_transitionState = false;
     bool m_colorStarLines = false;
     bool m_extents = false;
+    bool m_grid = false;
 
     QVector<Polygon> m_loadedPolygons;
     QVector<TreeNode> m_groomedPolygons;
@@ -200,6 +208,7 @@ private:
     QVector<TreeNode> m_transitionNeutral;
     QVector<TreeNode> m_transitionAdd;
     QVector<TreeNode> m_transitionRemove;
+    QVector<TreeNode> m_gridStructure;
     QVector<bool> m_valueFilters;
     float currentTransitionSize = 0.0f;
     int transitionType = 1;

@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     ../Additional/Libraries/LM/IntersectTester/AABB.cpp \
     legendcanvas.cpp \
     wheelglyph.cpp \
-    barchart.cpp
+    barchart.cpp \
+    gridamalgamate.cpp
 
 HEADERS  += maininterfacewindow.h \
     canvas.h \
@@ -76,7 +77,8 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/LM/IntersectTester/AABB.h \
     legendcanvas.h \
     wheelglyph.h \
-    barchart.h
+    barchart.h \
+    gridamalgamate.h
 
 FORMS    += maininterfacewindow.ui
 

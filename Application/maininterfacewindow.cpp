@@ -55,11 +55,15 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
 
     Map map( shpreader.getMapData(), data, recipeLoc );
     ui->virtualzoom->setEnabled(true);
+    setGridValues(map.getContiguousRegions().first().polygons());
     ui->OpenGLWidget->setDefaultOrtho(map.getWrapper());
     ui->OpenGLWidget->setLoadedPolygons( map.getLoadedPolygons() );
     setFullHierarchies( map.getHierarchies() );
     on_virtualzoom_valueChanged(0);
 //    ui->OpenGLWidget->setGroomedPolygons( map.getHierarchies() );
+    if(getRangeBreadth() == RANGE_SHOWN && ui->OpenGLWidget->getGrid())
+        calculateStandardDeviation(ui->OpenGLWidget->getGridStructure());
+    else
     calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
 
     return;
@@ -72,16 +76,19 @@ void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
     QVector<float> maxes;
     QVector<float> mins;
 
-    for( int i = 4; i < list.first().getValues().size(); ++i )
+    for( int i = 4; i < ui->OpenGLWidget->getGroomedPolygons().first().getValues().size(); ++i )
     {
         float max = -std::numeric_limits<float>::max();
         float min = std::numeric_limits<float>::max();
         float currentMean = 0;
         for( int j = 0; j < list.size(); ++j )
         {
-            max = std::max( max, list.at(j).getValues().at(i).toFloat() );
-            min = std::min( min, list.at(j).getValues().at(i).toFloat() );
-            currentMean += list.at(j).getValues().at(i).toFloat();
+            if(!list.at(j).getValues().isEmpty() && list.at(j).getValues().at(i) != 0)
+            {
+                max = std::max( max, list.at(j).getValues().at(i).toFloat() );
+                min = std::min( min, list.at(j).getValues().at(i).toFloat() );
+                currentMean += list.at(j).getValues().at(i).toFloat();
+            }
         }
         currentMean = currentMean / list.size();
         means.append(currentMean);
@@ -200,13 +207,28 @@ void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
     ui->verticalSlider->setEnabled(true);
     ui->virtualzoom->setFocus();
 
-    if(getRangeBreadth() == RANGE_SHOWN)
+    if(getRangeBreadth() == RANGE_SHOWN && !ui->OpenGLWidget->getGrid())
         calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
+
+    if(getRangeBreadth() == RANGE_SHOWN && ui->OpenGLWidget->getGrid())
+    {
+        calculateStandardDeviation(ui->OpenGLWidget->getGridStructure());
+    }
 
     if(getRangeDepth() == RANGE_OVERALL)
         calculateOverallRange( ui->OpenGLWidget->getMins(),
                                ui->OpenGLWidget->getMaxes() );
     ui->OpenGLWidget->update();
+}
+
+QVector<Polygon> MainInterfaceWindow::getGridValues() const
+{
+    return m_gridValues;
+}
+
+void MainInterfaceWindow::setGridValues(const QVector<Polygon> &gridValues)
+{
+    m_gridValues = gridValues;
 }
 
 QVector<bool> MainInterfaceWindow::getValueFilters() const
@@ -675,4 +697,14 @@ void MainInterfaceWindow::on_rdoFC2_released()
     ui->OpenGLWidget->setFocusContextType(1);
     ui->OpenGLWidget->update();
     // GreyScale
+}
+
+void MainInterfaceWindow::on_actionGrid_Placement_toggled(bool arg1)
+{
+    ui->OpenGLWidget->setGrid(arg1);
+    if( arg1 )
+        ui->OpenGLWidget->setGridStructure(GridAmalgamate::amalgamate( getGridValues(),
+                                               ui->OpenGLWidget->getCurrentWrapper() )
+                    );
+    ui->OpenGLWidget->update();
 }

@@ -117,8 +117,8 @@ void LegendCanvas::changeColorMap(int mapType)
     }
     case this->DIVERGING :
     {
-        if( !ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
+//        if( !ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
         ColourMap cMap = CMList::getMapList(CMClassification::DIVERGING)[2];
         ColourManager::setCurrentColourMap(cMap);
 
@@ -126,16 +126,16 @@ void LegendCanvas::changeColorMap(int mapType)
     }
     case this->CATEGORICAL :
     {
-        if( !ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
+//        if( !ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
         ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[colorMap()];
         ColourManager::setCurrentColourMap(cMap);
         break;
     }
     case this->OUTLINE :
     {
-        if( ColourManager::InvertColourMapFlag() )
-            ColourManager::InvertColourMap();
+//        if( ColourManager::InvertColourMapFlag() )
+//            ColourManager::InvertColourMap();
         ColourMap cMap = CMList::getMapList(CMClassification::QUALITATIVE)[1];
         ColourManager::setCurrentColourMap(cMap);
         break;
@@ -662,7 +662,7 @@ void LegendCanvas::paintBarChart()
     }
 
     //        //Outlines
-    glColor4f( 0.105882353, 0.105882353, 0.105882353, 0.8);
+    glColor4f( 0.388235294f, 0.388235294f, 0.388235294f, 0.8);
     for( int j = 0; j < bars; ++j )
     {
         minX = ( b.centroid().x() - ((max/3) * size) ) + (barWidth*j);

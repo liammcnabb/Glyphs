@@ -47,7 +47,7 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
     setMouse(QPointF( convertedX( float( event->x() ) ),
                       convertedY( float( event->y() ) ) ) );
 
-    if(getGlyphType() == this->GLYPH_EQUAL_PIE ||
+    if(/*getGlyphType() == this->GLYPH_EQUAL_PIE ||*/ !getGrid() &&
             getGlyphType() == GLYPH_VARIABLE_PIE)
     {
         setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
@@ -468,6 +468,26 @@ void Canvas::setTranslationY(float value)
     translationY = value;
 }
 
+bool Canvas::getGrid() const
+{
+    return m_grid;
+}
+
+void Canvas::setGrid(bool grid)
+{
+    m_grid = grid;
+}
+
+QVector<TreeNode> Canvas::getGridStructure() const
+{
+    return m_gridStructure;
+}
+
+void Canvas::setGridStructure(const QVector<TreeNode> &gridStructure)
+{
+    m_gridStructure = gridStructure;
+}
+
 void Canvas::paintGL()
 {
     if(getGroomedPolygons().size() > 0)
@@ -529,27 +549,34 @@ void Canvas::redraw()
     }
     case GLYPH_EQUAL_PIE :
     {
-        if(getTransitionState())
+        if( !getGrid() )
         {
-            QVector<WheelGlyph> wheels;
-            wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
-            wheels.append( createWheelGlyphs( getTransitionRemove(), -1) );
-            wheels.append( createWheelGlyphs( getTransitionAdd(), 1) );
-            setWheelGlyphs(wheels);
-        }
-        else
-        {
-            if(getTransitionNeutral().isEmpty())
-            {
-                setWheelGlyphs(createWheelGlyphs( getGroomedPolygons(), 0) );
-            }
-            else
+            if(getTransitionState())
             {
                 QVector<WheelGlyph> wheels;
                 wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
-                wheels.append( createWheelGlyphs( getTransitionAdd(), 0) );
+                wheels.append( createWheelGlyphs( getTransitionRemove(), -1) );
+                wheels.append( createWheelGlyphs( getTransitionAdd(), 1) );
                 setWheelGlyphs(wheels);
             }
+            else
+            {
+                if(getTransitionNeutral().isEmpty())
+                {
+                    setWheelGlyphs(createWheelGlyphs( getGroomedPolygons(), 0) );
+                }
+                else
+                {
+                    QVector<WheelGlyph> wheels;
+                    wheels.append( createWheelGlyphs( getTransitionNeutral(), 0) );
+                    wheels.append( createWheelGlyphs( getTransitionAdd(), 0) );
+                    setWheelGlyphs(wheels);
+                }
+            }
+        }
+        else
+        {
+            setWheelGlyphs(createWheelGlyphs( getGridStructure(), 0));
         }
         calculateValueBounds( getWheelGlyphs() );
         changeColorMap(this->DIVERGING);
@@ -560,31 +587,37 @@ void Canvas::redraw()
     }
     case GLYPH_VARIABLE_PIE :
     {
-        if(getTransitionState())
+        if(!getGrid())
         {
-            QVector<PieChart> pies;
-            pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
-            pies.append( createPieGlyphs( getTransitionRemove(), GLYPH_VARIABLE_PIE, -1) );
-            pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 1) );
-            setPieGlyphs(pies);
-
-        }
-        else
-        {
-            if(getTransitionNeutral().isEmpty())
-            {
-                setPieGlyphs(createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE, 0 ) );
-            }
-            else
+            if(getTransitionState())
             {
                 QVector<PieChart> pies;
                 pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
-                pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 0) );
+                pies.append( createPieGlyphs( getTransitionRemove(), GLYPH_VARIABLE_PIE, -1) );
+                pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 1) );
                 setPieGlyphs(pies);
+
             }
+            else
+            {
+                if(getTransitionNeutral().isEmpty())
+                {
+                    setPieGlyphs(createPieGlyphs( getGroomedPolygons(), GLYPH_VARIABLE_PIE, 0 ) );
+                }
+                else
+                {
+                    QVector<PieChart> pies;
+                    pies.append( createPieGlyphs( getTransitionNeutral(), GLYPH_VARIABLE_PIE, 0) );
+                    pies.append( createPieGlyphs( getTransitionAdd(), GLYPH_VARIABLE_PIE, 0) );
+                    setPieGlyphs(pies);
+                }
 
+            }
         }
-
+        else
+        {
+            setPieGlyphs( createPieGlyphs( getGridStructure(), GLYPH_VARIABLE_PIE, 0 ) );
+        }
         calculateValueBounds( getPieGlyphs() );
         changeColorMap(this->CATEGORICAL);
         ColourManager manager(getValueLower(), getValueUpper());
@@ -594,29 +627,35 @@ void Canvas::redraw()
     }
     case GLYPH_STAR :
     {
-        if( getTransitionState() )
+        if( !getGrid() )
         {
-            QVector<StarGlyph> stars;
-            stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
-            stars.append( createStarGlyphs( getTransitionRemove(), -1 ) );
-            stars.append( createStarGlyphs( getTransitionAdd(), 1 ) );
-            setStarGlyphs( stars );
-        }
-        else
-        {
-            if( getTransitionNeutral().isEmpty() )
-            {
-                setStarGlyphs(createStarGlyphs( getGroomedPolygons(), 0 ) );
-            }
-            else
+            if( getTransitionState() )
             {
                 QVector<StarGlyph> stars;
                 stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
-                stars.append( createStarGlyphs( getTransitionAdd(), 0 ) );
+                stars.append( createStarGlyphs( getTransitionRemove(), -1 ) );
+                stars.append( createStarGlyphs( getTransitionAdd(), 1 ) );
                 setStarGlyphs( stars );
             }
+            else
+            {
+                if( getTransitionNeutral().isEmpty() )
+                {
+                    setStarGlyphs(createStarGlyphs( getGroomedPolygons(), 0 ) );
+                }
+                else
+                {
+                    QVector<StarGlyph> stars;
+                    stars.append( createStarGlyphs( getTransitionNeutral(), 0 ) );
+                    stars.append( createStarGlyphs( getTransitionAdd(), 0 ) );
+                    setStarGlyphs( stars );
+                }
+            }
         }
-
+        else
+        {
+            setStarGlyphs( createStarGlyphs( getGridStructure(), 0));
+        }
         calculateValueBounds( getStarGlyphs() );
         changeColorMap(this->DIVERGING);
         ColourManager manager(-2, 2);
@@ -626,24 +665,31 @@ void Canvas::redraw()
     }
     case GLYPH_BAR :
     {
-        if( getTransitionState() )
+        if( !getGrid() )
         {
-            QVector<BarChart> bars;
-            bars.append(createBarCharts(getTransitionNeutral(), 0));
-            bars.append(createBarCharts(getTransitionRemove(), -1));
-            bars.append(createBarCharts(getTransitionAdd(), 1));
-            setBarCharts(bars);
-        }
-        else if ( getTransitionNeutral().isEmpty() )
-        {
-            setBarCharts(createBarCharts(getGroomedPolygons(), 0) );
+            if( getTransitionState() )
+            {
+                QVector<BarChart> bars;
+                bars.append(createBarCharts(getTransitionNeutral(), 0));
+                bars.append(createBarCharts(getTransitionRemove(), -1));
+                bars.append(createBarCharts(getTransitionAdd(), 1));
+                setBarCharts(bars);
+            }
+            else if ( getTransitionNeutral().isEmpty() )
+            {
+                setBarCharts(createBarCharts(getGroomedPolygons(), 0) );
+            }
+            else
+            {
+                QVector<BarChart> bars;
+                bars.append(createBarCharts(getTransitionNeutral(), 0));
+                bars.append(createBarCharts(getTransitionAdd(), 0));
+                setBarCharts(bars);
+            }
         }
         else
         {
-            QVector<BarChart> bars;
-            bars.append(createBarCharts(getTransitionNeutral(), 0));
-            bars.append(createBarCharts(getTransitionAdd(), 0));
-            setBarCharts(bars);
+            setBarCharts(createBarCharts(getGridStructure(), 0));
         }
         calculateValueBounds( getBarCharts() );
         changeColorMap(this->CATEGORICAL);
@@ -908,7 +954,9 @@ QVector<PieChart> Canvas::createPieGlyphs( QVector<TreeNode> list, int pieType,
     foreach( TreeNode p, list)
     {
         QStringList usedValues;
-        if(getCurrentWrapper().intersects(p.getBoundingBox()))
+        if(getGrid())
+            drawBox(p.getBoundingBox());
+        if(/*getGrid() &&*/ !p.values.isEmpty() && getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -940,7 +988,9 @@ QVector<StarGlyph> Canvas::createStarGlyphs( QVector<TreeNode> list, int state )
     foreach( TreeNode p, list )
     {
         QStringList usedValues;
-        if(getCurrentWrapper().intersects(p.getBoundingBox()))
+        if(getGrid())
+            drawBox(p.getBoundingBox());
+        if(/*getGrid() &&*/ !p.values.isEmpty() && getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -972,7 +1022,9 @@ QVector<WheelGlyph> Canvas::createWheelGlyphs( QVector<TreeNode> list, int state
     foreach( TreeNode p, list )
     {
         QStringList usedValues;
-        if(getCurrentWrapper().intersects(p.getBoundingBox()))
+        if(getGrid())
+            drawBox(p.getBoundingBox());
+        if(/*getGrid() &&*/ !p.values.isEmpty() && getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -1003,7 +1055,9 @@ QVector<BarChart> Canvas::createBarCharts(QVector<TreeNode> list, int state)
     foreach( TreeNode p, list)
     {
         QStringList usedValues;
-        if(getCurrentWrapper().intersects(p.getBoundingBox()))
+        if(getGrid())
+            drawBox(p.getBoundingBox());
+        if(/*getGrid() &&*/ !p.values.isEmpty() && getCurrentWrapper().intersects(p.getBoundingBox()))
         {
             QStringList values = p.getValues();
             for( int i = 0; i < 4; ++i )
@@ -2242,6 +2296,18 @@ void Canvas::setOrtho()
     setLength( getCurrentWrapper().length( AABB::XDIM )) ;
     glClear( GL_COLOR_BUFFER_BIT );
     return;
+}
+
+void Canvas::drawBox(AABB box)
+{
+    glLineWidth(1);
+    glColor4f(0,0,0,0.1f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(box.minimums[AABB::XDIM], box.minimums[AABB::YDIM]);
+    glVertex2f(box.minimums[AABB::XDIM], box.maximums[AABB::YDIM]);
+    glVertex2f(box.maximums[AABB::XDIM], box.maximums[AABB::YDIM]);
+    glVertex2f(box.maximums[AABB::XDIM], box.minimums[AABB::YDIM]);
+    glEnd();
 }
 
 float Canvas::scaleModifier()

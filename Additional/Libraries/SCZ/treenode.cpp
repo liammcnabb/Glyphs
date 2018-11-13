@@ -261,6 +261,11 @@ void TreeNode::calculateArea()
     return;
 }
 
+void TreeNode::setCentroid(QPointF *centroid)
+{
+    m_centroid = centroid;
+}
+
 float TreeNode::getB() const
 {
     return m_b;
