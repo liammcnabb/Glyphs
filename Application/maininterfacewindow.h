@@ -139,6 +139,12 @@ private slots:
 
     void on_actionGrid_Placement_toggled(bool arg1);
 
+    void on_radioButton_4_released();
+
+    void on_radioButton_2_released();
+
+    void on_radioButton_3_released();
+
 private:
     Ui::MainInterfaceWindow *ui;
     int ignoredValues = 4;

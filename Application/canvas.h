@@ -48,6 +48,10 @@ public:
     static const int TRANSITION_IN = 1;
     static const int TRANSITION_OUT = -1;
 
+    static const int ADV_FILTER_NA = 0;
+    static const int ADV_FILTER_ABOVE = 1;
+    static const int ADV_FILTER_BELOW = 2;
+
     static const bool DEBUG = false;
 
     Canvas(QWidget *parent);
@@ -180,6 +184,9 @@ public:
     void setGridStructure(const QVector<TreeNode> &gridStructure);
 
     void drawBox(AABB box);
+    int getAdvFilter() const;
+    void setAdvFilter(int advFilter);
+
 private:
     float outline_r = 0.388235294f;
     float outline_g = 0.388235294f;
@@ -222,6 +229,7 @@ private:
     bool m_indicatorMatches = false;
 
     int m_colorMap = 0;
+    int m_advFilter = 0;
 
     QVector<float> m_means, m_maxes, m_mins;
 

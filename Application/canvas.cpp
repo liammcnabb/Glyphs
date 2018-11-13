@@ -1536,7 +1536,9 @@ void Canvas::drawWheelGlyphs( QVector<WheelGlyph> list, ColourManager cm)
                   getFocusContextType() == 1 ) )
             {
             cm = ColourManager(getMins().at(i), getMaxes().at(i));
-            if( getFocusContextType() == 1 && !getValueFilters().at(i) )
+            if( (getFocusContextType() == 1 && !getValueFilters().at(i)) ||
+                    (getAdvFilter() == ADV_FILTER_ABOVE && s.getRads().at(i) < getMeans().at(i)) ||
+                    (getAdvFilter() == ADV_FILTER_BELOW && s.getRads().at(i) > getMeans().at(i) ) )
                 color = cm.getColourFromIndex(i).brighter().greyscale();
             else
                 color = cm.getColourFromIndex(i);
@@ -1739,7 +1741,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
                   getFocusContextType() == 1 ) )
             {
                 PieSegment ps = p.pieSlices().at(i);
-                if( getFocusContextType() == 1 && !getValueFilters().at(i) )
+                if( (getFocusContextType() == 1 && !getValueFilters().at(i)) ||
+                        (getAdvFilter() == ADV_FILTER_ABOVE && ps.value() < getMeans().at(i)) ||
+                        (getAdvFilter() == ADV_FILTER_BELOW && ps.value() > getMeans().at(i) ) )
                     color = cm.getColourFromIndex(i).brighter().greyscale();
                 else
                     color = cm.getColourFromIndex(i);
@@ -2008,7 +2012,9 @@ void Canvas::drawBarCharts(QVector<BarChart> list, ColourManager cm)
                 minY = currentCentroid.y() -  ( max * size /2)  - (indicateSize/2);
                 height = value  * ( max * size * 2 ) + (indicateSize);
 
-                if( getFocusContextType() == 1 && !getValueFilters().at(j) )
+                if( (getFocusContextType() == 1 && !getValueFilters().at(j)) ||
+                        (getAdvFilter() == ADV_FILTER_ABOVE && b.values().at( j ) < getMeans().at(j)) ||
+                        (getAdvFilter() == ADV_FILTER_BELOW && b.values().at( j ) > getMeans().at(j) ) )
                     color = cm.getColourFromIndex(j).brighter().greyscale();
                 else
                     color = cm.getColourFromIndex(j);
@@ -2308,6 +2314,16 @@ void Canvas::drawBox(AABB box)
     glVertex2f(box.maximums[AABB::XDIM], box.maximums[AABB::YDIM]);
     glVertex2f(box.maximums[AABB::XDIM], box.minimums[AABB::YDIM]);
     glEnd();
+}
+
+int Canvas::getAdvFilter() const
+{
+    return m_advFilter;
+}
+
+void Canvas::setAdvFilter(int advFilter)
+{
+    m_advFilter = advFilter;
 }
 
 float Canvas::scaleModifier()

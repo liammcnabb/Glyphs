@@ -598,6 +598,61 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox_11">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>85</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Provided Advanced Filters:</string>
+             </property>
+             <widget class="QRadioButton" name="radioButton_2">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>60</y>
+                <width>151</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Above Avg Only</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioButton_3">
+              <property name="geometry">
+               <rect>
+                <x>160</x>
+                <y>60</y>
+                <width>121</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Below Avg Only</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioButton_4">
+              <property name="geometry">
+               <rect>
+                <x>120</x>
+                <y>30</y>
+                <width>100</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>N/A</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>

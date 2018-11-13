@@ -708,3 +708,21 @@ void MainInterfaceWindow::on_actionGrid_Placement_toggled(bool arg1)
                     );
     ui->OpenGLWidget->update();
 }
+
+void MainInterfaceWindow::on_radioButton_4_released()
+{
+    ui->OpenGLWidget->setAdvFilter(0);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_radioButton_2_released()
+{
+    ui->OpenGLWidget->setAdvFilter(1);
+    ui->OpenGLWidget->update();
+}
+
+void MainInterfaceWindow::on_radioButton_3_released()
+{
+    ui->OpenGLWidget->setAdvFilter(2);
+    ui->OpenGLWidget->update();
+}
