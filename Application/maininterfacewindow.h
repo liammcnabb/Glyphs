@@ -129,9 +129,7 @@ private slots:
 
     void on_chkMatchingLines_toggled(bool checked);
 
-    void on_pushButton_6_released();
 
-    void on_pushButton_7_released();
 
     void on_rdoFC1_released();
 
@@ -144,6 +142,10 @@ private slots:
     void on_radioButton_2_released();
 
     void on_radioButton_3_released();
+
+    void on_toolButton_6_released();
+
+    void on_toolButton_7_released();
 
 private:
     Ui::MainInterfaceWindow *ui;

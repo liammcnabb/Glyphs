@@ -61,9 +61,6 @@ void MainInterfaceWindow::on_actionEngland_Example_triggered()
     setFullHierarchies( map.getHierarchies() );
     on_virtualzoom_valueChanged(0);
 //    ui->OpenGLWidget->setGroomedPolygons( map.getHierarchies() );
-    if(getRangeBreadth() == RANGE_SHOWN && ui->OpenGLWidget->getGrid())
-        calculateStandardDeviation(ui->OpenGLWidget->getGridStructure());
-    else
     calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
 
     return;
@@ -83,7 +80,7 @@ void MainInterfaceWindow::calculateStandardDeviation( QVector<TreeNode> list )
         float currentMean = 0;
         for( int j = 0; j < list.size(); ++j )
         {
-            if(!list.at(j).getValues().isEmpty() && list.at(j).getValues().at(i) != 0)
+            if(!ui->OpenGLWidget->getGrid() || (!list.at(j).getValues().isEmpty() && list.at(j).getValues().at(i) != 0))
             {
                 max = std::max( max, list.at(j).getValues().at(i).toFloat() );
                 min = std::min( min, list.at(j).getValues().at(i).toFloat() );
@@ -209,8 +206,7 @@ void MainInterfaceWindow::calculateNewlyVisible(int screenSpaceValue)
 
     if(getRangeBreadth() == RANGE_SHOWN && !ui->OpenGLWidget->getGrid())
         calculateStandardDeviation(ui->OpenGLWidget->getGroomedPolygons());
-
-    if(getRangeBreadth() == RANGE_SHOWN && ui->OpenGLWidget->getGrid())
+    else if(getRangeBreadth() == RANGE_SHOWN && ui->OpenGLWidget->getGrid())
     {
         calculateStandardDeviation(ui->OpenGLWidget->getGridStructure());
     }
@@ -667,9 +663,7 @@ void MainInterfaceWindow::on_toolButton_5_released()
     ui->GlLegend->update();
 }
 
-
-
-void MainInterfaceWindow::on_pushButton_6_released()
+void MainInterfaceWindow::on_toolButton_6_released()
 {
     ui->OpenGLWidget->setColorMap(6);
     ui->GlLegend->setColorMap(6);
@@ -677,7 +671,7 @@ void MainInterfaceWindow::on_pushButton_6_released()
     ui->GlLegend->update();
 }
 
-void MainInterfaceWindow::on_pushButton_7_released()
+void MainInterfaceWindow::on_toolButton_7_released()
 {
     ui->OpenGLWidget->setColorMap(7);
     ui->GlLegend->setColorMap(7);

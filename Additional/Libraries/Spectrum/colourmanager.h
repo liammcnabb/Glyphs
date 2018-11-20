@@ -866,7 +866,7 @@ public:
 
     inline Colour getColourFromName(std::string name){
         try{
-            for(int i=0;i<CurrentColourMap().getColourList().size();i++){
+            for(int i=0; i<CurrentColourMap().getColourList().size(); i++){
                 if(CurrentColourMap()[i].getNameID()==name){
                     return CurrentColourMap()[i];
                 }

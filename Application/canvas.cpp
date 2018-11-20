@@ -502,6 +502,7 @@ void Canvas::redraw()
     calculateValueBounds( getGroomedPolygons() );
     drawPolygons( loadedPolygons() );
 
+
     if(getTransitionNeutral().isEmpty())
     {
         float min = std::numeric_limits<float>::max();
@@ -533,7 +534,7 @@ void Canvas::redraw()
         drawPolygons( &m_transitionNeutral );
         drawPolygons( &m_transitionAdd );
     }
-    
+
     glLineWidth( 1 );
     /**Default*/
     switch( getGlyphType() )
@@ -907,7 +908,10 @@ void Canvas::drawPolygons(QVector<TreeNode>
         TreeNode polygon = list->at( i );
         if(getCurrentWrapper().intersects(polygon.getBoundingBox()))
         {
-            glLineWidth( 1.5 );
+            if(getGrid())
+                glLineWidth( 1 );
+            else
+                glLineWidth( 1.5 );
             glBegin( GL_LINE_STRIP );
 
             Colour c = cm.getClassColour(polygon.getArea());
