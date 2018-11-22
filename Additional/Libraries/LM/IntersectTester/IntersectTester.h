@@ -119,16 +119,37 @@ public:
     inline static bool isIntersecting(LineSegment a, Circle c)
     { return areLineSegmentAndCircleIntersecting( a, c ); }
 
-    inline static bool isIntersecting(AABB a, AABB b) 
-    { return areBoxesIntersecting( a, b ); }
-    
+    inline static bool isIntersecting(LineSegment ls, Triangle t)
+    { return doesLineSegmentIntersectTriangle( ls, t ); }
+
     inline static bool isIntersecting(LineSegment ls, AABB a)
     { return doesLineSegmentIntersectAABB( ls, a ); }
 
+    inline static bool isIntersecting(Circle a, Circle b)
+    { return doCirclesIntersect(a,b); }
 
+    inline static bool isIntersecting(Circle c, Triangle t)
+    { return doesCircleIntersectTriangle(c,t); }
+
+    inline static bool isIntersecting(Circle c, AABB a)
+    { return doCircleandAABBIntersect(c, a); }
+
+    inline static bool isIntersecting(Triangle a, Triangle b)
+    { return doTrianglesIntersect(a,b); }
+
+    inline static bool isIntersecting(Triangle t, AABB a)
+    { return doTriangleAndAABBIntersect(t,a); }
+
+    inline static bool isIntersecting(AABB a, AABB b) 
+    { return areBoxesIntersecting( a, b ); }
     
+
+
+
     static float distanceBetweenPoints(Point a, Point b);
     static float crossProduct(Point a, Point b, Point c);
+    static float dotProduct(Point a, Point b, Point c);
+    static int direction(Point a, Point b, Point c);
 private:
     /**
     * @brief IntersectTester::isPointOnLineSegment used to check
@@ -144,12 +165,16 @@ private:
     static bool isPointOnAABB(Point p, AABB a);
     static bool areLineSegmentsIntersecting(LineSegment a, LineSegment b);
     static bool areLineSegmentAndCircleIntersecting( LineSegment a, Circle c );
-
-
+    static bool doesLineSegmentIntersectTriangle( LineSegment a, Triangle t);
     static bool doesLineSegmentIntersectAABB(LineSegment ls, AABB a );
-
+    static bool doCirclesIntersect(Circle a, Circle b);
+    static bool doesCircleIntersectTriangle(Circle c, Triangle t);
     static bool doCircleandAABBIntersect(Circle c, AABB a);
+    static bool doTrianglesIntersect(Triangle a, Triangle b);
+    static bool doTriangleAndAABBIntersect(Triangle t, AABB a);
     static bool areBoxesIntersecting(AABB a, AABB b);
+
+
 };
 
 
