@@ -14,7 +14,7 @@ MainInterfaceWindow::~MainInterfaceWindow()
     delete ui;
 }
 
-void MainInterfaceWindow::on_actionEngland_Example_triggered()
+void MainInterfaceWindow::on_actionOpen_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName( this,
                                     tr( "Open Shape File" ),
@@ -164,7 +164,7 @@ void MainInterfaceWindow::on_rdo_StarGlyph_released()
     ui->GlLegend->update();
 }
 
-void MainInterfaceWindow::on_radioButton_released()
+void MainInterfaceWindow::on_rdo_Bar_released()
 {
     ui->OpenGLWidget->changeColorMap(ui->OpenGLWidget->CATEGORICAL);
     ui->OpenGLWidget->setGlyphType(ui->OpenGLWidget->GLYPH_BAR);
