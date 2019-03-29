@@ -122,7 +122,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -225,7 +225,7 @@
                <string>Star Glyph</string>
               </property>
              </widget>
-             <widget class="QRadioButton" name="radioButton">
+             <widget class="QRadioButton" name="rdo_Bar">
               <property name="geometry">
                <rect>
                 <x>10</x>
@@ -677,7 +677,7 @@
              <x>0</x>
              <y>0</y>
              <width>311</width>
-             <height>194</height>
+             <height>206</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -910,14 +910,14 @@
      <x>0</x>
      <y>0</y>
      <width>1450</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionEngland_Example"/>
+    <addaction name="actionOpen"/>
    </widget>
    <widget class="QMenu" name="menuDebug_Options">
     <property name="title">
@@ -931,7 +931,7 @@
    <addaction name="menuDebug_Options"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionEngland_Example">
+  <action name="actionOpen">
    <property name="text">
     <string>Open...</string>
    </property>

@@ -4,7 +4,16 @@
 class Segment
 {
 public:
+    /**
+     * @brief Segment Default Constructor. A segment of the dynamic choropleth
+     * map algorithm. The method held more value in early construction, but was
+     * left in order to ease redundancy
+     */
     Segment();
+    /**
+     * @brief Segment constructor initializing default search type
+     * @param searchType
+     */
     Segment( int searchType );
 
     /**
