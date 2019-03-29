@@ -1,10 +1,5 @@
 #include "gridamalgamate.h"
 
-GridAmalgamate::GridAmalgamate()
-{
-
-}
-
 QVector<TreeNode> GridAmalgamate::amalgamate(QVector<Polygon> nodes,
                                              AABB envelope)
 {
@@ -29,8 +24,10 @@ QVector<TreeNode> GridAmalgamate::amalgamate(QVector<Polygon> nodes,
     for( int i = 0; i < cells.size(); ++i )
     {
         TreeNode node;
-        node.setCentroid(new QPointF( cells[i].minimums[AABB::XDIM]+(cells[i].length(AABB::XDIM)/2),
-                         cells[i].minimums[AABB::YDIM]+(cells[i].length(AABB::YDIM)/2)));
+        node.setCentroid(new QPointF( cells[i].minimums[AABB::XDIM] + (
+                             cells[i].length( AABB::XDIM ) / 2 ),
+                         cells[i].minimums[AABB::YDIM] + (
+                             cells[i].length( AABB::YDIM ) / 2 ) ) );
         node.setLevel(1);
         node.setBoundingBox(cells.at(i));
         result.append(node);
@@ -43,29 +40,34 @@ QVector<TreeNode> GridAmalgamate::amalgamate(QVector<Polygon> nodes,
         float distance = std::numeric_limits<float>::max();
         for (int j = 0; j < cells.size(); ++j )
         {
-            float temp = fabs( sqrt( pow(nodes[i].centroid()->x()-result[j].centroid()->x(),2) +
-                               pow(nodes[i].centroid()->y()-result[j].centroid()->y(),2 ) ) );
+            float temp = fabs( sqrt( pow( nodes[i].centroid()->x() -
+                                          result[j].centroid()->x(), 2 ) +
+                                     pow( nodes[i].centroid()->y() -
+                                          result[j].centroid()->y(), 2 ) ) );
             if( temp < distance )
             {
                 match = j;
                 distance = temp;
             }
         }
-        result[match].values = updateValue( result[match].values, nodes.at(i).values );
+        result[match].values = updateValue( result[match].values,
+                                            nodes.at(i).values );
     }
 
     return result;
 }
 
 
-QStringList GridAmalgamate::updateValue( QStringList values, QStringList newValues)
+QStringList GridAmalgamate::updateValue( QStringList values,
+                                         QStringList newValues)
 {
     if(values.isEmpty())
         return newValues;
 
     QStringList updated = values;
     for( int i = 0; i < values.size(); ++i )
-            updated[i] = QString::number( ( values[i].toFloat() + newValues[i].toFloat() ) / 2.0f);
+            updated[i] = QString::number( ( values[i].toFloat()
+                                            + newValues[i].toFloat() ) / 2.0f);
 
     return updated;
 }

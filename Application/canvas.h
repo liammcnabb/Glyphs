@@ -262,6 +262,9 @@ private:
     float convertedX(float windowX);
     float convertedY(float windowY);
     int findClickedIndex(QPointF coords, QVector<PieChart> list);
+    int findClickedIndex(QPointF coords, QVector<WheelGlyph> list);
+    int findClickedIndex(QPointF coords, QVector<StarGlyph> list);
+    int findClickedIndex(QPointF coords, QVector<BarChart> list);
     void drawPolygon(TreeNode polygon);
     void fillToolTip(int glyphIndex);
     QVector<StarGlyph> createStarGlyphs(QVector<TreeNode> list, int state);
@@ -274,6 +277,9 @@ private:
     QVector<BarChart> createBarCharts(QVector<TreeNode> list, int state);
     void calculateValueBounds(QVector<BarChart> list);
     void drawBarCharts(QVector<BarChart> list, ColourManager cm);
+
+
+
 };
 
 #endif // CANVAS_H

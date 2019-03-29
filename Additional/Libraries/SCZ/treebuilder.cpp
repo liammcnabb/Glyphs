@@ -68,6 +68,9 @@ TreeNode TreeBuilder::createBinaryTree( QVector<Polygon>
         calculateValueRange( list );
     buildBinaryTree( list );
 
+    qDebug() << "Build PL_counter =" << NeighbourChecker::PL_counter;
+    qDebug() << "Build BB_counter =" << NeighbourChecker::BB_counter;
+
     return *list->first();
 }
 
@@ -743,15 +746,7 @@ void TreeBuilder::addParentToList( LinkedList* list,
     return;
 }
 
-/**
- * @brief SCZTreeBuilder::debugRender send LinkedList to be rendered if debug
- *  rendering is selected.
- * @param list list to render
- * @param debugMode type of debug render to run
- * @param highlight the index of polygon to highlight
- * @param sleepMul rest multiplier after render
- * @return true if successful
- */
+
 bool TreeBuilder::debugRender( LinkedList* list, int debugMode,
                                   int highlight,
                                   int sleepMul )

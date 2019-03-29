@@ -25,7 +25,6 @@ SOURCES += main.cpp\
     ../Additional/Libraries/SCZ/segment.cpp \
     ../Additional/Libraries/SCZ/mapextractor.cpp \
     ../Additional/Libraries/SCZ/polygon.cpp \
-    ../Additional/Libraries/LM/boundingbox.cpp \
     ../Additional/Libraries/LM/csvreader.cpp \
     ../Additional/Libraries/SCZ/contiguitybuilder.cpp \
     ../Additional/Libraries/SCZ/contiguousarea.cpp \
@@ -57,7 +56,6 @@ HEADERS  += maininterfacewindow.h \
     ../Additional/Libraries/SCZ/segment.h \
     ../Additional/Libraries/SCZ/mapextractor.h \
     ../Additional/Libraries/SCZ/polygon.h \
-    ../Additional/Libraries/LM/boundingbox.h \
     ../Additional/Libraries/LM/csvreader.h \
     ../Additional/Libraries/Spectrum/colourmanager.h \
     ../Additional/Libraries/SCZ/contiguitybuilder.h \

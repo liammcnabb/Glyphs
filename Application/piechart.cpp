@@ -3,14 +3,12 @@
 PieChart::PieChart() :
     Glyph( QPointF( 0.0f,0.0f ), 0.0f, 0, QPointF( 0.0f, 0.0f ) )
 {
-    setSize(1 * SIZE_MODIFIER);
 
 }
 
 PieChart::PieChart(QPointF centroid, float size, int state, QPointF parent) :
     Glyph( centroid, size,  state, parent )
 {
-    setSize( size * SIZE_MODIFIER );
 }
 
 void PieChart::initialize(QStringList values)
@@ -97,25 +95,12 @@ void PieChart::createEqualSlices( QStringList values )
     return;
 }
 
-float PieChart::size() const
-{
-    return m_size;
-}
-
-void PieChart::setSize(float size)
-{
-    m_size = size;
-}
 
 float PieChart::maxAngle() const
 {
     return m_maxAngle;
 }
 
-void PieChart::setMaxAngle(float maxAngle)
-{
-    m_maxAngle = maxAngle;
-}
 
 QVector<PieSegment> PieChart::pieSlices() const
 {

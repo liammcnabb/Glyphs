@@ -41,3 +41,7 @@ Doxygen*
 Application/Application
 
 Additional/Materials/*
+
+Additional/Libraries/boundingbox\.cpp
+
+Additional/Libraries/boundingbox\.h

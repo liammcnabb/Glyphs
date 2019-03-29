@@ -43,6 +43,8 @@ QVector<ContiguousArea> ContiguityBuilder::sortContiguously(
     for( int i = 0; i < contigList.size(); ++i )
         contigList[i].sortedByArea();
 
+    qDebug() << "Contig PL_counter =" << NeighbourChecker::PL_counter;
+    qDebug() << "Contig BB_counter =" << NeighbourChecker::BB_counter;
     return contigList;
 }
 

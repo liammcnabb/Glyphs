@@ -32,6 +32,7 @@ void Map::copyInfoFromFile()
     extractMap( layer );
     splitContiguousRegions( getLoadedPolygons() );
     buildHierarchy(getContiguousRegions());
+
 }
 
 void Map::extractMap( OGRLayer* layer )

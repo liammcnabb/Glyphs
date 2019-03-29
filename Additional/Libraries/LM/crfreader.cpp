@@ -5,18 +5,6 @@ CrfReader::CrfReader( std::string fileName )
     Reader::setFileName( fileName );
 }
 
-/**
- * @brief CrfReader::exists checks if a file exists.
- * "The stat function returns information about the attributes of the file
- * named by filename in the structure pointed to by buf. If filename is the
- * name of a symbolic link, the attributes you get describe the file that the
- * link points to. If the link points to a nonexistent file name, then stat
- * fails reporting a nonexistent file. The return value is 0 if the operation
- * is successful, or -1 on failure. "
- * @see https://en.wikibooks.org/wiki/C_Programming/POSIX_Reference/sys/stat.h#Member_functions
- * @param name file location of item to check existance of in
- * @return true if exists, false otherwise.
- */
 bool CrfReader::exists( const QString& name )
 {
     struct stat buffer;

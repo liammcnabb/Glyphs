@@ -337,11 +337,41 @@ private:
      * @param list list of nodes
      */
     void calculateValueRange( LinkedList* list );
+
+    /**
+     * @brief calculateValueByAreaNormalisedSum move through data structure from
+     * node to calculate average, then use vCount to normalise based on the
+     * underlying total of nodes
+     * @param node current TreeNode
+     * @param fieldIndex
+     * @return
+     */
     double calculateValueByAreaNormalisedSum(TreeNode* node , int fieldIndex);
+    /**
+     * @brief SCZTreeBuilder::debugRender send LinkedList to be rendered if debug
+     *  rendering is selected.
+     * @param list list to render
+     * @param debugMode type of debug render to run
+     * @param highlight the index of polygon to highlight
+     * @param sleepMul rest multiplier after render
+     * @return true if successful
+     */
     bool debugRender( LinkedList* list, int debugMode, int highlight,
                       int sleepMul );
 
+    /**
+     * @brief distance distance between two ranges
+     * @param range1 range 1
+     * @param range2 range 2
+     * @return
+     */
     double distance(double range1, double range2);
+    /**
+     * @brief next next index in list assuming the list is looped
+     * @param list list to test
+     * @param index current index
+     * @return next index assuming the list is looped
+     */
     int next(QVector<QPointF> list, int index);
 };
 

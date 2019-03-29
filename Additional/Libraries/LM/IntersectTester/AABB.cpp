@@ -1,4 +1,4 @@
-#include "LM/IntersectTester/AABB.h"
+#include "AABB.h"
 
 AABB::AABB()
 {
@@ -64,11 +64,6 @@ void AABB::overwrite( const AABB& other )
     maximums.at( ZDIM ) = other.maximums.at( ZDIM );
 }
 
-/**
- * @brief AABB::equals
- * @param comparitor comparison AABB to check for variable equality
- * @return false if any items are not the same value.
- */
 bool AABB::equals( AABB comparitor ) const
 {
     for ( int i = 0; i < TOTAL_SIZE; ++i )
@@ -81,11 +76,6 @@ bool AABB::equals( AABB comparitor ) const
     return true;
 }
 
-/**
- * @brief AABB::intersects
- * @param comparitor comparison AABB to check for overlap
- * @return false if does not overlap on any of the axes
- */
 bool AABB::intersects( AABB comparitor ) const
 {
     if ( maximums.at( XDIM ) < comparitor.minimums.at( XDIM ) ||
@@ -101,17 +91,7 @@ bool AABB::intersects( AABB comparitor ) const
     return true;
 }
 
-AABB::~AABB()
-{
 
-}
-
-/**
- * @brief AABB::unify
- * @param a
- * @param b
- * @return
- */
 AABB AABB::unify( AABB* a, AABB* b )
 {
     float minX = std::min( a->minimums.at( XDIM ),
@@ -152,9 +132,7 @@ float AABB::length( int dimension )
     }
 }
 
-/**
- * @brief AABB::initialize
- */
+
 void AABB::initialize()
 {
     minimums = std::vector<float>( TOTAL_SIZE, 0.0f );
@@ -162,10 +140,6 @@ void AABB::initialize()
 }
 
 
-/**
- * @brief AABB::toString
- * @return  string representation of object
- */
 std::string AABB::toString()
 {
 //    return "Minimums: { " +  std::to_string(minimums[ XDIM ])  + ", " +

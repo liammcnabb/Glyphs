@@ -22,6 +22,12 @@ QVector<Polygon> MapExtractor::toVector()
         extractPolygonPoints( feature, &polygonList, &fields );
         feature = layer->GetNextFeature();
     }
+//    long vertexCount=0;
+//    foreach(Polygon p, polygonList)
+//    {
+//        vertexCount+= p.getPoints().size();
+//    }
+//    qDebug() << "vertexCount ="<<vertexCount;
     return polygonList;
 }
 

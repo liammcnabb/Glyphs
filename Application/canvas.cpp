@@ -53,6 +53,25 @@ void Canvas::mouseMoveEvent( QMouseEvent *event )
         setClickedIndex(findClickedIndex(getMouse(), getPieGlyphs()));
         fillToolTip(getClickedIndex());
     }
+    else if( !getGrid() &&
+             getGlyphType() == GLYPH_EQUAL_PIE)
+    {
+        setClickedIndex(findClickedIndex(getMouse(), getWheelGlyphs()));
+        fillToolTip(getClickedIndex());
+    }
+    else if( !getGrid() &&
+             getGlyphType() == GLYPH_STAR)
+    {
+        setClickedIndex(findClickedIndex(getMouse(), getStarGlyphs()));
+        fillToolTip(getClickedIndex());
+    }
+    else if( !getGrid() &&
+             getGlyphType() == GLYPH_BAR)
+    {
+        setClickedIndex(findClickedIndex(getMouse(), getBarCharts()));
+        fillToolTip(getClickedIndex());
+    }
+
     update();
 
 }
@@ -78,6 +97,78 @@ float Canvas::convertedY( float windowY )
 }
 
 int Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list )
+{
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) BEGIN";
+
+    for(int i = 0; i < list.size(); i++)
+    {
+        QPointF c = list.at(i).centroid();
+        if( IntersectTester::isIntersecting( Point( coords.x(),coords.y() ),
+                                             Circle( Point( c.x(),c.y() ),
+                                                     ( getLength() / 100 ) * getGlyphSize() ) ) )
+        {
+            if(DEBUG)
+                qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+            return i;
+        }
+    }
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+    return NEGATIVE_INDEX;
+}
+
+int Canvas::findClickedIndex(QPointF coords, QVector<WheelGlyph> list )
+{
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) BEGIN";
+
+    for(int i = 0; i < list.size(); i++)
+    {
+        QPointF c = list.at(i).centroid();
+        if( IntersectTester::isIntersecting( Point( coords.x(),coords.y() ),
+                                             Circle( Point( c.x(),c.y() ),
+                                                     ( getLength() / 100 ) * getGlyphSize() ) ) )
+        {
+            if(DEBUG)
+                qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+            return i;
+        }
+    }
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+    return NEGATIVE_INDEX;
+}
+
+int Canvas::findClickedIndex(QPointF coords, QVector<StarGlyph> list )
+{
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) BEGIN";
+
+    for(int i = 0; i < list.size(); i++)
+    {
+        QPointF c = list.at(i).centroid();
+        if( IntersectTester::isIntersecting( Point( coords.x(),coords.y() ),
+                                             Circle( Point( c.x(),c.y() ),
+                                                     ( getLength() / 100 ) * getGlyphSize() ) ) )
+        {
+            if(DEBUG)
+                qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+            return i;
+        }
+    }
+    if(DEBUG)
+        qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) END";
+
+    return NEGATIVE_INDEX;
+}
+
+int Canvas::findClickedIndex(QPointF coords, QVector<BarChart> list )
 {
     if(DEBUG)
         qDebug() << "Canvas::findClickedIndex(QPointF coords, QVector<PieChart> list ) BEGIN";
@@ -146,6 +237,8 @@ void Canvas::fillToolTip(int glyphIndex)
         return;
     }
 
+
+
     QString string;
     for( int i = 4; i < getGroomedPolygons().at(glyphIndex).getValues().size();
          ++i )
@@ -153,7 +246,10 @@ void Canvas::fillToolTip(int glyphIndex)
         string.append(getDataHeaders().at(i)+": ");
         string.append(getGroomedPolygons().at(glyphIndex).getValues().at(i)+"%, \n");
     }
-    string.remove(string.size()-3,3);
+    string.append("Holds: ");
+    string.append(QString::number(getGroomedPolygons().at(glyphIndex).getLevel()));
+    string.append(" areas.");
+//    string.remove(string.size()-3,3);
     QWidget::setToolTip(string);
     return;
 }
@@ -1613,9 +1709,9 @@ void Canvas::drawPieGlyphs( QVector<PieChart> list, ColourManager cm)
     double size = getGlyphSize();
     QPointF currentCentroid;
 
-    float indicateValue = getLength()*0.00001f;
-    if(indicateValue < 0.917768f)
-        indicateValue = 0.917768f;
+    float indicateValue = getLength()*0.000001f;
+//    if(indicateValue < 0.917768f)
+//        indicateValue = 0.917768f;
 
     for( int j = 0; j < list.size(); ++j )
     {

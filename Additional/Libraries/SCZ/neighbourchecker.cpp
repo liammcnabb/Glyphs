@@ -1,16 +1,12 @@
 #include "neighbourchecker.h"
 
-/**
- * @brief NeighbourChecker::isNeighbour checks if two polygons are neighbours
- * @param pOne polygon One
- * @param pTwo polygon Two
- * @param searchType type of search necessary (shallow search check for listed
- * points, deep checks all points against possible lines
- * @return true if neighbours, false otherwise
- */
+long NeighbourChecker::PL_counter = 0;
+long NeighbourChecker::BB_counter = 0;
+
 bool NeighbourChecker::isNeighbour( Polygon pOne, Polygon pTwo,
                                     int searchType )
 {
+    BB_counter++;
     if ( pOne.getBoundingBox().intersects( pTwo.getBoundingBox() ) )
         return commonVertices( pOne.getPoints(),
                                pTwo.getPoints(),
@@ -18,16 +14,6 @@ bool NeighbourChecker::isNeighbour( Polygon pOne, Polygon pTwo,
     return false;
 }
 
-/**
- * @brief NeighbourChecker::isNeighbour
- * @param pOne polygon one to check intersection of
- * @param pTwo index of polygon two in list (added for debug oppurtunity)
- * @param list List of all polygons
- * @param searchType type of search necessary (shallow search check for added
- * points, deep checks all points against possible lines
- * @return true if two polygons neighbour each other with at least two common
- * vertices
- */
 bool NeighbourChecker::isNeighbour( TreeNode pOne, int pTwo,
                                     LinkedList* list, int searchType )
 {
@@ -38,29 +24,7 @@ bool NeighbourChecker::isNeighbour( TreeNode pOne, int pTwo,
     return false;
 }
 
-/**
- * @brief NeighbourChecker::commonVertices checks whether there is a concrete
- * boundary. Variable counter constrains the points to have at least 2 distinct
- * bounds found (need at least two to be considered a neighbour). DEEP_SEARCH
- * checks each point to see if a point is found on the line of the neighbour.
- * This is important for simple boundaries (US counties) who may have 1 common
- * vertex, but 2 points on a line. Examples where deep search are necessary
- * drawn below.
- *
- *     *------------*            *-------------*
- *     |            |            |             |
- *     |            |            |             |
- *    [*]-----------*---[ ]      *-----[-]-----*------[ ]
- *     |                 |              |              |
- *     |                 |              |              |
- *    [ ]---------------[ ]            [ ]------------[ ]
- *
- * @param pOne First list of points
- * @param pTwo Second list of points
- * @param searchType refer to NeighbourChecker::isNeighbour( Polygon pOne, Polygon pTwo,
-                                    int searchType )
- * @return true if enough common vertices found, false if otherwise.
- */
+
 bool NeighbourChecker::commonVertices( QVector<QPointF> pOne,
                                        QVector<QPointF> pTwo,
                                        int searchType )
@@ -139,19 +103,11 @@ bool NeighbourChecker::commonVertices( QVector<QPointF> pOne,
     return false;
 }
 
-/**
- * @brief NeighbourChecker::isPointOnLine used to check whether a set of
- * coordinates intersects with on line (lastNeighbour to nextNeighbour)
- * @param point coordinate set to test
- * @param linePointA last neighbour to have a common vertex
- * @param linePointB the next vertex after the last common vertex
- * @return if point is on the line (lastNeighbour to nextNeighbour), return
- * true, otherwise return false.
- */
 bool NeighbourChecker::isPointOnLine( QPointF point,
                                       QPointF linePointA,
                                       QPointF linePointB )
 {
+    PL_counter++;
     QPointF a = linePointA;
     QPointF b = linePointB;
     QPointF c = point;
@@ -186,6 +142,7 @@ bool NeighbourChecker::isPointOnLine( QPointF point,
 
 bool NeighbourChecker::isIntersecting(AABB a, AABB b )
 {
+    BB_counter++;
     return a.intersects( b );
 }
 

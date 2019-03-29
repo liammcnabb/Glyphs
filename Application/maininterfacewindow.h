@@ -35,8 +35,6 @@ public:
     QVector<TreeNode> getFullHierarchies() const;
     void setFullHierarchies(const QVector<TreeNode> &fullHierarchies);
 
-
-
     QStringList getValueHeaders() const;
     void setValueHeaders(const QStringList &valueHeaders);
 
@@ -68,9 +66,6 @@ public:
 private slots:
     void on_actionEngland_Example_triggered();
 
-    //    void on_lstHeaders_itemDoubleClicked(QListWidgetItem *item);
-
-
     void on_rdo_DebugCentroids_released();
 
     void on_rdo_EqualSegmentPie_released();
@@ -90,7 +85,6 @@ private slots:
     void on_AreaOpacity_valueChanged(int value);
 
     void on_chkColoredStarLines_toggled(bool checked);
-
 
     void on_rdoOutline_released();
 
