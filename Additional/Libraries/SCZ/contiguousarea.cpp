@@ -39,7 +39,6 @@ bool ContiguousArea::initPolygons( QVector<Polygon> input )
     m_polygons->clear();
     m_polygons->resize( input.size() );
     std::copy( input.begin(), input.end(), m_polygons->begin() );
-    //    m_polygons = new QVector<Polygon>(input);
 
     setupAABB(m_polygons);
     return true;
@@ -144,15 +143,6 @@ const Polygon& ContiguousArea::polygons( int value ) const
     return polygons().at( 0 );
 }
 
-bool ContiguousArea::treeReadyFlag() const
-{
-    return m_treeReadyFlag;
-}
-
-void ContiguousArea::setTreeReadyFlag( bool treeReadyFlag )
-{
-    m_treeReadyFlag = treeReadyFlag;
-}
 
 QVector<Polygon>& ContiguousArea::polygons() const
 {
