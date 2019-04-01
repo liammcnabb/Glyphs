@@ -31,7 +31,10 @@ public:
     Container* next = nullptr;
     Container* previous = nullptr;
     TreeNode* data;
-
+    /**
+     * @brief setData setter method for data held by container
+     * @param data to be held
+     */
     void setData( TreeNode* data );
 
 
